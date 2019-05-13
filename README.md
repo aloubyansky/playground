@@ -6,6 +6,8 @@
 
 You should see
 
+````
 compileClasspath - Compile classpath for source set 'main'.
 +--- io.playground:playground-bom:999-SNAPSHOT
 \--- commons-lang:commons-lang FAILED
+````
