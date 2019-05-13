@@ -1,0 +1,27 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>io.playground</groupId>
+  <artifactId>app</artifactId>
+  <version>1.0</version>
+  <packaging>jar</packaging>
+  <name>Playground - App</name>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.playground.groups</groupId>
+        <artifactId>group3</artifactId>
+        <version>1.0</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.playground.groups</groupId>
+        <artifactId>group2</artifactId>
+        <version>1.0</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>

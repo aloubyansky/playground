@@ -1,0 +1,25 @@
+<project>
+ <parent>
+   <groupId>io.playground.platform</groupId>
+   <artifactId>platform-parent</artifactId>
+   <version>1.0</version>
+ </parent>
+ <modelVersion>4.0.0</modelVersion>
+ <artifactId>platform-bom</artifactId>
+ <packaging>pom</packaging>
+ <name>Playground - Platform BOM</name>
+ <dependencyManagement>
+   <dependencies>
+     <dependency>
+       <groupId>io.playground.platform</groupId>
+       <artifactId>core</artifactId>
+       <version>1.0</version>
+     </dependency>
+     <dependency>
+       <groupId>io.playground.platform</groupId>
+       <artifactId>platform-bom-1.x</artifactId>
+       <version>${project.version}</version>
+     </dependency>
+   </dependencies>
+ </dependencyManagement>
+</project>
