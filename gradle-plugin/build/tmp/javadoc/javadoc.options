@@ -1,7 +1,0 @@
--classpath '/home/aloubyansky/git/playground/gradle-plugin/build/classes/java/main:/home/aloubyansky/git/playground/gradle-plugin/build/resources/main:/home/aloubyansky/.gradle/caches/5.4.1/generated-gradle-jars/gradle-api-5.4.1.jar:/home/aloubyansky/.gradle/wrapper/dists/gradle-5.4.1-bin/e75iq110yv9r9wt1a6619x2xm/gradle-5.4.1/lib/groovy-all-1.0-2.5.4.jar:/home/aloubyansky/.gradle/wrapper/dists/gradle-5.4.1-bin/e75iq110yv9r9wt1a6619x2xm/gradle-5.4.1/lib/gradle-installation-beacon-5.4.1.jar'
--d '/home/aloubyansky/git/playground/gradle-plugin/build/docs/javadoc'
--doctitle 'playground-gradle-plugin API'
--encoding 'UTF-8'
--quiet 
--windowtitle 'playground-gradle-plugin API'
-'/home/aloubyansky/git/playground/gradle-plugin/src/main/java/io/playground/gradle/PlaygroundPlugin.java'
