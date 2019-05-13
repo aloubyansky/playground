@@ -1,0 +1,14 @@
+pluginManagement {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == 'io.playground') {
+                useModule("io.playground:playground-gradle-plugin:${playgroundVersion}")
+            }
+        }
+    }
+}
