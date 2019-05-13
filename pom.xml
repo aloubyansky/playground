@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.jboss</groupId>
+        <artifactId>jboss-parent</artifactId>
+        <version>36</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.playground</groupId>
+    <artifactId>quarkus-platform-parent</artifactId>
+    <name>Quarkus universe - Parent pom</name>
+    <version>999-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <description>Quarkus Universe platform aggregates extensions from Quarkus Core and those developed by the community into a single compatible and versioned set that application developers can reference from their applications to align the dependency versions</description>
+    <url>https://github.com/quarkusio/quarkus-platform</url>
+
+    <developers>
+        <developer>
+            <id>quarkus</id>
+            <name>Quarkus Community</name>
+            <organization>Quarkus</organization>
+            <organizationUrl>https://quarkus.io</organizationUrl>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/quarkusio/quarkus-platform</url>
+        <connection>scm:git:git@github.com:quarkusio/quarkus-platform.git</connection>
+        <developerConnection>scm:git:git@github.com:quarkusio/quarkus-platform.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/quarkusio/quarkus/issues/</url>
+    </issueManagement>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <graalvmHome>${env.GRAALVM_HOME}</graalvmHome>
+        <postgres.url>jdbc:postgresql:hibernate_orm_test</postgres.url>
+
+        <quarkus.version>999-SNAPSHOT</quarkus.version>
+
+        <!-- After upgrading camel-quarkus regenerate the test modules by running
+
+             mvn validate -Pregen-camel -N
+        -->
+        <camel-quarkus.version>1.7.0</camel-quarkus.version>
+
+        <quarkus-qpid-jms.version>0.24.0</quarkus-qpid-jms.version>
+        <quarkus-hazelcast-client.version>1.1.1</quarkus-hazelcast-client.version>
+        <debezium.version>1.3.0.Final</debezium.version>
+        <debezium-quarkus-outbox.version>1.4.0.Final</debezium-quarkus-outbox.version>
+        <quarkus-blaze-persistence.version>1.6.0-Alpha2</quarkus-blaze-persistence.version>
+        <quarkus-cassandra-client.version>1.0.1</quarkus-cassandra-client.version>
+
+        <!-- After upgrading Kogito regenerate the test modules by running
+
+             mvn validate -Pregen-kogito -N
+        -->
+        <kogito-quarkus.version>1.4.1.Final</kogito-quarkus.version>
+        <optaplanner-quarkus.version>8.4.1.Final</optaplanner-quarkus.version>
+
+        <build-helper-maven-plugin.version>3.1.0</build-helper-maven-plugin.version>
+        <rpkgtests-maven-plugin.version>0.8.0</rpkgtests-maven-plugin.version>
+        <groovy-maven-plugin.version>2.1.1</groovy-maven-plugin.version>
+        <useReleaseProfile>true</useReleaseProfile>
+
+        <!-- descriptor overrides -->
+        <resourcesdir>${project.basedir}/src/main/resources</resourcesdir>
+        <overridesfile>
+            ${resourcesdir}/extensions-overrides.json
+        </overridesfile>
+    </properties>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>sonatype-nexus-release</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${build-helper-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <systemProperties>
+                            <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                        </systemProperties>
+                        <excludedGroups>quarkus-platform-ignore</excludedGroups>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <configuration>
+                        <excludedGroups>quarkus-platform-ignore</excludedGroups>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.gmaven</groupId>
+                    <artifactId>groovy-maven-plugin</artifactId>
+                    <version>${groovy-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.l2x6.rpkgtests</groupId>
+                    <artifactId>rpkgtests-maven-plugin</artifactId>
+                    <version>${rpkgtests-maven-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+                <version>0.0.9-SNAPSHOT</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>generate-platform-project</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>generate-platform-project</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>build-platform-project</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>invoke-platform-project</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <platformConfig>
+                        <!-- coordinates of the generated platform BOM -->
+                        <bom>${project.groupId}:playground-quarkus-platform-bom:${project.version}</bom>
+                        <!-- the platform stack key and version -->
+                        <platformStack>
+                            <key>${project.groupId}:playground-quarkus-platform-bom</key>
+                            <version>${project.version}</version>
+                        </platformStack>
+                        <!-- Quarkus core -->
+                        <core>
+                            <name>Core</name>
+                            <bom>io.quarkus:quarkus-bom:${quarkus.version}</bom>
+                            <release>
+                                <upcoming>${project.groupId}:quarkus-bom:${quarkus.version}-redhat-00001</upcoming>
+                            </release>
+                        </core>
+                        <!-- Platform members -->
+                        <members>
+                            <member>
+                                <name>OptaPlanner</name>
+                                <bom>org.optaplanner:optaplanner-bom:${optaplanner-quarkus.version}</bom>
+                                <release>
+                                    <upcoming>${project.groupId}:optaplanner-bom:${optaplanner-quarkus.version}-redhat-00001</upcoming>
+                                </release>
+                                <tests>
+                                    <artifact>org.optaplanner:optaplanner-quarkus-jackson-integration-test:${optaplanner-quarkus.version}</artifact>
+                                </tests>
+                            </member>
+                            <!-- member>
+                                <bom>org.kie.kogito:kogito-bom:${kogito-quarkus.version}</bom>
+                            </member -->
+                        </members>
+                        <!-- Platform BOM generator configuration -->
+                        <bomGenerator>
+                            <!-- Config to enforce specific versions and excluding dependencies -->
+                            <!--
+                            <enforcedDependencies>
+                                <dependency>groupId:artifactId:desired-version</dependency>
+                            </enforcedDependencies>
+                            <excludedDependencies>
+                                <dependency>groupId:artifactId</dependency>
+                            </excludedDependencies>
+                            <excludedGroups>
+                                <excludedGroup>groupId</excludedGroup>
+                            </excludedGroups>
+                            -->
+                            <excludedDependencies>
+                                <dependency>io.quarkus:quarkus-bom-quarkus-platform-descriptor:${quarkus.version}:json</dependency>
+                                <dependency>io.quarkus:quarkus-bom-quarkus-platform-properties::properties</dependency>
+                            </excludedDependencies>
+                        </bomGenerator>
+                        <descriptorGenerator>
+                            <overridesFile>${overridesfile}</overridesFile>
+                            <skipCategoryCheck>true</skipCategoryCheck>
+                        </descriptorGenerator>
+                    </platformConfig>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <!--
+                        ## IMPORTANT ##
+                        In your ~/.m2/settings.xml you need to add and edit the following profile:
+                        <profile>
+                            <id>release</id>
+                            <properties>
+                                <gpg.useagent>false</gpg.useagent>
+                                <gpg.executable>/usr/local/Cellar/gnupg@1.4/1.4.23_1/bin/gpg1</gpg.executable> <- use gpg1 on Mac OS X <gpg.homedir>~/.gnupg</gpg.homedir>  <- Update to your own directory <gpg.passphrase>******</gpg.passphrase> <- Add your passphrase </properties>
+                        </profile>
+                         -->
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>rhproduct</id>
+            <properties>
+                <overridesfile>
+                    ${resourcesdir}/extensions-overrides.json,
+                    ${resourcesdir}/extensions-support-overrides.json,
+                </overridesfile>
+            </properties>
+        </profile>
+
+    </profiles>
+
+</project>

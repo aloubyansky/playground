@@ -1,0 +1,69 @@
+{
+    "categories": [
+    {
+      "name": "Integration",
+      "id": "integration",
+      "description": "Connectors to read to write from a skew of systems (file, S#, Twitter, etc)",
+      "metadata": {
+        "pinned": [
+          "org.apache.camel.quarkus:camel-quarkus-core",
+          "org.apache.camel.quarkus:camel-quarkus-core-xml"
+        ]
+      }
+    },
+    {
+      "name": "Business Automation",
+      "id": "business-automation",
+      "description": "Rules engine, BPM, etc"
+    }
+    ],
+      "extensions": [
+        {
+            "name": "Camel Quarkus LZF",
+            "description": "Camel LZF compression support",
+            "group-id": "org.apache.camel.quarkus",
+            "artifact-id": "camel-quarkus-lzf"
+        },
+        {
+            "name": "Camel Quarkus Zip Deflate",
+            "description": "Camel Zip Deflate compression support",
+            "group-id": "org.apache.camel.quarkus",
+            "artifact-id": "camel-quarkus-zip-deflater"
+        },
+        {
+            "group-id": "io.quarkus",
+            "artifact-id": "quarkus-kogito",
+            "metadata": {
+               "unlisted": true
+            }
+        },
+        {
+            "group-id": "io.quarkus",
+            "artifact-id": "quarkus-optaplanner",
+            "metadata": {
+               "unlisted": true
+            }
+        },
+        {
+            "group-id": "io.quarkus",
+            "artifact-id": "quarkus-optaplanner-jackson",
+            "metadata": {
+               "unlisted": true
+            }
+        },
+        {
+            "group-id": "io.quarkus",
+            "artifact-id": "quarkus-optaplanner-jsonb",
+            "metadata": {
+               "unlisted": true
+            }
+        },
+        {
+            "group-id": "io.quarkus",
+            "artifact-id": "quarkus-funqy-knative",
+            "metadata": {
+               "unlisted": true
+            }
+        }
+    ]
+}
