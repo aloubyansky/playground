@@ -10,39 +10,25 @@
     <maven.compiler.source>1.8</maven.compiler.source>
   </properties>
   <modules>
-  	<module>api</module>
-  	<module>red</module>
-  	<module>main</module>
-  	<module>initializer</module>
-  	<module>blue</module>
-  	<module>green</module>
-  	<module>factory</module>
+    <module>plugin</module>
+    <module>bom</module>
+    <module>app</module>
   </modules>
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>factory</artifactId>
+        <artifactId>playground-maven-plugin</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>api</artifactId>
+        <artifactId>playground-bom</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>red</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>blue</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>initializer</artifactId>
+        <artifactId>playground-app</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>
