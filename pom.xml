@@ -10,20 +10,14 @@
     <maven.compiler.source>1.8</maven.compiler.source>
   </properties>
   <modules>
-    <module>plugin</module>
-    <module>bom</module>
+    <module>mvn-ext</module>
     <module>app</module>
   </modules>
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>playground-maven-plugin</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>playground-bom</artifactId>
+        <artifactId>playground-mvn-ext</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
