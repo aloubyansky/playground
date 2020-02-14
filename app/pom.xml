@@ -10,7 +10,7 @@
     <dependencies>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>playground-bom</artifactId>
+        <artifactId>playground-bom3</artifactId>
         <type>pom</type>
         <scope>import</scope>
         <version>${project.version}</version>

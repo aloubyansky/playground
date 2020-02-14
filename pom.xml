@@ -12,6 +12,7 @@
   <modules>
     <module>plugin</module>
     <module>bom</module>
+    <module>bom2</module>
     <module>app</module>
   </modules>
   <dependencyManagement>
@@ -24,6 +25,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>playground-bom</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>playground-bom2</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
