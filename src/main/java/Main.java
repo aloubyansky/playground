@@ -20,6 +20,7 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
 import io.quarkus.bootstrap.resolver.AppModelResolverException;
 import io.quarkus.bootstrap.resolver.maven.MavenArtifactResolver;
+import io.quarkus.bootstrap.resolver.maven.MavenRepoInitializer;
 import io.quarkus.bootstrap.resolver.maven.workspace.ModelUtils;
 import io.quarkus.bootstrap.util.IoUtils;
 
@@ -172,7 +173,7 @@ public class Main {
 		} else {
 			debug("Using Maven settings %s", p);
 		}
-		System.setProperty(MAVEN_CMD_LINE_ARGS, "-s " + s);
+		System.setProperty(MavenRepoInitializer.QUARKUS_INTERNAL_MAVEN_CMD_LINE_ARGS, "-s " + s);
 		return p;
 	}
 
