@@ -1,0 +1,23 @@
+<settings>
+
+  <localRepository>tmp-repo</localRepository>
+
+  <profiles>
+    <profile>
+      <id>settings-profile</id>
+      <repositories>
+        <repository>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+          <id>central</id>
+          <name>Settings Central Repository</name>
+          <url>http://custom.settings.repo</url>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>settings-profile</activeProfile>
+  </activeProfiles>
+</settings>
