@@ -1,0 +1,56 @@
+plugins {
+    id 'java'
+    id 'io.quarkus'
+}
+
+repositories {
+     mavenLocal()
+     mavenCentral()
+}
+
+///
+/// Group details
+///
+group = 'io.rogue.quarkus-test'
+
+
+// ----------------------------------------------------
+//
+// Configure the common settings for all projects.
+//
+// ----------------------------------------------------
+
+allprojects { Project it ->
+    it.buildDir = file(rootDir.path + File.separator + 'tmp' + File.separator + rootProject.relativePath(projectDir))
+}
+
+dependencies {
+
+    // Enforce the Quarkus BOM for various dependencies.
+    implementation enforcedPlatform(platform("io.quarkus:quarkus-bom:$quarkusPlatformVersion"))
+
+    implementation 'io.quarkus:quarkus-resteasy-jsonb'
+
+    testImplementation 'io.quarkus:quarkus-junit5'
+    testImplementation 'io.rest-assured:rest-assured'
+    testImplementation 'org.apache.sshd:sshd-scp:2.3.0'
+    testImplementation 'org.apache.sshd:sshd-sftp:2.3.0'
+}
+
+compileJava {
+    options.compilerArgs << '-parameters'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+test {
+    // Show standard streams on the console.
+    testLogging {
+        showStandardStreams = true
+    }
+
+    systemProperty 'quarkus.http.host', 'localhost'
+}

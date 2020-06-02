@@ -1,0 +1,35 @@
+pluginManagement {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    plugins {
+      id 'io.quarkus' version "${quarkusPluginVersion}"
+    }
+}
+
+rootProject.name = 'quarkus-sample'
+
+// Find the directories containing a "build.gradle" file in the modules directory
+/*
+['modules'].each {
+    def subDirs = new File(rootDir, it).listFiles(new FileFilter() {
+        boolean accept(File file) {
+            if (!file.isDirectory()) {
+                return false
+            }
+            return new File(file, 'build.gradle').isFile()
+        }
+    })
+
+
+    subDirs.each { File dir ->
+        String projectName = ":${rootProject.name}-${dir.name}"
+        include projectName
+
+        // Set the project directory for them as well.
+        project(projectName).projectDir = dir
+    }
+}
+*/
