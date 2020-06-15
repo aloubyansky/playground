@@ -5,21 +5,20 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.Objects;
 
 import org.eclipse.aether.artifact.Artifact;
 
-public abstract class DetectedReleasesFileWriter implements DetectedReleasesCallback {
+public abstract class DecomposedBomReportFileWriter implements DecomposedBomVisitor {
 
 	private final Path reportFile;
 	private BufferedWriter writer;
 
-	public DetectedReleasesFileWriter(String name) {
+	public DecomposedBomReportFileWriter(String name) {
 		this(Paths.get(name));
 	}
 
-	public DetectedReleasesFileWriter(Path p) {
+	public DecomposedBomReportFileWriter(Path p) {
 		Objects.requireNonNull(p);
 		reportFile = p;
 	}
@@ -34,7 +33,7 @@ public abstract class DetectedReleasesFileWriter implements DetectedReleasesCall
 	}
 
 	@Override
-	public void startBom(Artifact bomArtifact) {
+	public void enterBom(Artifact bomArtifact) {
 		try {
 			if (!Files.exists(reportFile)) {
 				final Path parentDir = reportFile.isAbsolute() ? reportFile.getParent() : reportFile.normalize().toAbsolutePath().getParent();
@@ -53,19 +52,19 @@ public abstract class DetectedReleasesFileWriter implements DetectedReleasesCall
 	protected abstract void writeStartBom(BufferedWriter writer, Artifact bomArtifact) throws IOException;
 
 	@Override
-	public void startReleaseOrigin(ReleaseOrigin releaseOrigin) {
+	public boolean enterReleaseOrigin(ReleaseOrigin releaseOrigin, int versions) {
 		try {
-			writeStartReleaseOrigin(writer, releaseOrigin);
+			return writeStartReleaseOrigin(writer, releaseOrigin, versions);
 		} catch(Exception e) {
 			close();
 			throw new IllegalStateException("Failed to write release origin " + releaseOrigin + " to " + reportFile, e);
 		}
 	}
 
-	protected abstract void writeStartReleaseOrigin(BufferedWriter writer, ReleaseOrigin releaseOrigin) throws IOException;
+	protected abstract boolean writeStartReleaseOrigin(BufferedWriter writer, ReleaseOrigin releaseOrigin, int versions) throws IOException;
 
 	@Override
-	public void endReleaseOrigin(ReleaseOrigin releaseOrigin) {
+	public void leaveReleaseOrigin(ReleaseOrigin releaseOrigin) {
 		try {
 			writeEndReleaseOrigin(writer, releaseOrigin);
 		} catch(Exception e) {
@@ -77,31 +76,19 @@ public abstract class DetectedReleasesFileWriter implements DetectedReleasesCall
 	protected abstract void writeEndReleaseOrigin(BufferedWriter writer, ReleaseOrigin releaseOrigin) throws IOException;
 
 	@Override
-	public void startReleaseVersion(ReleaseVersion releaseVersion, Collection<Artifact> artifacts) {
+	public void visitProjectRelease(ProjectRelease release) {
 		try {
-			writeStartReleaseVersion(writer, releaseVersion, artifacts);
+			writeProjectRelease(writer, release);
 		} catch (Exception e) {
 			close();
-			throw new IllegalStateException("Failed to write release version " + releaseVersion + " to " + reportFile, e);
+			throw new IllegalStateException("Failed to write release " + release.id() + " to " + reportFile, e);
 		}
 	}
 
-	protected abstract void writeStartReleaseVersion(BufferedWriter writer, ReleaseVersion releaseVersion, Collection<Artifact> artifacts) throws IOException;
+	protected abstract void writeProjectRelease(BufferedWriter writer, ProjectRelease release) throws IOException;
 
 	@Override
-	public void endReleaseVersion(ReleaseVersion releaseVersion) {
-		try {
-			writeEndReleaseVersion(writer, releaseVersion);
-		} catch (Exception e) {
-			close();
-			throw new IllegalStateException("Failed to write release version " + releaseVersion + " to " + reportFile, e);
-		}
-	}
-
-	protected abstract void writeEndReleaseVersion(BufferedWriter writer, ReleaseVersion releaseVersion) throws IOException;
-
-	@Override
-	public void endBom() {
+	public void leaveBom() {
 		try {
 			writeEndBom(writer);
 		} catch (Exception e) {

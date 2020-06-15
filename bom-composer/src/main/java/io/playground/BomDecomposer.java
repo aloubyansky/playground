@@ -2,10 +2,7 @@ package io.playground;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -48,11 +45,6 @@ public class BomDecomposer {
 			return this;
 		}
 
-		public BomDecomposerConfig setDetectedReleasesCallback(DetectedReleasesCallback detectedReleasesCallback) {
-			releasesCallback = detectedReleasesCallback;
-			return this;
-		}
-
 		public DecomposedBom decompose() throws BomDecomposerException {
 			return BomDecomposer.this.decompose();
 		}
@@ -69,7 +61,7 @@ public class BomDecomposer {
 	private Artifact bomArtifact;
 	private MavenArtifactResolver mvnResolver;
 	private List<ReleaseIdDetector> releaseDetectors = new ArrayList<>();
-	private DetectedReleasesCallback releasesCallback;
+	private DecomposedBomBuilder decomposedBuilder;
 
 	private MavenArtifactResolver artifactResolver() throws BomDecomposerException {
 		try {
@@ -87,21 +79,12 @@ public class BomDecomposer {
 
 		final ArtifactDescriptorResult descriptor = describe(bomArtifact);
 
-		Map<ReleaseOrigin, Map<ReleaseVersion, List<Artifact>>> releases = new HashMap<>();
+		final DecomposedBomBuilder bomBuilder = decomposedBuilder == null ? new DefaultDecomposedBomBuilder() : decomposedBuilder;
+		bomBuilder.bomArtifact(bomArtifact);
 		for (Dependency dep : descriptor.getManagedDependencies()) {
 			try {
 				final ReleaseId releaseId = releaseId(dep.getArtifact());
-				Map<ReleaseVersion, List<Artifact>> versions = releases.get(releaseId.getOrigin());
-				if (versions == null) {
-					versions = new HashMap<>();
-					releases.put(releaseId.getOrigin(), versions);
-				}
-				List<Artifact> list = versions.get(releaseId.getVersion());
-				if (list == null) {
-					list = new ArrayList<>();
-					versions.put(releaseId.getVersion(), list);
-				}
-				list.add(dep.getArtifact());
+				bomBuilder.bomDependency(releaseId, dep.getArtifact());
 			} catch (BomDecomposerException e) {
 				if (e.getCause() instanceof AppModelResolverException) {
 					debug("Failed to resolve POM for %s", dep.getArtifact());
@@ -110,32 +93,6 @@ public class BomDecomposer {
 				}
 			}
 		}
-
-		if (releasesCallback != null) {
-			releasesCallback.startBom(bomArtifact);
-			List<ReleaseOrigin> origins = new ArrayList<>(releases.keySet());
-			for (ReleaseOrigin origin : origins) {
-				releasesCallback.startReleaseOrigin(origin);
-				for (Map.Entry<ReleaseVersion, List<Artifact>> v : releases.get(origin).entrySet()) {
-					releasesCallback.startReleaseVersion(v.getKey(), v.getValue());
-					releasesCallback.endReleaseVersion(v.getKey());
-				}
-				releasesCallback.endReleaseOrigin(origin);
-			}
-			releasesCallback.endBom();
-		}
-
-		/*
-		 * final Model rawModel = readModel(bomArtifact.getFile());
-		 * if(rawModel.getDependencyManagement() != null) { for(Dependency d :
-		 * rawModel.getDependencyManagement().getDependencies()) {
-		 * if(d.getScope().equals("import") && d.getType().equals("pom")) {
-		 *
-		 * } } }
-		 */
-
-		final DecomposedBom.Builder bomBuilder = DecomposedBom.builder();
-		bomBuilder.setArtifact(bomArtifact);
 
 		return bomBuilder.build();
 	}
@@ -238,7 +195,7 @@ public class BomDecomposer {
 	}
 
 	public static void main(String[] args) throws Exception {
-		BomDecomposer.config().debug().bomArtifact("io.quarkus", "quarkus-universe-bom-deployment", "1.5.0.Final")
+		BomDecomposer.config().debug().bomArtifact("io.quarkus", "quarkus-universe-bom-deployment", "1.5.1.Final")
 				.addReleaseDetector(new ReleaseIdDetector() {
 					@Override
 					public ReleaseId detectReleaseId(BomDecomposer decomposer, Artifact artifact)
@@ -256,8 +213,7 @@ public class BomDecomposer {
 						return ReleaseIdFactory.create(ReleaseOrigin.Factory.scmConnection("org.apache.kafka"),
 								ReleaseVersion.Factory.version(ModelUtils.getVersion(decomposer.model(artifact))));
 					}
-				})
-				.addReleaseDetector(new ReleaseIdDetector() {
+				}).addReleaseDetector(new ReleaseIdDetector() {
 					@Override
 					public ReleaseId detectReleaseId(BomDecomposer decomposer, Artifact artifact)
 							throws BomDecomposerException {
@@ -267,8 +223,7 @@ public class BomDecomposer {
 						return ReleaseIdFactory.create(ReleaseOrigin.Factory.scmConnection("io.vertx"),
 								ReleaseVersion.Factory.version(ModelUtils.getVersion(decomposer.model(artifact))));
 					}
-				})
-				.addReleaseDetector(new ReleaseIdDetector() {
+				}).addReleaseDetector(new ReleaseIdDetector() {
 					@Override
 					public ReleaseId detectReleaseId(BomDecomposer decomposer, Artifact artifact)
 							throws BomDecomposerException {
@@ -278,8 +233,6 @@ public class BomDecomposer {
 						return ReleaseIdFactory.create(ReleaseOrigin.Factory.scmConnection("com.fasterxml.jackson"),
 								ReleaseVersion.Factory.version(ModelUtils.getVersion(decomposer.model(artifact))));
 					}
-				})
-				.setDetectedReleasesCallback(DetectedReleasesHtmlWriter.builder("releases.html").build())
-				.decompose();
+				}).decompose().visit(DecomposedBomHtmlReportGenerator.builder("target/releases.html").skipSingleReleases().build());
 	}
 }

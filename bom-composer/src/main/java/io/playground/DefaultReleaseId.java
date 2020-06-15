@@ -52,12 +52,12 @@ public class DefaultReleaseId implements ReleaseId {
 	}
 
 	@Override
-	public ReleaseOrigin getOrigin() {
+	public ReleaseOrigin origin() {
 		return origin;
 	}
 
 	@Override
-	public ReleaseVersion getVersion() {
+	public ReleaseVersion version() {
 		return version;
 	}
 }

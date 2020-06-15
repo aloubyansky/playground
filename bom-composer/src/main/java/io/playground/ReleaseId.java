@@ -2,7 +2,7 @@ package io.playground;
 
 public interface ReleaseId {
 
-	ReleaseOrigin getOrigin();
+	ReleaseOrigin origin();
 
-	ReleaseVersion getVersion();
+	ReleaseVersion version();
 }

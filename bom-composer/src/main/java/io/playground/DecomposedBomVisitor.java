@@ -7,7 +7,7 @@ import org.eclipse.aether.artifact.Artifact;
 /**
  * Callback that receives events on detected releases and their content
  */
-public interface DetectedReleasesCallback {
+public interface DecomposedBomVisitor {
 
 	/**
 	 * Called only once at the beginning of the processing to communicate the BOM artifact
@@ -15,19 +15,19 @@ public interface DetectedReleasesCallback {
 	 *
 	 * @param bomArtifact  BOM that is being analyzed
 	 */
-	void startBom(Artifact bomArtifact);
+	void enterBom(Artifact bomArtifact);
 
 	/**
 	 * Called for every new detected release origin.
 	 * This callback method will be followed up by one or more
-	 * {@link #startReleaseVersion(ReleaseVersion, Collection)} invocations for the detected
+	 * {@link #enterReleaseVersion(ReleaseVersion, Collection)} invocations for the detected
 	 * release versions from this origin.
 	 *
 	 * @param releaseOrigin  new detected release origin
 	 */
-	void startReleaseOrigin(ReleaseOrigin releaseOrigin);
+	boolean enterReleaseOrigin(ReleaseOrigin releaseOrigin, int versions);
 
-	void endReleaseOrigin(ReleaseOrigin releaseOrigin);
+	void leaveReleaseOrigin(ReleaseOrigin releaseOrigin);
 
 	/**
 	 * Called for every new release version.
@@ -35,12 +35,10 @@ public interface DetectedReleasesCallback {
 	 * @param releaseVersion  release version
 	 * @param artifacts  artifacts included in the release version
 	 */
-	void startReleaseVersion(ReleaseVersion releaseVersion, Collection<Artifact> artifacts);
-
-	void endReleaseVersion(ReleaseVersion releaseVersion);
+	void visitProjectRelease(ProjectRelease release);
 
 	/**
 	 * Called after the last processed release version in the BOM.
 	 */
-	void endBom();
+	void leaveBom();
 }

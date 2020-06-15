@@ -6,10 +6,10 @@ public interface ReleaseVersion {
 
 	class Factory {
 		public static ReleaseVersion tag(String tag) {
-			return new StringReleaseVersion("tag", tag);
+			return new StringReleaseVersion("Tag", tag);
 		}
 		public static ReleaseVersion version(String version) {
-			return new StringReleaseVersion("version", version);
+			return new StringReleaseVersion("Version", version);
 		}
 	}
 
@@ -22,7 +22,7 @@ public interface ReleaseVersion {
 		}
 		@Override
 		public String toString() {
-			return value + "(" + type + ")";
+			return type + ": " + value;
 		}
 		@Override
 		public int hashCode() {
