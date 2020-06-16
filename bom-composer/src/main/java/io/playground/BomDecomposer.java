@@ -195,8 +195,22 @@ public class BomDecomposer {
 	}
 
 	public static void main(String[] args) throws Exception {
-		BomDecomposer.config().debug().bomArtifact("io.quarkus", "quarkus-universe-bom-deployment", "1.5.1.Final")
+		BomDecomposer.config().debug().bomArtifact("io.quarkus", "quarkus-bom-deployment", "999-SNAPSHOT")
 				.addReleaseDetector(new ReleaseIdDetector() {
+					@Override
+					public ReleaseId detectReleaseId(BomDecomposer decomposer, Artifact artifact)
+							throws BomDecomposerException {
+						if(!artifact.getGroupId().startsWith("org.junit")) {
+							return null;
+						}
+						if(artifact.getGroupId().startsWith("org.junit.platform")) {
+							return ReleaseIdFactory.create(ReleaseOrigin.Factory.scmConnection("org.junit.platform"),
+									ReleaseVersion.Factory.version(ModelUtils.getVersion(decomposer.model(artifact))));
+						}
+						return null;
+					}
+
+				}).addReleaseDetector(new ReleaseIdDetector() {
 					@Override
 					public ReleaseId detectReleaseId(BomDecomposer decomposer, Artifact artifact)
 							throws BomDecomposerException {
@@ -218,6 +232,9 @@ public class BomDecomposer {
 					public ReleaseId detectReleaseId(BomDecomposer decomposer, Artifact artifact)
 							throws BomDecomposerException {
 						if (!artifact.getGroupId().startsWith("io.vertx")) {
+							return null;
+						}
+						if(artifact.getArtifactId().equals("vertx-docgen")) {
 							return null;
 						}
 						return ReleaseIdFactory.create(ReleaseOrigin.Factory.scmConnection("io.vertx"),
