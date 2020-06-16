@@ -16,7 +16,7 @@ public class DefaultReleaseId implements ReleaseId {
 	public String toString() {
 		final StringBuilder buf = new StringBuilder();
 		buf.append(origin);
-		buf.append('#').append(version);
+		buf.append('#').append(version.asString());
 		return buf.toString();
 	}
 

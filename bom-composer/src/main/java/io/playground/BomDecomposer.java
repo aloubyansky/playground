@@ -3,6 +3,9 @@ package io.playground;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -45,6 +48,11 @@ public class BomDecomposer {
 			return this;
 		}
 
+		public BomDecomposerConfig transformer(DecomposedBomTransformer bomTransformer) {
+			transformer = bomTransformer;
+			return this;
+		}
+		
 		public DecomposedBom decompose() throws BomDecomposerException {
 			return BomDecomposer.this.decompose();
 		}
@@ -62,10 +70,12 @@ public class BomDecomposer {
 	private MavenArtifactResolver mvnResolver;
 	private List<ReleaseIdDetector> releaseDetectors = new ArrayList<>();
 	private DecomposedBomBuilder decomposedBuilder;
+	private DecomposedBomTransformer transformer;
 
 	private MavenArtifactResolver artifactResolver() throws BomDecomposerException {
 		try {
-			return mvnResolver == null ? mvnResolver = new MavenArtifactResolver(new BootstrapMavenContext())
+			return mvnResolver == null ? mvnResolver = new MavenArtifactResolver(new BootstrapMavenContext(
+					BootstrapMavenContext.config().setArtifactTransferLogging(false)))
 					: mvnResolver;
 		} catch (AppModelResolverException e) {
 			throw new BomDecomposerException("Failed to initialize Maven artifact resolver", e);
@@ -83,8 +93,7 @@ public class BomDecomposer {
 		bomBuilder.bomArtifact(bomArtifact);
 		for (Dependency dep : descriptor.getManagedDependencies()) {
 			try {
-				final ReleaseId releaseId = releaseId(dep.getArtifact());
-				bomBuilder.bomDependency(releaseId, dep.getArtifact());
+				bomBuilder.bomDependency(releaseId(dep.getArtifact()), dep.getArtifact());
 			} catch (BomDecomposerException e) {
 				if (e.getCause() instanceof AppModelResolverException) {
 					debug("Failed to resolve POM for %s", dep.getArtifact());
@@ -94,7 +103,7 @@ public class BomDecomposer {
 			}
 		}
 
-		return bomBuilder.build();
+		return transformer == null ? bomBuilder.build() : transformer.transform(this, bomBuilder.build());
 	}
 
 	private boolean print;
@@ -195,7 +204,9 @@ public class BomDecomposer {
 	}
 
 	public static void main(String[] args) throws Exception {
-		BomDecomposer.config().debug().bomArtifact("io.quarkus", "quarkus-bom-deployment", "999-SNAPSHOT")
+		BomDecomposer.config()
+				.debug()
+				.bomArtifact("io.quarkus", "quarkus-universe-bom-deployment", "1.5.1.Final")
 				.addReleaseDetector(new ReleaseIdDetector() {
 					@Override
 					public ReleaseId detectReleaseId(BomDecomposer decomposer, Artifact artifact)
@@ -210,7 +221,8 @@ public class BomDecomposer {
 						return null;
 					}
 
-				}).addReleaseDetector(new ReleaseIdDetector() {
+				})
+				.addReleaseDetector(new ReleaseIdDetector() {
 					@Override
 					public ReleaseId detectReleaseId(BomDecomposer decomposer, Artifact artifact)
 							throws BomDecomposerException {
@@ -227,7 +239,8 @@ public class BomDecomposer {
 						return ReleaseIdFactory.create(ReleaseOrigin.Factory.scmConnection("org.apache.kafka"),
 								ReleaseVersion.Factory.version(ModelUtils.getVersion(decomposer.model(artifact))));
 					}
-				}).addReleaseDetector(new ReleaseIdDetector() {
+				})
+				.addReleaseDetector(new ReleaseIdDetector() {
 					@Override
 					public ReleaseId detectReleaseId(BomDecomposer decomposer, Artifact artifact)
 							throws BomDecomposerException {
@@ -240,7 +253,8 @@ public class BomDecomposer {
 						return ReleaseIdFactory.create(ReleaseOrigin.Factory.scmConnection("io.vertx"),
 								ReleaseVersion.Factory.version(ModelUtils.getVersion(decomposer.model(artifact))));
 					}
-				}).addReleaseDetector(new ReleaseIdDetector() {
+				})
+				.addReleaseDetector(new ReleaseIdDetector() {
 					@Override
 					public ReleaseId detectReleaseId(BomDecomposer decomposer, Artifact artifact)
 							throws BomDecomposerException {
@@ -250,6 +264,66 @@ public class BomDecomposer {
 						return ReleaseIdFactory.create(ReleaseOrigin.Factory.scmConnection("com.fasterxml.jackson"),
 								ReleaseVersion.Factory.version(ModelUtils.getVersion(decomposer.model(artifact))));
 					}
-				}).decompose().visit(DecomposedBomHtmlReportGenerator.builder("target/releases.html").skipSingleReleases().build());
+				})
+				.transformer(new DecomposedBomTransformer() {
+					@Override
+					public DecomposedBom transform(BomDecomposer decomposer, DecomposedBom decomposedBom) throws BomDecomposerException {
+						log("Transforming Decomposed " + decomposedBom.bomArtifact());
+						decomposedBom.visit(new NoopDecomposedBomVisitor() {
+
+							final List<ProjectRelease> releases = new ArrayList<>();
+							ReleaseVersion latestVersion;
+							ArtifactVersion latestMvnVersion;
+							final StringBuilder buf = new StringBuilder();
+							
+							@Override
+							public boolean enterReleaseOrigin(ReleaseOrigin releaseOrigin, int versions) {
+								return versions > 1;
+							}
+
+							@Override
+							public void leaveReleaseOrigin(ReleaseOrigin releaseOrigin) {
+
+								log("Origin: " + releaseOrigin);
+								log("  Latest version: " + latestMvnVersion);
+								final String latestVersionStr = latestMvnVersion.toString();
+								for(ProjectRelease release : releases) {
+									if(release.id.version().equals(latestVersion)) {
+										continue;
+									}
+									log("  Release " + release.id.version().asString());
+									for(Artifact artifact : release.artifacts) {
+										final Artifact updatedArtifact = artifact.setVersion(latestVersionStr);
+										try {
+											decomposer.resolve(updatedArtifact);
+											buf.setLength(0);
+											buf.append("  - ").append(artifact);
+											buf.append(" -> ").append(latestVersionStr);
+											log(buf.toString());
+										} catch (BomDecomposerException e) {
+										}
+									}
+								}
+
+								latestVersion = null;
+								latestMvnVersion = null;
+								releases.clear();
+							}
+
+							@Override
+							public void visitProjectRelease(ProjectRelease release) {
+								final DefaultArtifactVersion mvnVersion = new DefaultArtifactVersion(release.id.version().asString());
+								if(latestMvnVersion == null || latestMvnVersion.compareTo(mvnVersion) < 0) {
+									latestVersion = release.id().version();
+									latestMvnVersion = mvnVersion;
+								}
+								releases.add(release);
+							}
+						});
+						return decomposedBom;
+					}
+				})
+				.decompose()
+				.visit(DecomposedBomHtmlReportGenerator.builder("target/releases.html").skipSingleReleases().build());
 	}
 }

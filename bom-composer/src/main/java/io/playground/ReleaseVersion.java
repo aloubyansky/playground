@@ -13,12 +13,18 @@ public interface ReleaseVersion {
 		}
 	}
 
+	String asString();
+	
 	class StringReleaseVersion implements ReleaseVersion {
 		final String type;
 		final String value;
 		StringReleaseVersion(String type, String value) {
 			this.type = Objects.requireNonNull(type);
 			this.value = Objects.requireNonNull(value);
+		}
+		@Override
+		public String asString() {
+			return value;
 		}
 		@Override
 		public String toString() {
