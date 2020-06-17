@@ -78,7 +78,7 @@ public class BomDecomposer {
 	private MavenArtifactResolver artifactResolver() throws BomDecomposerException {
 		try {
 			return mvnResolver == null ? mvnResolver = new MavenArtifactResolver(new BootstrapMavenContext(
-					BootstrapMavenContext.config().setArtifactTransferLogging(false)))
+					BootstrapMavenContext.config().setArtifactTransferLogging(debug)))
 					: mvnResolver;
 		} catch (AppModelResolverException e) {
 			throw new BomDecomposerException("Failed to initialize Maven artifact resolver", e);
@@ -192,7 +192,7 @@ public class BomDecomposer {
 		}
 	}
 
-	private void debug(String msg) {
+	private void debug(Object msg) {
 		if (debug) {
 			log(msg);
 		}
@@ -271,7 +271,7 @@ public class BomDecomposer {
 				.transformer(new DecomposedBomTransformer() {
 					@Override
 					public DecomposedBom transform(BomDecomposer decomposer, DecomposedBom decomposedBom) throws BomDecomposerException {
-						log("Transforming Decomposed " + decomposedBom.bomArtifact());
+						decomposer.debug("Transforming decomposed %s", decomposedBom.bomArtifact);
 						decomposedBom.visit(new NoopDecomposedBomVisitor() {
 
 							final List<ProjectRelease> releases = new ArrayList<>();
@@ -328,6 +328,7 @@ public class BomDecomposer {
 								versions.put(release.id.version().asString(), release.id());
 							}
 						});
+						decomposer.debug("Transformed decomposed BOM %s", decomposedBom.bomArtifact);
 						return decomposedBom;
 					}
 
@@ -341,6 +342,8 @@ public class BomDecomposer {
 					}
 				})
 				.decompose()
-				.visit(DecomposedBomHtmlReportGenerator.builder("target/releases.html").skipSingleReleases().build());
+				.visit(DecomposedBomHtmlReportGenerator.builder("target/releases.html")
+						.skipSingleReleases()
+						.build());
 	}
 }

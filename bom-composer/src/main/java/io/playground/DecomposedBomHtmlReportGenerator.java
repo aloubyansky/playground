@@ -101,7 +101,10 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 
 		openTag("body");
 
-		writeTag("h1", "Project Releases Detected in " + bomArtifact);
+		writeTag("h1", "Multi Module Project Releases Detected in " + bomArtifact);
+		if(skipSingleReleases) {
+		    writeTag("p", "color:IndianRed", "Release origins with a single release version were skipped");
+		}
 	}
 
 	@Override
