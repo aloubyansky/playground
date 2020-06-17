@@ -3,8 +3,15 @@ package io.playground;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.eclipse.aether.artifact.Artifact;
 
 public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWriter {
@@ -45,6 +52,10 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 	private int releaseVersionsTotal;
 	private int artifactsTotal;
 	private boolean skipSingleReleases;
+
+	private Map<String, ProjectDependency> allDeps = new HashMap<>();
+	private int originReleaseVersions;
+	private List<ArtifactVersion> releaseVersions = new ArrayList<>();
 
 	private DecomposedBomHtmlReportGenerator(String file) {
 		super(file);
@@ -95,49 +106,58 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 
 	@Override
 	protected boolean writeStartReleaseOrigin(BufferedWriter writer, ReleaseOrigin releaseOrigin, int versions) throws IOException {
-		if(skipSingleReleases && versions < 2) {
-			return false;
-		}
-		offsetLine("<button class=\"accordion\">" + releaseOrigin + (versions > 1 ? " (" + versions + ")" : "") + "</button>");
-		offsetLine("<div class=\"panel\">");
-		openTag("ul");
-		++releaseOriginsTotal;
-		return true;
+		originReleaseVersions = versions;
+		return !skipSingleReleases || versions > 1;
 	}
 
 	@Override
 	protected void writeEndReleaseOrigin(BufferedWriter writer, ReleaseOrigin releaseOrigin) throws IOException {
-		closeTag("ul");
+		offsetLine("<button class=\"accordion\">" + releaseOrigin + (originReleaseVersions > 1 ? " (" + originReleaseVersions + ")" : "") + "</button>");
+		offsetLine("<div class=\"panel\">");
+
+		Collections.sort(releaseVersions);
+		final List<String> stringVersions = releaseVersions.stream().map(v -> v.toString()).collect(Collectors.toList());
+
+		final List<String> sortedKeys = new ArrayList<>(allDeps.keySet());
+		Collections.sort(sortedKeys);
+		openTag("table");
+		int i = 1;
+		for(String key : sortedKeys) {
+			openTag("tr");
+			writeTag("td", i++ + ")");
+			final ProjectDependency dep = allDeps.get(key);
+			writeTag("td", dep.artifact());
+			for(String version : stringVersions) {
+				if(version.equals(dep.releaseId().version().asString())) {
+					writeTag("td", version);
+				} else if(dep.isUpdateAvailable() && dep.availableUpdate().getVersion().equals(version)) {
+					offset();
+					append("<td style=\"color:gray\">" + version + "</td>");
+					newLine();
+				} else {
+					emptyTag("td");
+				}
+			}
+			closeTag("tr");
+		}
+		closeTag("table");
+
 		offsetLine("</div>");
+
+		++releaseOriginsTotal;
+		artifactsTotal += allDeps.size();
+		allDeps.clear();
+		releaseVersionsTotal += releaseVersions.size();
+		releaseVersions.clear();
 	}
 
 	@Override
 	protected void writeProjectRelease(BufferedWriter writer, ProjectRelease release) throws IOException {
 		final List<ProjectDependency> deps = release.dependencies();
-
-		openTag("li");
-		offsetLine("<button class=\"accordion\">" + release.id().version() + " (" + deps.size() + ")</button>");
-		offsetLine("<div class=\"panel\">");
-
-		openTag("table");
-		int i = 1;
+        releaseVersions.add(new DefaultArtifactVersion(release.id().version().asString()));
 		for(ProjectDependency dep : deps) {
-			openTag("tr");
-			writeTag("td", i++ + ")");
-			final StringBuilder buf = new StringBuilder();
-			final Artifact artifact = dep.artifact();
-			buf.append(artifact.getGroupId()).append(':').append(artifact.getArtifactId()).append(':').append(artifact.getClassifier()).append(':').append(artifact.getExtension());
-			writeTag("td", buf.toString());
-			if(dep.isUpdateAvailable()) {
-				writeTag("td", "available in " + dep.availableUpdate().getVersion());
-			}
-			closeTag("tr");
-			++artifactsTotal;
+			allDeps.put(dep.key().toString(), dep);
 		}
-		closeTag("table");
-		offsetLine("</div>");
-		closeTag("li");
-		++releaseVersionsTotal;
 	}
 
 	@Override
@@ -190,10 +210,8 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 	}
 
 	private void writeTag(String name, String style, Object value) throws IOException {
+		offset();
 		var buf = buf();
-		for(int i = 0; i < tagDepth*indentChars; ++i) {
-			buf.append(' ');
-		}
 		buf.append('<').append(name);
 		if(style != null) {
 			buf.append(" style=\"").append(style).append("\"");
@@ -203,10 +221,8 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 	}
 
 	private void openTag(String name) throws IOException {
+		offset();
 		var buf = buf();
-		for(int i = 0; i < tagDepth*indentChars; ++i) {
-			buf.append(' ');
-		}
 		buf.append('<').append(name).append('>');
 		writeLine(buf.toString());
 		++tagDepth;
@@ -214,29 +230,29 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 
 	private void closeTag(String name) throws IOException {
 		--tagDepth;
+		offset();
 		var buf = buf();
-		for(int i = 0; i < tagDepth*indentChars; ++i) {
-			buf.append(' ');
-		}
 		buf.append("</").append(name).append('>');
 		writeLine(buf.toString());
 	}
 
 	private void emptyTag(String name) throws IOException {
+		offset();
 		var buf = buf();
-		for(int i = 0; i < tagDepth*indentChars; ++i) {
-			buf.append(' ');
-		}
 		buf.append("<").append(name).append("/>");
 		writeLine(buf.toString());
 	}
 
 	private void offsetLine(String line) throws IOException {
+		offset();
+		writeLine(line);
+	}
+
+	private void offset() throws IOException {
 		var buf = buf();
 		for(int i = 0; i < tagDepth*indentChars; ++i) {
 			buf.append(' ');
 		}
-		buf.append(line);
-		writeLine(buf.toString());
+		append(buf);
 	}
 }

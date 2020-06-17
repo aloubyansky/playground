@@ -19,7 +19,7 @@ public class DefaultDecomposedBomBuilder implements DecomposedBomBuilder {
 
 	@Override
 	public void bomDependency(ReleaseId releaseId, Artifact artifact) throws BomDecomposerException {
-		releases.computeIfAbsent(releaseId, t -> new ArrayList<>()).add(ProjectDependency.of(artifact));
+		releases.computeIfAbsent(releaseId, t -> new ArrayList<>()).add(ProjectDependency.create(releaseId, artifact));
 	}
 
 	@Override

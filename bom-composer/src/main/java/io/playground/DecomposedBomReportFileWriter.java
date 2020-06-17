@@ -28,8 +28,16 @@ public abstract class DecomposedBomReportFileWriter implements DecomposedBomVisi
 	}
 
 	protected void writeLine(Object line) throws IOException {
-		writer.write(line.toString());
+		append(line);
+		newLine();
+	}
+
+	protected void newLine() throws IOException {
 		writer.newLine();
+	}
+
+	protected void append(Object line) throws IOException {
+		writer.write(line.toString());
 	}
 
 	@Override

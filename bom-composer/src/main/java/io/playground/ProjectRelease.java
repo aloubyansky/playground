@@ -12,7 +12,7 @@ public class ProjectRelease {
 		}
 
 		public Builder add(Artifact artifact) {
-			return add(ProjectDependency.of(artifact));
+			return add(ProjectDependency.create(id, artifact));
 		}
 
 		public Builder add(ProjectDependency dep) {
