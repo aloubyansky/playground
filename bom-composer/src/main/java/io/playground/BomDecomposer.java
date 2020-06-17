@@ -2,6 +2,7 @@ package io.playground;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
@@ -52,7 +53,7 @@ public class BomDecomposer {
 			transformer = bomTransformer;
 			return this;
 		}
-		
+
 		public DecomposedBom decompose() throws BomDecomposerException {
 			return BomDecomposer.this.decompose();
 		}
@@ -272,10 +273,8 @@ public class BomDecomposer {
 						decomposedBom.visit(new NoopDecomposedBomVisitor() {
 
 							final List<ProjectRelease> releases = new ArrayList<>();
-							ReleaseVersion latestVersion;
-							ArtifactVersion latestMvnVersion;
-							final StringBuilder buf = new StringBuilder();
-							
+							List<ArtifactVersion> versions = new ArrayList<>();
+
 							@Override
 							public boolean enterReleaseOrigin(ReleaseOrigin releaseOrigin, int versions) {
 								return versions > 1;
@@ -283,44 +282,42 @@ public class BomDecomposer {
 
 							@Override
 							public void leaveReleaseOrigin(ReleaseOrigin releaseOrigin) {
-
-								log("Origin: " + releaseOrigin);
-								log("  Latest version: " + latestMvnVersion);
-								final String latestVersionStr = latestMvnVersion.toString();
+								Collections.sort(versions);
 								for(ProjectRelease release : releases) {
-									if(release.id.version().equals(latestVersion)) {
-										continue;
-									}
-									log("  Release " + release.id.version().asString());
-									for(Artifact artifact : release.artifacts) {
-										final Artifact updatedArtifact = artifact.setVersion(latestVersionStr);
-										try {
-											decomposer.resolve(updatedArtifact);
-											buf.setLength(0);
-											buf.append("  - ").append(artifact);
-											buf.append(" -> ").append(latestVersionStr);
-											log(buf.toString());
-										} catch (BomDecomposerException e) {
+									for(ProjectDependency dep : release.deps) {
+										for(int i = versions.size() - 1; i >= 0; --i) {
+											final String versionStr = versions.get(i).toString();
+											if(release.id().version().asString().equals(versionStr)) {
+												break;
+											}
+											final Artifact updatedArtifact = dep.artifact.setVersion(versionStr);
+											if(isAvailable(decomposer, updatedArtifact)) {
+												dep.availableUpdate = updatedArtifact;
+												break;
+											}
 										}
 									}
 								}
-
-								latestVersion = null;
-								latestMvnVersion = null;
 								releases.clear();
+								versions.clear();
 							}
 
 							@Override
 							public void visitProjectRelease(ProjectRelease release) {
-								final DefaultArtifactVersion mvnVersion = new DefaultArtifactVersion(release.id.version().asString());
-								if(latestMvnVersion == null || latestMvnVersion.compareTo(mvnVersion) < 0) {
-									latestVersion = release.id().version();
-									latestMvnVersion = mvnVersion;
-								}
 								releases.add(release);
+								versions.add(new DefaultArtifactVersion(release.id.version().asString()));
 							}
 						});
 						return decomposedBom;
+					}
+
+					private boolean isAvailable(BomDecomposer decomposer, Artifact artifact) {
+						try {
+							decomposer.resolve(artifact);
+							return true;
+						} catch(BomDecomposerException e) {
+							return false;
+						}
 					}
 				})
 				.decompose()

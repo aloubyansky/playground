@@ -12,7 +12,11 @@ public class ProjectRelease {
 		}
 
 		public Builder add(Artifact artifact) {
-			artifacts.add(artifact);
+			return add(ProjectDependency.of(artifact));
+		}
+
+		public Builder add(ProjectDependency dep) {
+			deps.add(dep);
 			return this;
 		}
 
@@ -25,27 +29,27 @@ public class ProjectRelease {
 		return new ProjectRelease(id).new Builder();
 	}
 
-	public static ProjectRelease create(ReleaseId id, List<Artifact> artifacts) {
-		return new ProjectRelease(id, artifacts);
+	public static ProjectRelease create(ReleaseId id, List<ProjectDependency> deps) {
+		return new ProjectRelease(id, deps);
 	}
 
 	protected final ReleaseId id;
-	protected List<Artifact> artifacts = new ArrayList<>();
+	protected List<ProjectDependency> deps = new ArrayList<>();
 
 	private ProjectRelease(ReleaseId id) {
 		this(id, null);
 	}
 
-	private ProjectRelease(ReleaseId id, List<Artifact> artifacts) {
+	private ProjectRelease(ReleaseId id, List<ProjectDependency> deps) {
 		this.id = id;
-		this.artifacts = artifacts == null ? new ArrayList<>() : artifacts;
+		this.deps = deps == null ? new ArrayList<>() : deps;
 	}
 
 	public ReleaseId id() {
 		return id;
 	}
 
-	public List<Artifact> artifacts() {
-		return artifacts;
+	public List<ProjectDependency> dependencies() {
+		return deps;
 	}
 }

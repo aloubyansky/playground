@@ -24,8 +24,8 @@ public class DecomposedBomReleasesLogger extends NoopDecomposedBomVisitor {
 		++releasesCounter;
 		log("  " + release.id().version());
 		int artifactCounter = 1;
-		for (Artifact a : release.artifacts()) {
-			log("    " + artifactCounter++ + ") " + a);
+		for (ProjectDependency dep : release.dependencies()) {
+			log("    " + artifactCounter++ + ") " + dep);
 		}
 	}
 

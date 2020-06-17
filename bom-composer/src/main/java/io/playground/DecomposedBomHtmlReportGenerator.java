@@ -113,18 +113,28 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 
 	@Override
 	protected void writeProjectRelease(BufferedWriter writer, ProjectRelease release) throws IOException {
-		final List<Artifact> artifacts = release.artifacts();
+		final List<ProjectDependency> deps = release.dependencies();
 
 		openTag("li");
-		offsetLine("<button class=\"accordion\">" + release.id().version() + " (" + artifacts.size() + ")</button>");
+		offsetLine("<button class=\"accordion\">" + release.id().version() + " (" + deps.size() + ")</button>");
 		offsetLine("<div class=\"panel\">");
 
-		openTag("ol");
-		for(Artifact a : artifacts) {
-			writeTag("li", a);
+		openTag("table");
+		int i = 1;
+		for(ProjectDependency dep : deps) {
+			openTag("tr");
+			writeTag("td", i++ + ")");
+			final StringBuilder buf = new StringBuilder();
+			final Artifact artifact = dep.artifact();
+			buf.append(artifact.getGroupId()).append(':').append(artifact.getArtifactId()).append(':').append(artifact.getClassifier()).append(':').append(artifact.getExtension());
+			writeTag("td", buf.toString());
+			if(dep.isUpdateAvailable()) {
+				writeTag("td", "available in " + dep.availableUpdate().getVersion());
+			}
+			closeTag("tr");
 			++artifactsTotal;
 		}
-		closeTag("ol");
+		closeTag("table");
 		offsetLine("</div>");
 		closeTag("li");
 		++releaseVersionsTotal;
