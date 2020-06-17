@@ -27,7 +27,7 @@ public interface DecomposedBomVisitor {
 	 */
 	boolean enterReleaseOrigin(ReleaseOrigin releaseOrigin, int versions);
 
-	void leaveReleaseOrigin(ReleaseOrigin releaseOrigin);
+	void leaveReleaseOrigin(ReleaseOrigin releaseOrigin) throws BomDecomposerException;
 
 	/**
 	 * Called for every new release version.

@@ -14,7 +14,7 @@ public class NoopDecomposedBomVisitor implements DecomposedBomVisitor {
 	}
 
 	@Override
-	public void leaveReleaseOrigin(ReleaseOrigin releaseOrigin) {
+	public void leaveReleaseOrigin(ReleaseOrigin releaseOrigin) throws BomDecomposerException {
 	}
 
 	@Override

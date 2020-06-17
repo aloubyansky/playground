@@ -3,7 +3,9 @@ package io.playground;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -273,7 +275,7 @@ public class BomDecomposer {
 						decomposedBom.visit(new NoopDecomposedBomVisitor() {
 
 							final List<ProjectRelease> releases = new ArrayList<>();
-							List<ArtifactVersion> versions = new ArrayList<>();
+							Map<String, ReleaseId> versions = new HashMap<>();
 
 							@Override
 							public boolean enterReleaseOrigin(ReleaseOrigin releaseOrigin, int versions) {
@@ -281,18 +283,36 @@ public class BomDecomposer {
 							}
 
 							@Override
-							public void leaveReleaseOrigin(ReleaseOrigin releaseOrigin) {
-								Collections.sort(versions);
+							public void leaveReleaseOrigin(ReleaseOrigin releaseOrigin) throws BomDecomposerException {
+								
+								final List<ArtifactVersion> releaseVersions = new ArrayList<>();
+								for(String versionStr : versions.keySet()) {
+									releaseVersions.add(new DefaultArtifactVersion(versionStr));
+								}
+								Collections.sort(releaseVersions);
+								
 								for(ProjectRelease release : releases) {
 									for(ProjectDependency dep : release.deps) {
-										for(int i = versions.size() - 1; i >= 0; --i) {
-											final String versionStr = versions.get(i).toString();
+										// see if the dependency version can be derived from the project release tag/version
+										final String releaseVersionStr = dep.releaseId().version().asString();
+										final int depVersionIndex = releaseVersionStr.indexOf(dep.artifact().getVersion());
+										if(depVersionIndex < 0 || releaseVersionStr.indexOf(dep.artifact().getVersion(), depVersionIndex + 1) > 0) {
+											// give up
+											continue;
+										}
+										for(int i = releaseVersions.size() - 1; i >= 0; --i) {
+											final String versionStr = releaseVersions.get(i).toString();
 											if(release.id().version().asString().equals(versionStr)) {
 												break;
 											}
-											final Artifact updatedArtifact = dep.artifact.setVersion(versionStr);
+											final String updatedDepVersion = versionStr.substring(depVersionIndex, versionStr.length() - (releaseVersionStr.length() - depVersionIndex - dep.artifact().getVersion().length()));
+											final Artifact updatedArtifact = dep.artifact.setVersion(updatedDepVersion);
 											if(isAvailable(decomposer, updatedArtifact)) {
-												dep.availableUpdate = updatedArtifact;
+												final ReleaseId updatedReleaseId = versions.get(versionStr);
+												if(updatedReleaseId == null) {
+													throw new BomDecomposerException("Failed to locate release ID for " + versionStr);
+												}
+												dep.availableUpdate = ProjectDependency.create(updatedReleaseId, updatedArtifact);
 												break;
 											}
 										}
@@ -305,7 +325,7 @@ public class BomDecomposer {
 							@Override
 							public void visitProjectRelease(ProjectRelease release) {
 								releases.add(release);
-								versions.add(new DefaultArtifactVersion(release.id.version().asString()));
+								versions.put(release.id.version().asString(), release.id());
 							}
 						});
 						return decomposedBom;

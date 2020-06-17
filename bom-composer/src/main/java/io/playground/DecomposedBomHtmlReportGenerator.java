@@ -127,13 +127,12 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 			writeTag("td", i++ + ")");
 			final ProjectDependency dep = allDeps.get(key);
 			writeTag("td", dep.artifact());
-			for(String version : stringVersions) {
-				if(version.equals(dep.releaseId().version().asString())) {
-					writeTag("td", version);
-				} else if(dep.isUpdateAvailable() && dep.availableUpdate().getVersion().equals(version)) {
-					offset();
-					append("<td style=\"color:gray\">" + version + "</td>");
-					newLine();
+			for(int j = 0; j < stringVersions.size(); ++j) {
+				final String version = stringVersions.get(j);
+				if(dep.releaseId().version().asString().equals(version)) {
+					writeTag("td", !dep.isUpdateAvailable() || j == stringVersions.size() - 1 ? "color:DodgerBlue" : "color:IndianRed", version);
+				} else if(dep.isUpdateAvailable() && dep.availableUpdate().releaseId().version().asString().equals(version)) {
+					writeTag("td", "color:LimeGreen", version);
 				} else {
 					emptyTag("td");
 				}

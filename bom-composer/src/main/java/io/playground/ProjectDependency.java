@@ -14,7 +14,7 @@ public class ProjectDependency {
 
 	protected final ReleaseId releaseId;
 	protected final Artifact artifact;
-	protected Artifact availableUpdate;
+	protected ProjectDependency availableUpdate;
 	private AppArtifactKey key;
 
 	private ProjectDependency(ReleaseId releaseId, Artifact artifact) {
@@ -34,7 +34,7 @@ public class ProjectDependency {
 		return availableUpdate != null;
 	}
 
-	public Artifact availableUpdate() {
+	public ProjectDependency availableUpdate() {
 		return availableUpdate;
 	}
 
