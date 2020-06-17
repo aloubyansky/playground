@@ -53,7 +53,7 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 	private int artifactsTotal;
 	private boolean skipSingleReleases;
 
-	private Map<String, ProjectDependency> allDeps = new HashMap<>();
+	private Map<String, Map<String, ProjectDependency>> allDeps = new HashMap<>();
 	private int originReleaseVersions;
 	private List<ArtifactVersion> releaseVersions = new ArrayList<>();
 
@@ -118,33 +118,37 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 		Collections.sort(releaseVersions);
 		final List<String> stringVersions = releaseVersions.stream().map(v -> v.toString()).collect(Collectors.toList());
 
-		final List<String> sortedKeys = new ArrayList<>(allDeps.keySet());
-		Collections.sort(sortedKeys);
 		openTag("table");
 		int i = 1;
-		for(String key : sortedKeys) {
-			openTag("tr");
-			writeTag("td", i++ + ")");
-			final ProjectDependency dep = allDeps.get(key);
-			writeTag("td", dep.artifact());
-			for(int j = 0; j < stringVersions.size(); ++j) {
-				final String version = stringVersions.get(j);
-				if(dep.releaseId().version().asString().equals(version)) {
-					writeTag("td", !dep.isUpdateAvailable() || j == stringVersions.size() - 1 ? "color:DodgerBlue" : "color:IndianRed", version);
-				} else if(dep.isUpdateAvailable() && dep.availableUpdate().releaseId().version().asString().equals(version)) {
-					writeTag("td", "color:LimeGreen", version);
-				} else {
-					emptyTag("td");
+
+		for(String releaseVersionStr : stringVersions) {
+			final Map<String, ProjectDependency> releaseDeps = allDeps.get(releaseVersionStr);			
+			final List<String> sortedKeys = new ArrayList<>(releaseDeps.keySet());
+			Collections.sort(sortedKeys);
+			for(String key : sortedKeys) {
+				openTag("tr");
+				writeTag("td", i++ + ")");
+				final ProjectDependency dep = releaseDeps.get(key);
+				writeTag("td", dep.artifact());
+				for(int j = 0; j < stringVersions.size(); ++j) {
+					final String version = stringVersions.get(j);
+					if(dep.releaseId().version().asString().equals(version)) {
+						writeTag("td", !dep.isUpdateAvailable() || j == stringVersions.size() - 1 ? "color:DodgerBlue" : "color:IndianRed", version);
+					} else if(dep.isUpdateAvailable() && dep.availableUpdate().releaseId().version().asString().equals(version)) {
+						writeTag("td", "color:LimeGreen", version);
+					} else {
+						emptyTag("td");
+					}
 				}
+				closeTag("tr");
 			}
-			closeTag("tr");
 		}
+		
 		closeTag("table");
 
 		offsetLine("</div>");
 
 		++releaseOriginsTotal;
-		artifactsTotal += allDeps.size();
 		allDeps.clear();
 		releaseVersionsTotal += releaseVersions.size();
 		releaseVersions.clear();
@@ -154,9 +158,12 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 	protected void writeProjectRelease(BufferedWriter writer, ProjectRelease release) throws IOException {
 		final List<ProjectDependency> deps = release.dependencies();
         releaseVersions.add(new DefaultArtifactVersion(release.id().version().asString()));
+        final Map<String, ProjectDependency> releaseDeps = new HashMap<>(deps.size());
+        allDeps.put(release.id().version().asString(), releaseDeps);
 		for(ProjectDependency dep : deps) {
-			allDeps.put(dep.key().toString(), dep);
+			releaseDeps.put(dep.key().toString(), dep);
 		}
+		artifactsTotal += deps.size();
 	}
 
 	@Override
