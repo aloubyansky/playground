@@ -209,7 +209,7 @@ public class BomDecomposer {
 	public static void main(String[] args) throws Exception {
 		BomDecomposer.config()
 				.debug()
-				.bomArtifact("io.quarkus", "quarkus-universe-bom-deployment", "1.5.1.Final")
+				.bomArtifact("io.quarkus", "quarkus-universe-bom-deployment", "999-SNAPSHOT")
 				.addReleaseDetector(new ReleaseIdDetector() {
 					@Override
 					public ReleaseId detectReleaseId(BomDecomposer decomposer, Artifact artifact)

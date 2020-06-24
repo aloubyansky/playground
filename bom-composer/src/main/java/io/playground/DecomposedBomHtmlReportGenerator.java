@@ -44,6 +44,10 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 		}
 	}
 
+	private static String RED = "Red";
+	private static String GREEN = "Green";
+	private static String BLUE = "Blue";
+	
 	private int tagDepth;
 	private int indentChars = 4;
 	final StringBuilder buf = new StringBuilder();
@@ -103,8 +107,27 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 
 		writeTag("h1", "Multi Module Project Releases Detected in " + bomArtifact);
 		if(skipSingleReleases) {
-		    writeTag("p", "color:IndianRed", "Release origins with a single release version were skipped");
+		    writeTag("p", "color:" + RED, "Release origins with a single release version were skipped");
 		}
+
+		writeTag("p", "The colors used to highlight the versions:");
+		openTag("table");
+		openTag("tr");
+		writeTag("td", "text-align:left;color:" + BLUE, "Blue");
+		writeTag("td", "- version of the artifact found in the BOM which is either the preferred version or an older version for which the preferred version is not available");
+		closeTag("tr");
+		openTag("tr");
+		writeTag("td", "text-align:left;color:" + RED, "Red");
+		writeTag("td", "- old version of the artifact found in the BOM for which the preferred version is available in the Maven repository");
+		closeTag("tr");
+		openTag("tr");
+		writeTag("td", "text-align:left;color:" + GREEN, "Green");
+		writeTag("td", "- the preferred version of the artifact found to be available in the Maven repository");
+		closeTag("tr");
+		closeTag("table");
+		
+		openTag("p");
+		closeTag("p");
 	}
 
 	@Override
@@ -136,9 +159,9 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 				for(int j = 0; j < stringVersions.size(); ++j) {
 					final String version = stringVersions.get(j);
 					if(dep.releaseId().version().asString().equals(version)) {
-						writeTag("td", !dep.isUpdateAvailable() || j == stringVersions.size() - 1 ? "color:DodgerBlue" : "color:IndianRed", version);
+						writeTag("td", !dep.isUpdateAvailable() || j == stringVersions.size() - 1 ? "color:" + BLUE : "color:" + RED, version);
 					} else if(dep.isUpdateAvailable() && dep.availableUpdate().releaseId().version().asString().equals(version)) {
-						writeTag("td", "color:LimeGreen", version);
+						writeTag("td", "color:" + GREEN, version);
 					} else {
 						emptyTag("td");
 					}
