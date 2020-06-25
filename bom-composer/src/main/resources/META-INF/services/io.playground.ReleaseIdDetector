@@ -1,0 +1,4 @@
+io.playground.detector.JUnitPlatformReleaseDetector
+io.playground.detector.KafkaReleaseDetector
+io.playground.detector.VertxReleaseDetector
+io.playground.detector.FasterXmlReleaseDetector
