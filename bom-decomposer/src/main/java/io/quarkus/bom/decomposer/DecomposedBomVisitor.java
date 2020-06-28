@@ -39,6 +39,7 @@ public interface DecomposedBomVisitor {
 
 	/**
 	 * Called after the last processed release version in the BOM.
+	 * @throws BomDecomposerException 
 	 */
-	void leaveBom();
+	void leaveBom() throws BomDecomposerException;
 }

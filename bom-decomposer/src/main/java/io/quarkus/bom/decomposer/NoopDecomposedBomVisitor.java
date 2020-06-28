@@ -32,6 +32,6 @@ public class NoopDecomposedBomVisitor implements DecomposedBomVisitor {
 	}
 
 	@Override
-	public void leaveBom() {
+	public void leaveBom() throws BomDecomposerException {
 	}
 }

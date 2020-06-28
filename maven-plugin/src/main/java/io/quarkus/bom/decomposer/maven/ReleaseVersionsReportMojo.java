@@ -19,11 +19,17 @@ public class ReleaseVersionsReportMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}")
     protected MavenProject project;
 
-    @Parameter(defaultValue = "${htmlReport}")
-    protected boolean htmlReport;
+    @Parameter(property = "htmlReport", defaultValue = "true")
+    protected boolean htmlReport = true;
 
     @Parameter(defaultValue = "${reportAllReleases}")
     protected boolean reportAllReleases;
+
+    @Parameter(defaultValue = "${logReport}")
+    protected DecomposedBomReleasesLogger.Level logReport;
+
+    @Parameter(defaultValue = "${onConflict}")
+    protected DecomposedBomReleasesLogger.Level onConflict;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -35,20 +41,31 @@ public class ReleaseVersionsReportMojo extends AbstractMojo {
 	}
 
 	private void decompose() throws Exception {
+		final MojoMessageWriter msgWriter = new MojoMessageWriter(getLog());
 		final DecomposedBom decomposedBom = BomDecomposer.config()
-		.debug()
-		.bomArtifact(project.getGroupId(), project.getArtifactId(), project.getVersion())
-		.enableUpdateChecks()
-		.decompose();
+				.logger(msgWriter)
+				.debug()
+				.bomArtifact(project.getGroupId(), project.getArtifactId(), project.getVersion()).enableUpdateChecks()
+				.decompose();
 
 		if (htmlReport) {
-			final HtmlWriterBuilder htmlWriter = DecomposedBomHtmlReportGenerator.builder("target/managed-releases.html");
-			if(!reportAllReleases) {
+			final HtmlWriterBuilder htmlWriter = DecomposedBomHtmlReportGenerator
+					.builder("target/managed-releases.html");
+			if (!reportAllReleases) {
 				htmlWriter.skipOriginsWithSingleRelease();
 			}
 			decomposedBom.visit(htmlWriter.build());
 		}
 
-		decomposedBom.visit(new DecomposedBomReleasesLogger(!reportAllReleases));
+		if (logReport != null || onConflict != null) {
+			final DecomposedBomReleasesLogger.Config loggerConfig = DecomposedBomReleasesLogger.config(!reportAllReleases);
+			if(logReport != null) {
+				loggerConfig.defaultLogLevel(logReport);
+			}
+			if(onConflict != null) {
+				loggerConfig.conflictLogLevel(onConflict);
+			}
+			decomposedBom.visit(loggerConfig.logger(msgWriter).build());
+		}
 	}
 }

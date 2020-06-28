@@ -15,7 +15,8 @@ public class UpdateAvailabilityTransformer implements DecomposedBomTransformer {
 	@Override
 	public DecomposedBom transform(BomDecomposer decomposer, DecomposedBom decomposedBom)
 			throws BomDecomposerException {
-		decomposer.debug("Transforming decomposed %s", decomposedBom.bomArtifact());
+		Object[] params = { decomposedBom.bomArtifact() };
+		decomposer.logger().debug("Transforming decomposed %s", params);
 		decomposedBom.visit(new NoopDecomposedBomVisitor(true) {
 
 			final List<ProjectRelease> releases = new ArrayList<>();
@@ -67,7 +68,8 @@ public class UpdateAvailabilityTransformer implements DecomposedBomTransformer {
 				versions.put(release.id().version().asString(), release.id());
 			}
 		});
-		decomposer.debug("Transformed decomposed BOM %s", decomposedBom.bomArtifact());
+		Object[] params1 = { decomposedBom.bomArtifact() };
+		decomposer.logger().debug("Transformed decomposed BOM %s", params1);
 		return decomposedBom;
 	}
 

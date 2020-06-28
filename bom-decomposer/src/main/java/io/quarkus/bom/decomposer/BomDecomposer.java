@@ -27,6 +27,11 @@ public class BomDecomposer {
 		private BomDecomposerConfig() {
 		}
 
+		public BomDecomposerConfig logger(MessageWriter messageWriter) {
+			logger = messageWriter;
+			return this;
+		}
+		
 		public BomDecomposerConfig debug() {
 			debug = true;
 			return this;
@@ -58,7 +63,7 @@ public class BomDecomposer {
 
 		public DecomposedBom decompose() throws BomDecomposerException {
 			ServiceLoader.load(ReleaseIdDetector.class, Thread.currentThread().getContextClassLoader()).forEach(d -> {
-				BomDecomposer.this.debug("Loaded release detector " + d);
+				BomDecomposer.this.logger().debug("Loaded release detector " + d);
 				releaseDetectors.add(d);
 			});
 			return BomDecomposer.this.decompose();
@@ -75,6 +80,7 @@ public class BomDecomposer {
 	private BomDecomposer() {
 	}
 
+	private MessageWriter logger;
 	private boolean debug;
 	private Artifact bomArtifact;
 	private MavenArtifactResolver mvnResolver;
@@ -107,7 +113,8 @@ public class BomDecomposer {
 			} catch (BomDecomposerException e) {
 				if (e.getCause() instanceof AppModelResolverException) {
 					// there are plenty of BOMs that include artifacts that don't exist
-					debug("Failed to resolve POM for %s", dep.getArtifact());
+					Object[] params = { dep.getArtifact() };
+					logger().debug("Failed to resolve POM for %s", params);
 				} else {
 					throw e;
 				}
@@ -115,14 +122,6 @@ public class BomDecomposer {
 		}
 
 		return transformer == null ? bomBuilder.build() : transformer.transform(this, bomBuilder.build());
-	}
-
-	private boolean print;
-
-	private void print(String msg) {
-		if (print) {
-			log(msg);
-		}
 	}
 
 	private ReleaseId releaseId(Artifact artifact) throws BomDecomposerException {
@@ -174,6 +173,10 @@ public class BomDecomposer {
 		return null;
 	}
 
+	public MessageWriter logger() {
+		return logger == null ? logger = new DefaultMessageWriter().setDebugEnabled(debug) : logger;
+	}
+	
 	public Model model(Artifact artifact) throws BomDecomposerException {
 		return Util.model(resolve(Util.pom(artifact)).getFile());
 	}
@@ -192,26 +195,6 @@ public class BomDecomposer {
 		} catch (Exception e) {
 			throw new BomDecomposerException("Failed to resolve artifact " + artifact, e);
 		}
-	}
-
-	public void debug(String msg, Object... params) {
-		if (debug) {
-			log(msg, params);
-		}
-	}
-
-	public void debug(Object msg) {
-		if (debug) {
-			log(msg);
-		}
-	}
-
-	private static void log(String msg, Object... params) {
-		log(String.format(msg, params));
-	}
-
-	static void log(Object msg) {
-		System.out.println(msg);
 	}
 
 	public static void main(String[] args) throws Exception {
