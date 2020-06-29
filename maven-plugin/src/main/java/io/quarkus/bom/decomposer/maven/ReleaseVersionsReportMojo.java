@@ -3,8 +3,10 @@ package io.quarkus.bom.decomposer.maven;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
 import io.quarkus.bom.decomposer.BomDecomposer;
@@ -13,7 +15,7 @@ import io.quarkus.bom.decomposer.DecomposedBomHtmlReportGenerator;
 import io.quarkus.bom.decomposer.DecomposedBomHtmlReportGenerator.HtmlWriterBuilder;
 import io.quarkus.bom.decomposer.DecomposedBomReleasesLogger;
 
-@Mojo(name = "report-release-versions")
+@Mojo(name = "report-release-versions", defaultPhase = LifecyclePhase.VERIFY, requiresDependencyCollection = ResolutionScope.COMPILE_PLUS_RUNTIME)
 public class ReleaseVersionsReportMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project}")

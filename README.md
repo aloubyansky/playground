@@ -1,11 +1,81 @@
-# Playground
+# BOM Decomposer
 
-1) `cd gradle-bom` and install it `mvn install`
-2) `cd gradle-plugin` and install it `./gradlew publishToMavenLocal`
-3) `cd gradle-app` and list its dependencies `./gradlew dependencies --configuration compileClasspath`
+The project includes various utilities that help analyze managed dependencies of a project
+and suggest version changes to avoid potential conflicts among the dependencies.
 
-You should see
+## Multi module release detection
 
-compileClasspath - Compile classpath for source set 'main'.
-+--- io.playground:playground-bom:999-SNAPSHOT
-\--- commons-lang:commons-lang FAILED
+One of the utilities included is a multi module release detector. It is a best-effort
+(not 100% accurate) utility that is trying to identify the origin (e.g. a git repo or
+another ID) of the artifacts that are listed as managed dependencies and in case multiple releases
+with the same origin are detected in the same BOM it reports them as conflicts.
+
+NOTE: the utility will be resolving every managed dependency as part of the analyses!
+
+The utility can invoked using a public API or a Maven plugin with a minimal configuration below
+```
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-bom-decomposer-maven-plugin</artifactId>
+                <version>999-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>report-release-versions</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+```
+
+which should be added to the `pom.xml`. With this minimal configuration the conflicts will be
+logged as a `WARNING`.
+
+Here is a complete set of supported options
+```
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-bom-decomposer-maven-plugin</artifactId>
+                <version>999-SNAPSHOT</version>
+                <configuration>
+                    <!-- Whether to skip this goal during the build -->
+                    <skip>${skipBomReport}</skip>
+
+                    <!-- wWether to generate the HTML report, the default is true -->
+                    <htmlReport>${bomHtmlReport}</htmlReport>
+
+                    <!--
+                       Whether to report all the detected release origins
+                       or only those with the conflicts, the default is false (only the conflicts)
+                    -->
+                    <reportAll>${bomReportAll}</reportAll>
+
+                    <!--
+                      What to do when a conflict detected. The default is WARN. Allowed values are:
+                      * WARN - log a warning
+                      * ERROR - log as error and fail the build
+                      * INFO - log an info message
+                      * DEBUG - log a debug message
+                    -->
+                    <bomConflict>${bomConflict}</bomConflict>
+
+                    <!-- The default level to use for report logging, the default is DEBUG -->
+                    <reportLogging>${bomReportLogging}</reportLogging>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>report-release-versions</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+```
