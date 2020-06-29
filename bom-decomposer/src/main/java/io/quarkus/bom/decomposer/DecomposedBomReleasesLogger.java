@@ -2,6 +2,8 @@ package io.quarkus.bom.decomposer;
 
 import org.eclipse.aether.artifact.Artifact;
 
+import io.quarkus.bom.decomposer.ProjectDependency.UpdateStatus;
+
 public class DecomposedBomReleasesLogger extends NoopDecomposedBomVisitor {
 
 	public class Config {
@@ -21,6 +23,11 @@ public class DecomposedBomReleasesLogger extends NoopDecomposedBomVisitor {
 
 		public Config conflictLogLevel(Level level) {
 			conflictLogLevel = level;
+			return this;
+		}
+
+		public Config resolvableConflictLogLevel(Level level) {
+			resolvableConflictLogLevel = level;
 			return this;
 		}
 
@@ -44,6 +51,12 @@ public class DecomposedBomReleasesLogger extends NoopDecomposedBomVisitor {
 		ERROR
 	}
 
+	enum Conflict {
+		NONE,
+		CONFLICT,
+		RESOLVABLE,
+	}
+
 	public DecomposedBomReleasesLogger() {
 		super();
 	}
@@ -55,11 +68,15 @@ public class DecomposedBomReleasesLogger extends NoopDecomposedBomVisitor {
 	private MessageWriter log;
 	private Level logLevel = Level.INFO;
 	private Level conflictLogLevel;
+	private Level resolvableConflictLogLevel;
+	private Conflict conflict = Conflict.NONE;
+	private final StringBuilder buf = new StringBuilder();
 	private int originCounter;
 	private int releaseCounter;
 	private int artifactCounter;
-	private boolean versionConflict;
-	private final StringBuilder buf = new StringBuilder();
+	private int originWithConflictCounter;
+	private int resolvableConflictCounter;
+	private int unresolvableConflictCounter;
 
 	private MessageWriter logger() {
 		return log == null ? log = new DefaultMessageWriter() : log;
@@ -82,7 +99,10 @@ public class DecomposedBomReleasesLogger extends NoopDecomposedBomVisitor {
 	public boolean enterReleaseOrigin(ReleaseOrigin releaseOrigin, int versions) {
 		final boolean result = super.enterReleaseOrigin(releaseOrigin, versions);
 		if (result) {
-			versionConflict = versions > 1;
+			if(versions > 1) {
+				conflict = Conflict.CONFLICT;
+				++originWithConflictCounter;
+			}
 			++originCounter;
 			log(buf().append("Origin: ").append(releaseOrigin));
 		}
@@ -92,7 +112,7 @@ public class DecomposedBomReleasesLogger extends NoopDecomposedBomVisitor {
 	@Override
 	public void leaveReleaseOrigin(ReleaseOrigin releaseOrigin) throws BomDecomposerException {
 		super.leaveReleaseOrigin(releaseOrigin);
-		versionConflict = false;
+		conflict = Conflict.NONE;
 	}
 
 	@Override
@@ -106,29 +126,81 @@ public class DecomposedBomReleasesLogger extends NoopDecomposedBomVisitor {
 			if(dep.isUpdateAvailable()) {
 				buf.append(" -> ").append(dep.availableUpdate().artifact().getVersion());
 			}
+			if(dep.updateStatus() != UpdateStatus.UNKNOWN && conflict == Conflict.CONFLICT) {
+				if(dep.updateStatus() == UpdateStatus.AVAILABLE) {
+					++resolvableConflictCounter;
+					conflict = Conflict.RESOLVABLE;
+				} else {
+					++unresolvableConflictCounter;
+				}
+			}
 			log(buf);
+			if(conflict == Conflict.RESOLVABLE) {
+				conflict = Conflict.CONFLICT;
+			}
 		}
 		this.artifactCounter += artifactCounter;
 	}
 
 	@Override
 	public void leaveBom() throws BomDecomposerException {
-		if (originCounter > 0) {
-			log("TOTAL REPORTED");
-			log(buf().append("  Release origins:  ").append(originCounter));
-			log(buf().append("  Release versions: ").append(releaseCounter));
-			log(buf().append("  Artifacts:        ").append(artifactCounter));
+		if (originCounter == 0) {
+			return;
 		}
-		if(conflictLogLevel == Level.ERROR) {
+		Level level = totalLogLevel();
+		log(level, "TOTAL");
+		log(level, buf().append("  Release origins:                ").append(originCounter));
+		if (originWithConflictCounter > 0) {
+			log(level, buf().append("  Release origins with conflicts: ").append(originWithConflictCounter));
+		}
+		log(level, buf().append("  Release versions:               ").append(releaseCounter));
+		log(level, buf().append("  Artifacts:                      ").append(artifactCounter));
+		if (resolvableConflictCounter > 0) {
+			log(level, buf().append("  Resolvable version conflicts:   ").append(resolvableConflictCounter));
+		}
+		if (unresolvableConflictCounter > 0) {
+			log(level, buf().append("  Unresolvable version conflicts: ").append(unresolvableConflictCounter));
+		}
+		if(level == Level.ERROR) {
 			throw new BomDecomposerException("There have been version conflicts, please refer to the messages logged above");
 		}
 	}
 
+	private Level totalLogLevel() {
+		return higherLevel(higherLevel(resolvableConflictLogLevel, conflictLogLevel), logLevel);
+	}
+
+	private Level higherLevel(Level l1, Level l2) {
+		if(l1 == Level.ERROR || l2 == Level.ERROR) {
+			return Level.ERROR;
+		}
+		if(l1 == Level.WARN || l2 == Level.WARN) {
+			return Level.WARN;
+		}
+		if(l1 == Level.INFO || l2 == Level.INFO) {
+			return Level.INFO;
+		}
+		return l2 == null ? l1 : l2;
+	}
+
+	private Level conflictLogLevel() {
+		return conflictLogLevel == null ? logLevel : conflictLogLevel;
+	}
+
+	private Level resolvableConflictLogLevel() {
+		return resolvableConflictLogLevel == null ? conflictLogLevel() : resolvableConflictLogLevel;
+	}
+
 	private void log(Object msg) {
-		if(versionConflict) {
-			log(conflictLogLevel == null ? logLevel : conflictLogLevel, msg);
-		} else {
-		    log(logLevel, msg);
+		switch (conflict) {
+		case RESOLVABLE:
+			log(resolvableConflictLogLevel(), msg);
+			break;
+		case CONFLICT:
+			log(conflictLogLevel(), msg);
+			break;
+		default:
+			log(logLevel, msg);
 		}
 	}
 

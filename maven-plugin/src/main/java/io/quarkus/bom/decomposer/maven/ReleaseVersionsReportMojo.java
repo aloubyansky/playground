@@ -34,6 +34,9 @@ public class ReleaseVersionsReportMojo extends AbstractMojo {
     @Parameter(property = "bomConflict", defaultValue = "WARN")
     protected DecomposedBomReleasesLogger.Level bomConflict;
 
+    @Parameter(property = "bomResolvableConflict", defaultValue = "ERROR")
+    protected DecomposedBomReleasesLogger.Level bomResolvableConflict;
+
     @Parameter(property = "bomSkipUpdates", defaultValue = "false")
     protected boolean skipUpdates;
 
@@ -73,13 +76,16 @@ public class ReleaseVersionsReportMojo extends AbstractMojo {
 			decomposedBom.visit(htmlWriter.build());
 		}
 
-		if (reportLogging != null || bomConflict != null) {
+		if (reportLogging != null || bomConflict != null || bomResolvableConflict != null) {
 			final DecomposedBomReleasesLogger.Config loggerConfig = DecomposedBomReleasesLogger.config(!reportAll);
 			if(reportLogging != null) {
 				loggerConfig.defaultLogLevel(reportLogging);
 			}
 			if(bomConflict != null) {
 				loggerConfig.conflictLogLevel(bomConflict);
+			}
+			if(bomResolvableConflict != null) {
+				loggerConfig.resolvableConflictLogLevel(bomResolvableConflict);
 			}
 			decomposedBom.visit(loggerConfig.logger(msgWriter).build());
 		}

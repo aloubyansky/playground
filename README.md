@@ -56,17 +56,28 @@ Here is a complete set of supported options
                     -->
                     <reportAll>${bomReportAll}</reportAll>
 
+                    <!-- The default level to use for report logging, the default is DEBUG -->
+                    <reportLogging>${bomReportLogging}</reportLogging>
+
                     <!--
-                      What to do when a conflict detected. The default is WARN. Allowed values are:
-                      * WARN - log a warning
-                      * ERROR - log as error and fail the build
+                      How to handle a detected conflict. The allowed values are:
+                      * WARN - log a warning (the default)
+                      * ERROR - log an error and fail the build
                       * INFO - log an info message
                       * DEBUG - log a debug message
                     -->
                     <bomConflict>${bomConflict}</bomConflict>
 
-                    <!-- The default level to use for report logging, the default is DEBUG -->
-                    <reportLogging>${bomReportLogging}</reportLogging>
+                    <!--
+                      How to handle a detected resolvable version conflict. I.e. in case
+                      the preferred version of the artifact was found to be available in the Maven
+                      repository. Allowed values are:
+                      * WARN - log a warning
+                      * ERROR - log an error and fail the build (the default)
+                      * INFO - log and info message
+                      * DEBUG - log a debug message
+                    -->
+                    <bomResolvableConflict>${bomResolvableConflict}</bomResolvableConflict>
 
                     <!--
                       Whether to skip checking the conflicting dependencies for available versions updates

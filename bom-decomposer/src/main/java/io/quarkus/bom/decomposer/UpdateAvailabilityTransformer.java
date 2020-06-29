@@ -10,6 +10,8 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.eclipse.aether.artifact.Artifact;
 
+import io.quarkus.bom.decomposer.ProjectDependency.UpdateStatus;
+
 public class UpdateAvailabilityTransformer implements DecomposedBomTransformer {
 
 	@Override
@@ -40,8 +42,16 @@ public class UpdateAvailabilityTransformer implements DecomposedBomTransformer {
 							// give up
 							continue;
 						}
-						for(int i = releaseVersions.size() - 1; i >= 0; --i) {
-							final String versionStr = releaseVersions.get(i).toString();
+
+						int i = releaseVersions.size() - 1;
+						String versionStr = releaseVersions.get(i).toString();
+						if(release.id().version().asString().equals(versionStr)) {
+							dep.preferredVersion = true;
+							continue;
+						}
+
+						while(i >= 0) {
+							versionStr = releaseVersions.get(i--).toString();
 							if(release.id().version().asString().equals(versionStr)) {
 								break;
 							}
@@ -52,9 +62,13 @@ public class UpdateAvailabilityTransformer implements DecomposedBomTransformer {
 								if(updatedReleaseId == null) {
 									throw new BomDecomposerException("Failed to locate release ID for " + versionStr);
 								}
-								dep.availableUpdate = ProjectDependency.create(updatedReleaseId, updatedArtifact);
+								dep.setAvailableUpdate(ProjectDependency.create(updatedReleaseId, updatedArtifact));
 								break;
 							}
+						}
+
+						if(dep.updateStatus() == UpdateStatus.UNKNOWN) {
+							dep.setUpdateUnavailable();
 						}
 					}
 				}

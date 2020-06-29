@@ -14,6 +14,8 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.eclipse.aether.artifact.Artifact;
 
+import io.quarkus.bom.decomposer.ProjectDependency.UpdateStatus;
+
 public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWriter {
 
 	public static HtmlWriterBuilder builder(String file) {
@@ -55,6 +57,10 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 	private int releaseOriginsTotal;
 	private int releaseVersionsTotal;
 	private int artifactsTotal;
+	private int releaseOriginsWithConflictsTotal;
+	private int resolvableConflictsTotal;
+	private int unresolvableConflictsTotal;
+
 	private boolean skipOriginsWithSingleRelease;
 
 	private Map<String, Map<String, ProjectDependency>> allDeps = new HashMap<>();
@@ -152,6 +158,9 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 	@Override
 	protected boolean writeStartReleaseOrigin(BufferedWriter writer, ReleaseOrigin releaseOrigin, int versions) throws IOException {
 		originReleaseVersions = versions;
+		if(versions > 1) {
+			releaseOriginsWithConflictsTotal++;
+		}
 		return versions > 1 || !skipOriginsWithSingleRelease;
 	}
 
@@ -185,6 +194,14 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 						emptyTag("td");
 					}
 				}
+				if(dep.updateStatus() != UpdateStatus.UNKNOWN && originReleaseVersions > 1) {
+					if(dep.updateStatus() == UpdateStatus.AVAILABLE) {
+						++resolvableConflictsTotal;
+					} else {
+						++unresolvableConflictsTotal;
+					}
+				}
+
 				closeTag("tr");
 			}
 		}
@@ -216,10 +233,14 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 
 		writeTag("p", "");
 		openTag("table");
-		writeTag("caption", "text-align:left;font-weight:bold", "Total reported:");
+		writeTag("caption", "text-align:left;font-weight:bold", "Total:");
 		openTag("tr");
 		writeTag("td", "text-align:left;", "Release origins:");
 		writeTag("td", "text-align:right;", releaseOriginsTotal);
+		closeTag("tr");
+		openTag("tr");
+		writeTag("td", "text-align:left;", "Release origins with conflicts:");
+		writeTag("td", "text-align:right;", releaseOriginsWithConflictsTotal);
 		closeTag("tr");
 		openTag("tr");
 		writeTag("td", "text-align:left;", "Release versions:");
@@ -228,6 +249,14 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 		openTag("tr");
 		writeTag("td", "text-align:left;", "Artifacts:");
 		writeTag("td", "text-align:right;", artifactsTotal);
+		closeTag("tr");
+		openTag("tr");
+		writeTag("td", "text-align:left;", "Resolvable version conflicts:");
+		writeTag("td", "text-align:right;", resolvableConflictsTotal);
+		closeTag("tr");
+		openTag("tr");
+		writeTag("td", "text-align:left;", "Unresolvable version conflicts:");
+		writeTag("td", "text-align:right;", unresolvableConflictsTotal);
 		closeTag("tr");
 		closeTag("table");
 
