@@ -67,6 +67,13 @@ Here is a complete set of supported options
 
                     <!-- The default level to use for report logging, the default is DEBUG -->
                     <reportLogging>${bomReportLogging}</reportLogging>
+
+                    <!--
+                      Whether to skip checking the conflicting dependencies for available versions updates
+                      picking the latest version found in the BOM as the preferred one to align with.
+                      The default is false.
+                    -->
+                    <skipUpdates>${bomSkipUpdates}</skipUpdates>
                 </configuration>
                 <executions>
                     <execution>

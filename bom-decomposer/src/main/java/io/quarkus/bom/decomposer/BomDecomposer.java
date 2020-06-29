@@ -52,7 +52,7 @@ public class BomDecomposer {
 			return this;
 		}
 
-		public BomDecomposerConfig enableUpdateChecks() {
+		public BomDecomposerConfig checkForUpdates() {
 			return transform(new UpdateAvailabilityTransformer());
 		}
 
@@ -201,7 +201,7 @@ public class BomDecomposer {
 		BomDecomposer.config()
 				.debug()
 				.bomArtifact("io.quarkus", "quarkus-bom", "999-SNAPSHOT")
-				.enableUpdateChecks()
+				.checkForUpdates()
 				.decompose()
 				.visit(DecomposedBomHtmlReportGenerator.builder("target/releases.html")
 						.skipOriginsWithSingleRelease()

@@ -10,6 +10,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
 import io.quarkus.bom.decomposer.BomDecomposer;
+import io.quarkus.bom.decomposer.BomDecomposer.BomDecomposerConfig;
 import io.quarkus.bom.decomposer.DecomposedBom;
 import io.quarkus.bom.decomposer.DecomposedBomHtmlReportGenerator;
 import io.quarkus.bom.decomposer.DecomposedBomHtmlReportGenerator.HtmlWriterBuilder;
@@ -33,6 +34,9 @@ public class ReleaseVersionsReportMojo extends AbstractMojo {
     @Parameter(property = "bomConflict", defaultValue = "WARN")
     protected DecomposedBomReleasesLogger.Level bomConflict;
 
+    @Parameter(property = "bomSkipUpdates", defaultValue = "false")
+    protected boolean skipUpdates;
+
     @Parameter(defaultValue = "${skipBomReport}")
     protected boolean skip;
 
@@ -50,11 +54,15 @@ public class ReleaseVersionsReportMojo extends AbstractMojo {
 
 	private void decompose() throws Exception {
 		final MojoMessageWriter msgWriter = new MojoMessageWriter(getLog());
-		final DecomposedBom decomposedBom = BomDecomposer.config()
+		final BomDecomposerConfig config = BomDecomposer.config()
 				.logger(msgWriter)
 				.debug()
-				.bomArtifact(project.getGroupId(), project.getArtifactId(), project.getVersion()).enableUpdateChecks()
-				.decompose();
+				.bomArtifact(project.getGroupId(), project.getArtifactId(), project.getVersion());
+		if(!skipUpdates) {
+			config.checkForUpdates();
+		}
+
+		final DecomposedBom decomposedBom = config.decompose();
 
 		if (htmlReport) {
 			final HtmlWriterBuilder htmlWriter = DecomposedBomHtmlReportGenerator
