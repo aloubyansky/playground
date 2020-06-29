@@ -7,8 +7,8 @@ and suggest version changes to avoid potential conflicts among the dependencies.
 
 One of the utilities included is a multi module release detector. It is a best-effort
 (not 100% accurate) utility that is trying to identify the origin (e.g. a git repo or
-another ID) of the artifacts that are listed as managed dependencies and in case multiple releases
-with the same origin are detected in the same BOM it reports them as conflicts.
+another ID) of the artifacts from the effective set of the project's managed dependencies and
+in case multiple releases from the same origin are detected it reports them as conflicts.
 
 NOTE: the utility will be resolving every managed dependency as part of the analyses!
 

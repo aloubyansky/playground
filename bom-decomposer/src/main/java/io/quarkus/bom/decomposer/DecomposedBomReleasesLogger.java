@@ -119,10 +119,10 @@ public class DecomposedBomReleasesLogger extends NoopDecomposedBomVisitor {
 	public void visitProjectRelease(ProjectRelease release) {
 		++releaseCounter;
 		log("  " + release.id().version());
-		int artifactCounter = 0;
 		for (ProjectDependency dep : release.dependencies()) {
+			this.artifactCounter++;
 			final StringBuilder buf = buf();
-			buf.append("    ").append(++artifactCounter).append(") ").append(dep);
+			buf.append("    ").append(dep);
 			if(dep.isUpdateAvailable()) {
 				buf.append(" -> ").append(dep.availableUpdate().artifact().getVersion());
 			}
@@ -139,7 +139,6 @@ public class DecomposedBomReleasesLogger extends NoopDecomposedBomVisitor {
 				conflict = Conflict.CONFLICT;
 			}
 		}
-		this.artifactCounter += artifactCounter;
 	}
 
 	@Override
