@@ -166,7 +166,9 @@ public class DecomposedBomReleasesLogger extends NoopDecomposedBomVisitor {
 	}
 
 	private Level totalLogLevel() {
-		return higherLevel(higherLevel(resolvableConflictLogLevel, conflictLogLevel), logLevel);
+		Level level = resolvableConflictCounter > 0 ? resolvableConflictLogLevel : null;
+		level = originWithConflictCounter > 0 ? higherLevel(conflictLogLevel, level) : level;
+		return higherLevel(level, logLevel);
 	}
 
 	private Level higherLevel(Level l1, Level l2) {
