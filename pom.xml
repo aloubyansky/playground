@@ -16,6 +16,7 @@
   <modules>
     <module>bom-decomposer</module>
     <module>maven-plugin</module>
+    <module>platform-bom</module>
   </modules>
   <dependencyManagement>
     <dependencies>

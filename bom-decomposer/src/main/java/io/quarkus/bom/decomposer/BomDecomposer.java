@@ -200,7 +200,7 @@ public class BomDecomposer {
 	public static void main(String[] args) throws Exception {
 		BomDecomposer.config()
 				.debug()
-				.bomArtifact("io.quarkus", "quarkus-bom", "999-SNAPSHOT")
+				.bomArtifact("io.quarkus", "quarkus-universe-bom", "999-SNAPSHOT")
 				.checkForUpdates()
 				.decompose()
 				.visit(DecomposedBomHtmlReportGenerator.builder("target/releases.html")
