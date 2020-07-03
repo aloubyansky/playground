@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 import org.apache.maven.model.Dependency;
@@ -47,14 +48,17 @@ public class PlatformBomConfig {
 				parent = parentModel.getParent();
 				pom = parentPom;
 			}
-			return fromManagedDeps(dm.getDependencies(), allProps);
+			return fromManagedDeps(new DefaultArtifact(ModelUtils.getGroupId(model),
+					model.getArtifactId(), null, "pom", ModelUtils.getVersion(model)),
+					dm.getDependencies(), allProps);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to initialize platform BOM config", e);
 		}
 	}
 
-	private static PlatformBomConfig fromManagedDeps(final List<Dependency> managedDeps, Properties props) {
+	private static PlatformBomConfig fromManagedDeps(Artifact bomArtifact, final List<Dependency> managedDeps, Properties props) {
 		final PlatformBomConfig config = new PlatformBomConfig();
+		config.bomArtifact = Objects.requireNonNull(bomArtifact);
 		for(Dependency dep : managedDeps) {
 			String version = dep.getVersion();
 			if(version.startsWith("${") && version.endsWith("}")) {
@@ -77,12 +81,17 @@ public class PlatformBomConfig {
 		return config;
 	}
 
+	private Artifact bomArtifact;
 	private Artifact quarkusBom;
 	private List<Artifact> directDeps = new ArrayList<>();
 
 	private PlatformBomConfig() {
 	}
 
+	public Artifact bomArtifact() {
+		return bomArtifact;
+	}
+	
 	public Artifact quarkusBom() {
 		return quarkusBom;
 	}
