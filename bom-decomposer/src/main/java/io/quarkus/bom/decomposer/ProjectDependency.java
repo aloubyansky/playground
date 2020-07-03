@@ -52,7 +52,7 @@ public class ProjectDependency {
 		return availableUpdate != null;
 	}
 
-	protected void setAvailableUpdate(ProjectDependency update) {
+	public void setAvailableUpdate(ProjectDependency update) {
 		if(update != null) {
 			updateStatus = UpdateStatus.AVAILABLE;
 			availableUpdate = update;

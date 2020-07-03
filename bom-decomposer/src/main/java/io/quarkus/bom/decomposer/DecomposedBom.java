@@ -2,6 +2,7 @@ package io.quarkus.bom.decomposer;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,18 @@ public class DecomposedBom {
 
 	public Artifact bomArtifact() {
 		return bomArtifact;
+	}
+
+	public boolean includes(ReleaseOrigin origin) {
+		return releases.containsKey(origin);
+	}
+
+	public Collection<ReleaseVersion> releaseVersions(ReleaseOrigin origin) {
+		return releases.getOrDefault(origin, Collections.emptyMap()).keySet();
+	}
+
+	public Collection<ProjectRelease> releases(ReleaseOrigin origin) {
+		return releases.getOrDefault(origin, Collections.emptyMap()).values();
 	}
 
 	public void visit(DecomposedBomVisitor visitor) throws BomDecomposerException {
