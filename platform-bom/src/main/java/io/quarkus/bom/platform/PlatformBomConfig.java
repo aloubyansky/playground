@@ -2,21 +2,16 @@ package io.quarkus.bom.platform;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.resolution.ArtifactDescriptorResult;
-
-import io.quarkus.bootstrap.model.AppArtifactKey;
-import io.quarkus.bootstrap.resolver.maven.MavenArtifactResolver;
 import io.quarkus.bootstrap.resolver.maven.workspace.ModelUtils;
 
 public class PlatformBomConfig {
@@ -31,53 +26,68 @@ public class PlatformBomConfig {
 		    if(dm == null) {
 		    	throw new Exception(pom + " does not include managed dependencies");
 		    }
-		    final MavenArtifactResolver resolver = MavenArtifactResolver.builder().build();
-			return fromManagedDeps(dm.getDependencies(),
-					resolver.resolveDescriptor(new DefaultArtifact(ModelUtils.getGroupId(model), model.getArtifactId(),
-							null, "pom", ModelUtils.getVersion(model))));
+
+		    final Properties allProps = new Properties();
+		    allProps.putAll(model.getProperties());
+		    Parent parent = model.getParent();
+			while (parent != null) {
+				final String relativePath = parent.getRelativePath();
+				if(relativePath == null || relativePath.isEmpty()) {
+					break;
+				}
+				Path parentPom = pom.getParent().resolve(relativePath).normalize().toAbsolutePath();
+				if(!parentPom.getFileName().endsWith("pom.xml")) {
+					parentPom = parentPom.resolve("pom.xml");
+				}
+				if(!Files.exists(parentPom)) {
+					break;
+				}
+				final Model parentModel = ModelUtils.readModel(parentPom);
+				allProps.putAll(parentModel.getProperties());
+				parent = parentModel.getParent();
+				pom = parentPom;
+			}
+			return fromManagedDeps(dm.getDependencies(), allProps);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to initialize platform BOM config", e);
 		}
 	}
 
-	private static PlatformBomConfig fromManagedDeps(final List<Dependency> managedDeps, ArtifactDescriptorResult bomDescr) {
-
-		final Map<AppArtifactKey, org.eclipse.aether.graph.Dependency> resolvedDeps = new HashMap<>();
-		for(org.eclipse.aether.graph.Dependency dep : bomDescr.getManagedDependencies()) {
-			final Artifact artifact = dep.getArtifact();
-			resolvedDeps.put(new AppArtifactKey(artifact.getGroupId(), artifact.getArtifactId(), artifact.getClassifier(), artifact.getExtension()), dep);
-		}
-
+	private static PlatformBomConfig fromManagedDeps(final List<Dependency> managedDeps, Properties props) {
 		final PlatformBomConfig config = new PlatformBomConfig();
 		for(Dependency dep : managedDeps) {
-			final org.eclipse.aether.graph.Dependency resolvedDep = resolvedDeps.get(new AppArtifactKey(dep.getGroupId(), dep.getArtifactId(), dep.getClassifier(), dep.getType()));
-			if(resolvedDep == null) {
-				throw new IllegalStateException("Failed to locate direct " + dep + " in resolved descriptor");
+			String version = dep.getVersion();
+			if(version.startsWith("${") && version.endsWith("}")) {
+				String prop = version.substring(2, version.length() - 1);
+				String value = props.getProperty(prop);
+				if(value != null) {
+					version = value;
+				}
 			}
-			final Artifact artifact = resolvedDep.getArtifact();
-			if("import".equals(dep.getScope())) {
-				log("import " + artifact);
-				config.importedBoms.add(artifact);
+			final Artifact artifact = new DefaultArtifact(dep.getGroupId(), dep.getArtifactId(), dep.getClassifier(), dep.getType(), version);
+			if(config.quarkusBom == null && artifact.getArtifactId().equals("quarkus-bom") && artifact.getGroupId().equals("io.quarkus")) {
+				config.quarkusBom = artifact;
 			} else {
-				log("Direct dependency " + artifact);
-				config.directDeps.add(artifact);
+			    config.directDeps.add(artifact);
 			}
+		}
+		if(config.quarkusBom == null) {
+			throw new RuntimeException("Failed to locate io.quarkus:quarkus-bom among the dependencies");
 		}
 		return config;
 	}
 
-	private List<Artifact> importedBoms = new ArrayList<>();
+	private Artifact quarkusBom;
 	private List<Artifact> directDeps = new ArrayList<>();
 
 	private PlatformBomConfig() {
 	}
 
-	public static void main(String[] args) throws Exception {
-		forPom(Paths.get(System.getProperty("user.home")).resolve("git").resolve("quarkus-platform").resolve("bom")
-				.resolve("runtime").resolve("pom.xml"));
+	public Artifact quarkusBom() {
+		return quarkusBom;
 	}
 
-	private static void log(Object o) {
-		System.out.println(o == null ? "null" : o.toString());
+	public List<Artifact> directDeps() {
+		return directDeps;
 	}
 }

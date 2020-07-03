@@ -2,9 +2,9 @@ package io.quarkus.bom.decomposer;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
-
 import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -31,7 +31,7 @@ public class BomDecomposer {
 			logger = messageWriter;
 			return this;
 		}
-		
+
 		public BomDecomposerConfig debug() {
 			debug = true;
 			return this;
@@ -43,7 +43,11 @@ public class BomDecomposer {
 		}
 
 		public BomDecomposerConfig bomArtifact(String groupId, String artifactId, String version) {
-			bomArtifact = new DefaultArtifact(groupId, artifactId, "", "pom", version);
+			return bomArtifact(new DefaultArtifact(groupId, artifactId, "", "pom", version));
+		}
+
+		public BomDecomposerConfig bomArtifact(Artifact artifact) {
+			bomArtifact = artifact;
 			return this;
 		}
 
@@ -58,6 +62,11 @@ public class BomDecomposer {
 
 		public BomDecomposerConfig transform(DecomposedBomTransformer bomTransformer) {
 			transformer = bomTransformer;
+			return this;
+		}
+
+		public BomDecomposerConfig artifacts(Iterable<Artifact> iterator) {
+			artifacts = iterator;
 			return this;
 		}
 
@@ -83,6 +92,7 @@ public class BomDecomposer {
 	private MessageWriter logger;
 	private boolean debug;
 	private Artifact bomArtifact;
+	private Iterable<Artifact> artifacts;
 	private MavenArtifactResolver mvnResolver;
 	private List<ReleaseIdDetector> releaseDetectors = new ArrayList<>();
 	private DecomposedBomBuilder decomposedBuilder;
@@ -99,21 +109,16 @@ public class BomDecomposer {
 	}
 
 	private DecomposedBom decompose() throws BomDecomposerException {
-		if (!"pom".equals(bomArtifact.getExtension())) {
-			throw new BomDecomposerException("The BOM artifact " + bomArtifact + " is not of type 'pom'");
-		}
-
-		final ArtifactDescriptorResult descriptor = describe(bomArtifact);
-
 		final DecomposedBomBuilder bomBuilder = decomposedBuilder == null ? new DefaultDecomposedBomBuilder() : decomposedBuilder;
 		bomBuilder.bomArtifact(bomArtifact);
-		for (Dependency dep : descriptor.getManagedDependencies()) {
+		final Iterable<Artifact> artifacts = this.artifacts == null ? bomArtifacts() : this.artifacts;
+		for (Artifact dep : artifacts) {
 			try {
-				bomBuilder.bomDependency(releaseId(dep.getArtifact()), dep.getArtifact());
+				bomBuilder.bomDependency(releaseId(dep), dep);
 			} catch (BomDecomposerException e) {
 				if (e.getCause() instanceof AppModelResolverException) {
 					// there are plenty of BOMs that include artifacts that don't exist
-					Object[] params = { dep.getArtifact() };
+					Object[] params = { dep };
 					logger().debug("Failed to resolve POM for %s", params);
 				} else {
 					throw e;
@@ -122,6 +127,26 @@ public class BomDecomposer {
 		}
 
 		return transformer == null ? bomBuilder.build() : transformer.transform(this, bomBuilder.build());
+	}
+
+	private Iterable<Artifact> bomArtifacts() throws BomDecomposerException {
+		final Iterator<Dependency> managedDeps = describe(bomArtifact).getManagedDependencies().iterator();
+		return new Iterable<Artifact>() {
+			@Override
+			public Iterator<Artifact> iterator() {
+				return new Iterator<Artifact>() {
+
+					@Override
+					public boolean hasNext() {
+						return managedDeps.hasNext();
+					}
+
+					@Override
+					public Artifact next() {
+						return managedDeps.next().getArtifact();
+					}};
+			}
+		};
 	}
 
 	private ReleaseId releaseId(Artifact artifact) throws BomDecomposerException {
@@ -176,7 +201,7 @@ public class BomDecomposer {
 	public MessageWriter logger() {
 		return logger == null ? logger = new DefaultMessageWriter().setDebugEnabled(debug) : logger;
 	}
-	
+
 	public Model model(Artifact artifact) throws BomDecomposerException {
 		return Util.model(resolve(Util.pom(artifact)).getFile());
 	}
