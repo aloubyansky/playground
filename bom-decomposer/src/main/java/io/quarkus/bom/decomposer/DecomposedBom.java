@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -59,6 +60,31 @@ public class DecomposedBom {
 
 	public ProjectRelease releaseOrNull(ReleaseId releaseId) {
 		return releases.getOrDefault(releaseId.origin(), Collections.emptyMap()).get(releaseId.version());
+	}
+
+	public Iterable<ProjectRelease> releases() {
+		final Iterator<Map<ReleaseVersion, ProjectRelease>> origins = releases.values().iterator();
+		return new Iterable<ProjectRelease>() {
+			@Override
+			public Iterator<ProjectRelease> iterator() {
+				return new Iterator<ProjectRelease>() {
+					Iterator<ProjectRelease> releases;
+
+					@Override
+					public boolean hasNext() {
+						return releases != null && releases.hasNext() || origins.hasNext();
+					}
+
+					@Override
+					public ProjectRelease next() {
+						if(releases == null || !releases.hasNext()) {
+							releases = origins.next().values().iterator();
+						}
+						return releases.next();
+					}
+				};
+			}
+		};
 	}
 
 	public void visit(DecomposedBomVisitor visitor) throws BomDecomposerException {

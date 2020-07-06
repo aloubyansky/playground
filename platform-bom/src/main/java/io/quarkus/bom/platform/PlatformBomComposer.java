@@ -1,5 +1,6 @@
 package io.quarkus.bom.platform;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,6 +25,7 @@ import io.quarkus.bom.decomposer.DecomposedBomTransformer;
 import io.quarkus.bom.decomposer.DecomposedBomVisitor;
 import io.quarkus.bom.decomposer.DefaultMessageWriter;
 import io.quarkus.bom.decomposer.MessageWriter;
+import io.quarkus.bom.decomposer.PomUtils;
 import io.quarkus.bom.decomposer.ProjectDependency;
 import io.quarkus.bom.decomposer.ProjectRelease;
 import io.quarkus.bom.decomposer.ReleaseId;
@@ -42,8 +44,6 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 	private final DecomposedBom quarkusBom;
 	private final MessageWriter logger = new DefaultMessageWriter();
 	private MavenArtifactResolver resolver;
-
-	private Artifact bomArtifact;
 
 	private Collection<ReleaseVersion> quarkusVersions;
 	private LinkedHashMap<String, ReleaseId> preferredVersions;
@@ -83,7 +83,7 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 		for(ProjectDependency dep : extensionDeps.values()) {
 			releaseBuilder(dep.releaseId()).add(dep);
 		}
-		final DecomposedBom.Builder platformBuilder = DecomposedBom.builder().setArtifact(bomArtifact);
+		final DecomposedBom.Builder platformBuilder = DecomposedBom.builder().setArtifact(config.bomArtifact());
 		for(Map<ReleaseVersion, ProjectRelease.Builder> builders : releaseBuilders.values()) {
 			for(ProjectRelease.Builder builder : builders.values()) {
 				platformBuilder.addRelease(builder.build());
@@ -105,7 +105,6 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 
 	@Override
 	public void enterBom(Artifact bomArtifact) {
-		this.bomArtifact = bomArtifact;
 	}
 
 	@Override
@@ -246,7 +245,9 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 	}
 
 	public static void main(String[] args) throws Exception {
-		compose(PlatformBomConfig.forPom(Paths.get(System.getProperty("user.home")).resolve("git")
-				.resolve("quarkus-platform").resolve("bom").resolve("runtime").resolve("pom.xml")));
+		final Path pomDir = Paths.get(System.getProperty("user.home")).resolve("git")
+				.resolve("quarkus-platform").resolve("bom").resolve("runtime");
+		final DecomposedBom platformBom = compose(PlatformBomConfig.forPom(pomDir.resolve("pom.xml")));
+		PomUtils.toPom(platformBom, pomDir.resolve("platform-bom.xml"));
 	}
 }
