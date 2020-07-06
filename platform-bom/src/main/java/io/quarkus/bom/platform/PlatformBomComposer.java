@@ -31,6 +31,8 @@ import io.quarkus.bom.decomposer.ProjectRelease;
 import io.quarkus.bom.decomposer.ReleaseId;
 import io.quarkus.bom.decomposer.ReleaseOrigin;
 import io.quarkus.bom.decomposer.ReleaseVersion;
+import io.quarkus.bom.decomposer.util.BomDiff;
+import io.quarkus.bom.decomposer.util.BomDiff.VersionChange;
 import io.quarkus.bootstrap.model.AppArtifactKey;
 import io.quarkus.bootstrap.resolver.maven.BootstrapMavenException;
 import io.quarkus.bootstrap.resolver.maven.MavenArtifactResolver;
@@ -61,6 +63,7 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 				.mavenArtifactResolver(resolver())
 				.bomArtifact(config.quarkusBom())
 				.decompose();
+		quarkusBom.releases().forEach(r -> releaseBuilder(r.id()));
 
 		for(Artifact directDep : config.directDeps()) {
 			final Iterable<Artifact> artifacts;
@@ -249,5 +252,41 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 				.resolve("quarkus-platform").resolve("bom").resolve("runtime");
 		final DecomposedBom platformBom = compose(PlatformBomConfig.forPom(pomDir.resolve("pom.xml")));
 		PomUtils.toPom(platformBom, pomDir.resolve("platform-bom.xml"));
+
+		final BomDiff bomDiff = BomDiff.config().compare(pomDir.resolve("platform-bom.xml")).to(pomDir.resolve("pom.xml"));
+		log("COMPARING " + bomDiff.mainBom() + " TO " + bomDiff.toBom());
+		log("  main deps total " + bomDiff.mainBomSize());
+		log("  to deps total   " + bomDiff.toBomSize());
+		log("  matching total  " + bomDiff.matching().size());
+
+		if(bomDiff.hasMissing()) {
+			log("MISSING");
+			for(Dependency d : bomDiff.missing()) {
+				log(" - " + d.getArtifact());
+			}
+		}
+		if(bomDiff.hasExtra()) {
+			log("EXTRA");
+			for(Dependency d : bomDiff.extra()) {
+				log(" - " + d.getArtifact());
+			}
+		}
+		if(bomDiff.hasDowngraded()) {
+			log("DOWNGRADED");
+			for(VersionChange d : bomDiff.downgraded()) {
+				log(" - " + d.from().getArtifact() + " -> " + d.to().getArtifact().getVersion());
+			}
+		}
+		if(bomDiff.hasUpgraded()) {
+			log("UPGRADED");
+			for(VersionChange d : bomDiff.upgraded()) {
+				log(" - " + d.from().getArtifact() + " -> " + d.to().getArtifact().getVersion());
+			}
+		}
+
+	}
+
+	private static void log(Object o) {
+		System.out.println(o == null ? "null" : o.toString());
 	}
 }
