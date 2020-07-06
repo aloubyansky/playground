@@ -1,8 +1,13 @@
 package io.quarkus.bom.decomposer;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import org.eclipse.aether.artifact.Artifact;
+
+import io.quarkus.bootstrap.model.AppArtifactKey;
 
 public class ProjectRelease {
 
@@ -11,13 +16,27 @@ public class ProjectRelease {
 		private Builder() {
 		}
 
+		private Set<AppArtifactKey> depKeys;
+
 		public Builder add(Artifact artifact) {
 			return add(ProjectDependency.create(id, artifact));
 		}
 
 		public Builder add(ProjectDependency dep) {
 			deps.add(dep);
+			if(depKeys != null) {
+				depKeys.add(dep.key());
+			}
 			return this;
+		}
+
+		public boolean includes(AppArtifactKey key) {
+			if(depKeys == null) {
+				final Set<AppArtifactKey> depKeys = new HashSet<>(deps.size());
+				deps.forEach(d -> depKeys.add(d.key()));
+				this.depKeys = depKeys;
+			}
+			return depKeys.contains(key);
 		}
 
 		public ProjectRelease build() {

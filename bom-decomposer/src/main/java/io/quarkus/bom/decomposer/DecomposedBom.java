@@ -57,6 +57,10 @@ public class DecomposedBom {
 		return releases.getOrDefault(origin, Collections.emptyMap()).values();
 	}
 
+	public ProjectRelease releaseOrNull(ReleaseId releaseId) {
+		return releases.getOrDefault(releaseId.origin(), Collections.emptyMap()).get(releaseId.version());
+	}
+
 	public void visit(DecomposedBomVisitor visitor) throws BomDecomposerException {
 		visitor.enterBom(bomArtifact);
 		List<ReleaseOrigin> origins = new ArrayList<>(releases.keySet());
