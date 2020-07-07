@@ -122,7 +122,7 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 								}
 							}
 						}
-						extensionDeps.putIfAbsent(dep.key(), dep);
+						addNonQuarkusDep(dep, extensionDeps);
 					}
 				}
 			}
@@ -140,15 +140,15 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 
 	private void mergeExtensionDeps(final ProjectRelease release, Map<AppArtifactKey, ProjectDependency> extensionDeps) {
 		for(ProjectDependency dep : release.dependencies()) {
-			addDependency(dep, extensionDeps);
+			// the origin may have changed in the release of the dependency
+			if(quarkusDeps.containsKey(dep.key())) {
+				return;
+			}
+			addNonQuarkusDep(dep, extensionDeps);
 		}
 	}
 
-	private void addDependency(ProjectDependency dep, Map<AppArtifactKey, ProjectDependency> extensionDeps) {
-		// the origin may have changed in the release of the dependency
-		if(quarkusDeps.containsKey(dep.key())) {
-			return;
-		}
+	private void addNonQuarkusDep(ProjectDependency dep, Map<AppArtifactKey, ProjectDependency> extensionDeps) {
 		final ProjectDependency currentDep = extensionDeps.get(dep.key());
 		if(currentDep != null) {
 			final ArtifactVersion currentVersion = new DefaultArtifactVersion(currentDep.artifact().getVersion());
