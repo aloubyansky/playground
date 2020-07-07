@@ -1,5 +1,6 @@
 package io.quarkus.bom.decomposer;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,7 +14,9 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
 import io.quarkus.bootstrap.resolver.AppModelResolverException;
 import io.quarkus.bootstrap.resolver.maven.BootstrapMavenContext;
+import io.quarkus.bootstrap.resolver.maven.BootstrapMavenException;
 import io.quarkus.bootstrap.resolver.maven.MavenArtifactResolver;
+import io.quarkus.bootstrap.resolver.maven.workspace.LocalProject;
 import io.quarkus.bootstrap.resolver.maven.workspace.ModelUtils;
 
 public class BomDecomposer {
@@ -40,6 +43,22 @@ public class BomDecomposer {
 		public BomDecomposerConfig mavenArtifactResolver(MavenArtifactResolver resolver) {
 			mvnResolver = resolver;
 			return this;
+		}
+
+		public BomDecomposerConfig bomFile(Path bom) {
+			BootstrapMavenContext mvnCtx;
+			try {
+				mvnCtx = new BootstrapMavenContext(BootstrapMavenContext.config().setCurrentProject(bom.normalize().toAbsolutePath().toString()));
+			} catch (BootstrapMavenException e) {
+				throw new RuntimeException("Failed to initialize bootstrap Maven context", e);
+			}
+			final LocalProject bomProject = mvnCtx.getCurrentProject();
+			try {
+				mavenArtifactResolver(new MavenArtifactResolver(mvnCtx));
+			} catch (BootstrapMavenException e) {
+				throw new RuntimeException("Failed to initialize Maven artifact resolver for " + bom, e);
+			}
+			return bomArtifact(new DefaultArtifact(bomProject.getGroupId(), bomProject.getArtifactId(), "", "pom", bomProject.getVersion()));
 		}
 
 		public BomDecomposerConfig bomArtifact(String groupId, String artifactId, String version) {
@@ -223,9 +242,14 @@ public class BomDecomposer {
 	}
 
 	public static void main(String[] args) throws Exception {
+
+		final Path pomDir = Paths.get(System.getProperty("user.home")).resolve("git")
+				.resolve("quarkus-platform").resolve("bom").resolve("runtime");
+
 		BomDecomposer.config()
 				.debug()
-				.bomArtifact("io.quarkus", "quarkus-universe-bom", "999-SNAPSHOT")
+				//.bomArtifact("io.quarkus", "quarkus-universe-bom", "999-SNAPSHOT")
+				.bomFile(pomDir.resolve("platform-bom.xml"))
 				.checkForUpdates()
 				.decompose()
 				.visit(DecomposedBomHtmlReportGenerator.builder("target/releases.html")
