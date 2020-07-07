@@ -192,37 +192,16 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 
 	@Override
 	public void visitProjectRelease(ProjectRelease release) {
+		for(ProjectDependency dep : release.dependencies()) {
+			if(dep.artifact().getArtifactId().equals("xstream")) {
+				log("XSTREAM " + dep.artifact());
+				log("  " + extBom);
+				log("  " + quarkusVersions);
+				log("  " + release.id());
+			}
+		}
 		if(quarkusVersions.isEmpty()) {
 			extensionReleases.computeIfAbsent(release.id().origin(), id -> new HashMap<>()).put(release.id().version(), release);
-/*
-			Collection<ProjectRelease> currentReleases = null;
-			for(ProjectDependency dep : release.dependencies()) {
-				// the origin may have changed in the release of the dependency
-				if(quarkusDeps.containsKey(dep.key())) {
-					continue;
-				}
-
-				final ProjectDependency currentDep = extensionDeps.get(dep.key());
-				if(currentDep != null) {
-					final ArtifactVersion currentVersion = new DefaultArtifactVersion(currentDep.artifact().getVersion());
-					final ArtifactVersion newVersion = new DefaultArtifactVersion(dep.artifact().getVersion());
-					if(currentVersion.compareTo(newVersion) < 0) {
-						extensionDeps.put(dep.key(), dep);
-					}
-					continue;
-				}
-
-				if(currentReleases == null) {
-					currentReleases = extensionReleases.computeIfAbsent(dep.releaseId().origin(), id -> new ArrayList<>());
-					if (currentReleases.isEmpty()) {
-						currentReleases.add(release);
-						extensionDeps.put(dep.key(), dep);
-						continue;
-					}
-				}
-
-			}
-			*/
 			return;
 		}
 		if(quarkusVersions.contains(release.id().version())) {

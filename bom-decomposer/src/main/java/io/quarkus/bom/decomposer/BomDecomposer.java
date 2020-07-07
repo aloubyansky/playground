@@ -248,8 +248,8 @@ public class BomDecomposer {
 
 		BomDecomposer.config()
 				.debug()
-				//.bomArtifact("io.quarkus", "quarkus-universe-bom", "999-SNAPSHOT")
-				.bomFile(pomDir.resolve("platform-bom.xml"))
+				.bomArtifact("io.quarkus", "quarkus-universe-bom", "999-SNAPSHOT")
+				//.bomFile(pomDir.resolve("platform-bom.xml"))
 				.checkForUpdates()
 				.decompose()
 				.visit(DecomposedBomHtmlReportGenerator.builder("target/releases.html")
