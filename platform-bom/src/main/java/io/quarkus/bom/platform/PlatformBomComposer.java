@@ -18,6 +18,7 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
+import io.quarkus.bom.PomSource;
 import io.quarkus.bom.decomposer.BomDecomposer;
 import io.quarkus.bom.decomposer.BomDecomposerException;
 import io.quarkus.bom.decomposer.DecomposedBom;
@@ -31,8 +32,9 @@ import io.quarkus.bom.decomposer.ProjectRelease;
 import io.quarkus.bom.decomposer.ReleaseId;
 import io.quarkus.bom.decomposer.ReleaseOrigin;
 import io.quarkus.bom.decomposer.ReleaseVersion;
-import io.quarkus.bom.decomposer.util.BomDiff;
-import io.quarkus.bom.decomposer.util.BomDiff.VersionChange;
+import io.quarkus.bom.diff.BomDiff;
+import io.quarkus.bom.diff.BomDiffLogger;
+import io.quarkus.bom.diff.HtmlBomDiffReportGenerator;
 import io.quarkus.bootstrap.model.AppArtifactKey;
 import io.quarkus.bootstrap.resolver.maven.BootstrapMavenException;
 import io.quarkus.bootstrap.resolver.maven.MavenArtifactResolver;
@@ -131,7 +133,7 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 		for(ProjectDependency dep : extensionDeps.values()) {
 			releaseBuilders.computeIfAbsent(dep.releaseId(), id -> ProjectRelease.builder(id)).add(dep);
 		}
-		final DecomposedBom.Builder platformBuilder = DecomposedBom.builder().setArtifact(config.bomArtifact());
+		final DecomposedBom.Builder platformBuilder = DecomposedBom.builder().bomArtifact(config.bomArtifact());
 		for (ProjectRelease.Builder builder : releaseBuilders.values()) {
 			platformBuilder.addRelease(builder.build());
 		}
@@ -292,51 +294,20 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 	public static void main(String[] args) throws Exception {
 		final Path pomDir = Paths.get(System.getProperty("user.home")).resolve("git")
 				.resolve("quarkus-platform").resolve("bom").resolve("runtime");
-		//final PlatformBomConfig config = PlatformBomConfig.forPom(pomDir.resolve("pom.xml"));
-		//PlatformBomConfig config = PlatformBomConfig.forGithubPom("quarkusio/quarkus-platform/master/bom/runtime/pom.xml");
-		PlatformBomConfig config = PlatformBomConfig.forGithubPom("quarkusio/quarkus-platform/1.5.2.Final/bom/runtime/pom.xml");
+		//PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.of(pomDir.resolve("pom.xml")));
+		//PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.githubPom("quarkusio/quarkus-platform/master/bom/runtime/pom.xml"));
+		PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.githubPom("quarkusio/quarkus-platform/1.5.2.Final/bom/runtime/pom.xml"));
 
 		final DecomposedBom platformBom = compose(config);
 		Path outputDir = Paths.get("target"); // pomDir
 		PomUtils.toPom(platformBom, outputDir.resolve("platform-bom.xml"));
 
 		final BomDiff bomDiff = BomDiff.config()
-				.compare(outputDir.resolve("platform-bom.xml"))
-				.to(new DefaultArtifact("io.quarkus", "quarkus-universe-bom", null, "pom", "1.5.2.Final"));
+				.compare(new DefaultArtifact("io.quarkus", "quarkus-universe-bom", null, "pom", "1.5.2.Final"))
+				.to(outputDir.resolve("platform-bom.xml"));
 				//.to(pomDir.resolve("pom.xml"));
-		log("COMPARING " + bomDiff.mainBom() + " TO " + bomDiff.toBom());
-		log("  main deps total " + bomDiff.mainBomSize());
-		log("  to deps total   " + bomDiff.toBomSize());
-		log("  matching total  " + bomDiff.matching().size());
 
-		if(bomDiff.hasMissing()) {
-			log("MISSING");
-			for(Dependency d : bomDiff.missing()) {
-				log(" - " + d.getArtifact());
-			}
-		}
-		if(bomDiff.hasExtra()) {
-			log("EXTRA");
-			for(Dependency d : bomDiff.extra()) {
-				log(" - " + d.getArtifact());
-			}
-		}
-		if(bomDiff.hasDowngraded()) {
-			log("DOWNGRADED");
-			for(VersionChange d : bomDiff.downgraded()) {
-				log(" - " + d.from().getArtifact() + " -> " + d.to().getArtifact().getVersion());
-			}
-		}
-		if(bomDiff.hasUpgraded()) {
-			log("UPGRADED");
-			for(VersionChange d : bomDiff.upgraded()) {
-				log(" - " + d.from().getArtifact() + " -> " + d.to().getArtifact().getVersion());
-			}
-		}
-
-	}
-
-	private static void log(Object o) {
-		System.out.println(o == null ? "null" : o.toString());
+		BomDiffLogger.config().report(bomDiff);
+		HtmlBomDiffReportGenerator.config(outputDir.resolve("bom-diff.html")).report(bomDiff);
 	}
 }

@@ -10,6 +10,8 @@ import java.util.Map;
 
 import org.eclipse.aether.artifact.Artifact;
 
+import io.quarkus.bom.PomResolver;
+
 public class DecomposedBom {
 
 	public class Builder {
@@ -17,7 +19,12 @@ public class DecomposedBom {
 		private Builder() {
 		}
 
-		public Builder setArtifact(Artifact bom) {
+		public Builder bomSource(PomResolver bom) {
+			bomSource = bom;
+			return this;
+		}
+
+		public Builder bomArtifact(Artifact bom) {
 			bomArtifact = bom;
 			return this;
 		}
@@ -36,10 +43,15 @@ public class DecomposedBom {
 		return new DecomposedBom().new Builder();
 	}
 
+	protected PomResolver bomSource;
 	protected Artifact bomArtifact;
 	protected Map<ReleaseOrigin, Map<ReleaseVersion, ProjectRelease>> releases = new HashMap<>();
 
 	private DecomposedBom() {
+	}
+
+	public String bomSource() {
+		return bomSource == null ? "n/a" : bomSource.source();
 	}
 
 	public Artifact bomArtifact() {

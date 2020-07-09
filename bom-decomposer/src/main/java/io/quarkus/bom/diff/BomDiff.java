@@ -1,4 +1,4 @@
-package io.quarkus.bom.decomposer.util;
+package io.quarkus.bom.diff;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -28,7 +28,9 @@ public class BomDiff {
 	public static class Config {
 
 		private Artifact mainBom;
+		private String mainSource;
 		private Artifact toBom;
+		private String toSource;
 		private List<Dependency> mainDeps;
 		private List<Dependency> toDeps;
 
@@ -45,6 +47,7 @@ public class BomDiff {
 		public Config compare(Artifact bomArtifact) {
 			final ArtifactDescriptorResult descr = descriptor(defaultResolver(), bomArtifact);
 			mainBom = descr.getArtifact();
+			mainSource = bomArtifact.toString();
 			mainDeps = descr.getManagedDependencies();
 			return this;
 		}
@@ -52,6 +55,7 @@ public class BomDiff {
 		public Config compare(Path bomPath) {
 			final ArtifactDescriptorResult descr = descriptor(bomPath);
 			mainBom = descr.getArtifact();
+			mainSource = bomPath.toString();
 			mainDeps = descr.getManagedDependencies();
 			return this;
 		}
@@ -63,6 +67,7 @@ public class BomDiff {
 		public BomDiff to(Artifact bomArtifact) {
 			final ArtifactDescriptorResult descr = descriptor(defaultResolver(), bomArtifact);
 			toBom = descr.getArtifact();
+			toSource = bomArtifact.toString();
 			toDeps = descr.getManagedDependencies();
 			return diff();
 		}
@@ -70,6 +75,7 @@ public class BomDiff {
 		public BomDiff to(Path bomPath) {
 			final ArtifactDescriptorResult descr = descriptor(bomPath);
 			toBom = descr.getArtifact();
+			toSource = bomPath.toString();
 			toDeps = descr.getManagedDependencies();
 			return diff();
 		}
@@ -134,7 +140,9 @@ public class BomDiff {
 	}
 
 	private final Artifact mainBom;
+	private final String mainSource;
 	private final Artifact toBom;
+	private final String toSource;
 	private final int mainSize;
 	private final int toSize;
 	private final List<Dependency> missing;
@@ -145,7 +153,9 @@ public class BomDiff {
 
 	private BomDiff(Config config) {
 		mainBom = config.mainBom;
+		mainSource = config.mainSource;
 		toBom = config.toBom;
+		toSource = config.toSource;
 		mainSize = config.mainDeps.size();
 		toSize = config.toDeps.size();
 		final Map<AppArtifactKey, Dependency> mainDeps = toMap(config.mainDeps);
@@ -193,8 +203,16 @@ public class BomDiff {
 		return mainBom;
 	}
 
+	public String mainSource() {
+		return mainSource;
+	}
+
 	public Artifact toBom() {
 		return toBom;
+	}
+
+	public String toSource() {
+		return toSource;
 	}
 
 	public int mainBomSize() {

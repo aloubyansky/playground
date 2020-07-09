@@ -1,12 +1,6 @@
 package io.quarkus.bom.platform;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -18,97 +12,20 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
+
+import io.quarkus.bom.PomResolver;
 import io.quarkus.bootstrap.resolver.maven.workspace.ModelUtils;
 
 public class PlatformBomConfig {
 
-	private static interface PomResolver {
-		Path projectPom();
-		Model readModel(Path pom) throws IOException;
-	}
-
-	private static class FsPomResolver implements PomResolver {
-
-		private final Path projectPom;
-
-		FsPomResolver(Path projectPom) {
-			if(!Files.exists(projectPom)) {
-				throw new IllegalArgumentException("Path does not exist " + projectPom);
-			}
-			this.projectPom = projectPom;
-		}
-
-		@Override
-		public Path projectPom() {
-			return projectPom;
-		}
-
-		@Override
-		public Model readModel(Path pom) throws IOException {
-			if(Files.isDirectory(pom)) {
-				pom = pom.resolve("pom.xml");
-			}
-			return Files.exists(pom) ? ModelUtils.readModel(pom) : null;
-		}
-	}
-
-	private static class UrlPomResolver implements PomResolver {
-		private final URL baseUrl;
-
-		UrlPomResolver(URL baseUrl) {
-			this.baseUrl = baseUrl;
-		}
-
-		@Override
-		public Path projectPom() {
-			return Paths.get(baseUrl.getPath());
-		}
-
-		@Override
-		public Model readModel(Path pom) throws IOException {
-			if(!pom.getFileName().toString().endsWith(".xml")) {
-				pom = pom.resolve("pom.xml");
-			}
-			final URL url = new URL(baseUrl.getProtocol(), baseUrl.getHost(), baseUrl.getPort(), pom.toUri().getPath());
-			try(InputStream stream = url.openStream()) {
-				return ModelUtils.readModel(stream);
-			} catch(IOException e) {
-				return null;
-			}
-		}
-	}
-
-	public static PlatformBomConfig forGithubPom(String repoPath) {
-		final StringBuilder buf = new StringBuilder();
-		buf.append("https://raw.githubusercontent.com");
-		if(repoPath.charAt(0) != '/') {
-			buf.append("/");
-		}
-		buf.append(repoPath);
-		final URL url;
-		try {
-			url = new URL(buf.toString());
-		} catch (MalformedURLException e) {
-			throw new IllegalStateException("Failed to create a github URL for " + repoPath, e);
-		}
-		return forPom(url);
-	}
-
-	public static PlatformBomConfig forPom(URL pom) {
-		return build(new UrlPomResolver(pom));
-	}
-
-	public static PlatformBomConfig forPom(Path pom) {
-		if(!Files.exists(pom)) {
-			throw new IllegalArgumentException("Path does not exist " + pom);
-		}
-		return build(new FsPomResolver(pom));
+	public static PlatformBomConfig forPom(PomResolver pomResolver) {
+		return build(pomResolver);
 	}
 
 	private static PlatformBomConfig build(PomResolver pomResolver) {
-		Path pom = pomResolver.projectPom();
+		Path pom = pomResolver.pomPath();
 		try {
-		    final Model model = pomResolver.readModel(pom);
+		    final Model model = pomResolver.readLocalModel(pom);
 			final DependencyManagement dm = model.getDependencyManagement();
 		    if(dm == null) {
 		    	throw new Exception(pom + " does not include managed dependencies");
@@ -123,7 +40,7 @@ public class PlatformBomConfig {
 					break;
 				}
 				Path parentPom = pom.getParent().resolve(relativePath).normalize().toAbsolutePath();
-				final Model parentModel = pomResolver.readModel(parentPom);
+				final Model parentModel = pomResolver.readLocalModel(parentPom);
 				if(parentModel == null) {
 					break;
 				}

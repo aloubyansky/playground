@@ -32,7 +32,7 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 		}
 
 		public HtmlWriterBuilder indentChars(int indent) {
-			indentChars = indent;
+			indentChars(indent);
 			return this;
 		}
 
@@ -49,10 +49,6 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 	private static String RED = "Red";
 	private static String GREEN = "Green";
 	private static String BLUE = "Blue";
-
-	private int tagDepth;
-	private int indentChars = 4;
-	final StringBuilder buf = new StringBuilder();
 
 	private int releaseOriginsTotal;
 	private int releaseVersionsTotal;
@@ -278,61 +274,5 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 
 		closeTag("body");
 		closeTag("html");
-	}
-
-	private StringBuilder buf() {
-		buf.setLength(0);
-		return buf;
-	}
-
-	private void writeTag(String name, Object value) throws IOException {
-		writeTag(name, null, value);
-	}
-
-	private void writeTag(String name, String style, Object value) throws IOException {
-		offset();
-		final StringBuilder buf = buf();
-		buf.append('<').append(name);
-		if(style != null) {
-			buf.append(" style=\"").append(style).append("\"");
-		}
-		buf.append('>').append(value).append("</").append(name).append('>');
-		writeLine(buf);
-	}
-
-	private void openTag(String name) throws IOException {
-		offset();
-		final StringBuilder buf = buf();
-		buf.append('<').append(name).append('>');
-		writeLine(buf.toString());
-		++tagDepth;
-	}
-
-	private void closeTag(String name) throws IOException {
-		--tagDepth;
-		offset();
-		final StringBuilder buf = buf();
-		buf.append("</").append(name).append('>');
-		writeLine(buf.toString());
-	}
-
-	private void emptyTag(String name) throws IOException {
-		offset();
-		final StringBuilder buf = buf();
-		buf.append("<").append(name).append("/>");
-		writeLine(buf.toString());
-	}
-
-	private void offsetLine(String line) throws IOException {
-		offset();
-		writeLine(line);
-	}
-
-	private void offset() throws IOException {
-		final StringBuilder buf = buf();
-		for(int i = 0; i < tagDepth*indentChars; ++i) {
-			buf.append(' ');
-		}
-		append(buf);
 	}
 }

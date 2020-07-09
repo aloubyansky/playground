@@ -12,6 +12,8 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
+import io.quarkus.bom.PomResolver;
+import io.quarkus.bom.PomSource;
 import io.quarkus.bootstrap.resolver.AppModelResolverException;
 import io.quarkus.bootstrap.resolver.maven.BootstrapMavenContext;
 import io.quarkus.bootstrap.resolver.maven.BootstrapMavenException;
@@ -58,7 +60,9 @@ public class BomDecomposer {
 			} catch (BootstrapMavenException e) {
 				throw new RuntimeException("Failed to initialize Maven artifact resolver for " + bom, e);
 			}
-			return bomArtifact(new DefaultArtifact(bomProject.getGroupId(), bomProject.getArtifactId(), "", "pom", bomProject.getVersion()));
+			bomArtifact = new DefaultArtifact(bomProject.getGroupId(), bomProject.getArtifactId(), "", "pom", bomProject.getVersion());
+			bomSource = PomSource.of(bom);
+			return this;
 		}
 
 		public BomDecomposerConfig bomArtifact(String groupId, String artifactId, String version) {
@@ -67,6 +71,7 @@ public class BomDecomposer {
 
 		public BomDecomposerConfig bomArtifact(Artifact artifact) {
 			bomArtifact = artifact;
+			bomSource = PomSource.of(artifact);
 			return this;
 		}
 
@@ -102,6 +107,7 @@ public class BomDecomposer {
 			throws BomDecomposerException {
 		final BomDecomposer decomposer = new BomDecomposer();
 		decomposer.bomArtifact = new DefaultArtifact(groupId, artifactId, "", "pom", version);
+		decomposer.bomSource = PomSource.of(decomposer.bomArtifact);
 		return decomposer.decompose();
 	}
 
@@ -111,6 +117,7 @@ public class BomDecomposer {
 	private MessageWriter logger;
 	private boolean debug;
 	private Artifact bomArtifact;
+	private PomResolver bomSource;
 	private Iterable<Artifact> artifacts;
 	private MavenArtifactResolver mvnResolver;
 	private List<ReleaseIdDetector> releaseDetectors = new ArrayList<>();
