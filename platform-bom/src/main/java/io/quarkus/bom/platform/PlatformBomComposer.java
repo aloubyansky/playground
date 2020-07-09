@@ -193,12 +193,6 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 	@Override
 	public void visitProjectRelease(ProjectRelease release) {
 		for(ProjectDependency dep : release.dependencies()) {
-			if(dep.artifact().getArtifactId().equals("xstream")) {
-				log("XSTREAM " + dep.artifact());
-				log("  " + extBom);
-				log("  " + quarkusVersions);
-				log("  " + release.id());
-			}
 		}
 		if(quarkusVersions.isEmpty()) {
 			extensionReleases.computeIfAbsent(release.id().origin(), id -> new HashMap<>()).put(release.id().version(), release);
@@ -298,10 +292,18 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 	public static void main(String[] args) throws Exception {
 		final Path pomDir = Paths.get(System.getProperty("user.home")).resolve("git")
 				.resolve("quarkus-platform").resolve("bom").resolve("runtime");
-		final DecomposedBom platformBom = compose(PlatformBomConfig.forPom(pomDir.resolve("pom.xml")));
-		PomUtils.toPom(platformBom, pomDir.resolve("platform-bom.xml"));
+		//final PlatformBomConfig config = PlatformBomConfig.forPom(pomDir.resolve("pom.xml"));
+		//PlatformBomConfig config = PlatformBomConfig.forGithubPom("quarkusio/quarkus-platform/master/bom/runtime/pom.xml");
+		PlatformBomConfig config = PlatformBomConfig.forGithubPom("quarkusio/quarkus-platform/1.5.2.Final/bom/runtime/pom.xml");
 
-		final BomDiff bomDiff = BomDiff.config().compare(pomDir.resolve("platform-bom.xml")).to(pomDir.resolve("pom.xml"));
+		final DecomposedBom platformBom = compose(config);
+		Path outputDir = Paths.get("target"); // pomDir
+		PomUtils.toPom(platformBom, outputDir.resolve("platform-bom.xml"));
+
+		final BomDiff bomDiff = BomDiff.config()
+				.compare(outputDir.resolve("platform-bom.xml"))
+				.to(new DefaultArtifact("io.quarkus", "quarkus-universe-bom", null, "pom", "1.5.2.Final"));
+				//.to(pomDir.resolve("pom.xml"));
 		log("COMPARING " + bomDiff.mainBom() + " TO " + bomDiff.toBom());
 		log("  main deps total " + bomDiff.mainBomSize());
 		log("  to deps total   " + bomDiff.toBomSize());

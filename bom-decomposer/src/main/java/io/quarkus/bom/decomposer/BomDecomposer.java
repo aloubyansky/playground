@@ -195,7 +195,7 @@ public class BomDecomposer {
 					&& Util.getScmTag(model).equals(Util.getScmTag(parentModel)) ? parentModel : null;
 		}
 
-		if (model.getParent().getRelativePath().isBlank()) {
+		if (model.getParent().getRelativePath().isEmpty()) {
 			return null;
 		}
 
@@ -248,8 +248,8 @@ public class BomDecomposer {
 
 		BomDecomposer.config()
 				.debug()
-				.bomArtifact("io.quarkus", "quarkus-universe-bom", "999-SNAPSHOT")
-				//.bomFile(pomDir.resolve("platform-bom.xml"))
+				.bomArtifact("io.quarkus", "quarkus-universe-bom", "1.5.2.Final")
+				//.bomFile(pomDir.resolve("pom.xml"))
 				.checkForUpdates()
 				.decompose()
 				.visit(DecomposedBomHtmlReportGenerator.builder("target/releases.html")
