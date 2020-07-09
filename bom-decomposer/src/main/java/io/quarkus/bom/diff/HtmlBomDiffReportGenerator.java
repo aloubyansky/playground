@@ -14,6 +14,9 @@ import io.quarkus.bom.diff.BomDiff.VersionChange;
 
 public class HtmlBomDiffReportGenerator extends FileReportWriter implements BomDiffReportGenerator {
 
+	private static final String[] listBackground = new String[] { "background-color:#EBF4FA",
+			"background-color:#FFFFFF" };
+
 	public static Config config(String name) {
 		return new HtmlBomDiffReportGenerator(name).new Config();
 	}
@@ -137,7 +140,7 @@ public class HtmlBomDiffReportGenerator extends FileReportWriter implements BomD
 		}
 		openTag("tr");
 		writeTag("td", "text-align:left;font-weight:bold;color:gray", "managed dependencies:");
-		writeTag("td", "font-weight:bold", bomDiff.mainBomSize());
+		writeTag("td", /*"font-weight:bold",*/ bomDiff.mainBomSize());
 		closeTag("tr");
 		closeTag("table");
 
@@ -166,7 +169,7 @@ public class HtmlBomDiffReportGenerator extends FileReportWriter implements BomD
 		}
 		openTag("tr");
 		writeTag("td", "text-align:left;font-weight:bold;color:gray", "managed dependencies:");
-		writeTag("td", "font-weight:bold", bomDiff.toBomSize());
+		writeTag("td", /*"font-weight:bold",*/ bomDiff.toBomSize());
 		closeTag("tr");
 		closeTag("table");
 
@@ -191,8 +194,9 @@ public class HtmlBomDiffReportGenerator extends FileReportWriter implements BomD
 		accordionButton(caption, total, deps.size());
 		offsetLine("<div class=\"panel\">");
 		openTag("table");
+		int i = 0;
 		for(Dependency d : deps) {
-			openTag("tr");
+			openTag("tr", listBackground[i ^= 1]);
 			writeTag("td", gact(d.getArtifact()));
 			writeTag("td", d.getArtifact().getVersion());
 			closeTag("tr");
@@ -201,16 +205,18 @@ public class HtmlBomDiffReportGenerator extends FileReportWriter implements BomD
 		offsetLine("</div>");
 	}
 
-	private void versionChangeAccordion(final String caption, int total, List<VersionChange> downgraded)
+	private void versionChangeAccordion(final String caption, int total, List<VersionChange> changes)
 			throws IOException {
-		accordionButton(caption, total, downgraded.size());
+		accordionButton(caption, total, changes.size());
 		offsetLine("<div class=\"panel\">");
 		openTag("table");
-		for(VersionChange d : downgraded) {
-			openTag("tr");
+		int i = 0;
+		for(VersionChange d : changes) {
+			openTag("tr", listBackground[i ^= 1]);
 			writeTag("td", gact(d.from().getArtifact()));
 			writeTag("td", d.from().getArtifact().getVersion());
-			writeTag("td", d.to().getArtifact().getVersion());
+			writeTag("td", d.upgrade() ? "color:green" : "color:red", d.upgrade() ? "&#9745" : "&#9888");
+			writeTag("td", d.upgrade() ? "color:green" : "color:red", d.to().getArtifact().getVersion());
 			closeTag("tr");
 		}
 		closeTag("table");

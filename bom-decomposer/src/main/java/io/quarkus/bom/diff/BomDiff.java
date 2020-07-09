@@ -122,12 +122,14 @@ public class BomDiff {
 	}
 
 	public static class VersionChange {
+		private boolean upgrade;
 		private final Dependency from;
 		private final Dependency to;
 
-		private VersionChange(Dependency from, Dependency to) {
+		private VersionChange(Dependency from, Dependency to, boolean upgrade) {
 			this.from = from;
 			this.to = to;
+			this.upgrade = upgrade;
 		}
 
 		public Dependency from() {
@@ -136,6 +138,10 @@ public class BomDiff {
 
 		public Dependency to() {
 			return to;
+		}
+		
+		public boolean upgrade() {
+			return upgrade;
 		}
 	}
 
@@ -174,9 +180,9 @@ public class BomDiff {
 			} else if(main.getValue().getArtifact().getVersion().equals(toDep.getArtifact().getVersion())) {
 				matching.put(main.getKey().toString(), main.getValue());
 			} else if(new DefaultArtifactVersion(main.getValue().getArtifact().getVersion()).compareTo(new DefaultArtifactVersion(toDep.getArtifact().getVersion())) > 0) {
-				downgraded.put(main.getKey().toString(), new VersionChange(main.getValue(), toDep));
+				downgraded.put(main.getKey().toString(), new VersionChange(main.getValue(), toDep, false));
 			} else {
-				upgraded.put(main.getKey().toString(), new VersionChange(main.getValue(), toDep));
+				upgraded.put(main.getKey().toString(), new VersionChange(main.getValue(), toDep, true));
 			}
 		}
 		toDeps.entrySet().forEach(d -> extra.put(d.getKey().toString(), d.getValue()));

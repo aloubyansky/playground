@@ -82,9 +82,17 @@ public class FileReportWriter {
 	}
 
 	protected void openTag(String name) throws IOException {
+		openTag(name, null);
+	}
+	
+	protected void openTag(String name, String style) throws IOException {
 		offset();
 		final StringBuilder buf = buf();
-		buf.append('<').append(name).append('>');
+		buf.append('<').append(name);
+		if(style != null) {
+			buf.append(" style=\"").append(style).append("\"");
+		}		
+		buf.append('>');
 		writeLine(buf.toString());
 		++tagDepth;
 	}

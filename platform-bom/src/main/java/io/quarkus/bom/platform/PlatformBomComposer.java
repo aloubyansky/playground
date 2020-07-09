@@ -294,20 +294,20 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 	public static void main(String[] args) throws Exception {
 		final Path pomDir = Paths.get(System.getProperty("user.home")).resolve("git")
 				.resolve("quarkus-platform").resolve("bom").resolve("runtime");
-		PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.of(pomDir.resolve("pom.xml")));
+		//PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.of(pomDir.resolve("pom.xml")));
 		//PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.githubPom("quarkusio/quarkus-platform/master/bom/runtime/pom.xml"));
-		//PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.githubPom("quarkusio/quarkus-platform/1.5.2.Final/bom/runtime/pom.xml"));
+		PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.githubPom("quarkusio/quarkus-platform/1.5.2.Final/bom/runtime/pom.xml"));
 
 		final DecomposedBom platformBom = compose(config);
 		Path outputDir = Paths.get("target"); // pomDir
 		PomUtils.toPom(platformBom, outputDir.resolve("platform-bom.xml"));
 
 		final BomDiff bomDiff = BomDiff.config()
-				.compare(pomDir.resolve("pom.xml"))
-				//.compare(new DefaultArtifact("io.quarkus", "quarkus-universe-bom", null, "pom", "1.5.2.Final"))
+				//.compare(pomDir.resolve("pom.xml"))
+				.compare(new DefaultArtifact("io.quarkus", "quarkus-universe-bom", null, "pom", "1.5.2.Final"))
 				.to(outputDir.resolve("platform-bom.xml"));
 
-		BomDiffLogger.config().report(bomDiff);
+		//BomDiffLogger.config().report(bomDiff);
 		HtmlBomDiffReportGenerator.config(outputDir.resolve("bom-diff.html")).report(bomDiff);
 	}
 }
