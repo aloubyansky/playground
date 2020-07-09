@@ -170,16 +170,16 @@ public class BomDiff {
 		for(Map.Entry<AppArtifactKey, Dependency> main : mainDeps.entrySet()) {
 			final Dependency toDep = toDeps.remove(main.getKey());
 			if(toDep == null) {
-				extra.put(main.getKey().toString(), main.getValue());
+				missing.put(main.getKey().toString(), main.getValue());
 			} else if(main.getValue().getArtifact().getVersion().equals(toDep.getArtifact().getVersion())) {
 				matching.put(main.getKey().toString(), main.getValue());
 			} else if(new DefaultArtifactVersion(main.getValue().getArtifact().getVersion()).compareTo(new DefaultArtifactVersion(toDep.getArtifact().getVersion())) > 0) {
-				upgraded.put(main.getKey().toString(), new VersionChange(toDep, main.getValue()));
+				downgraded.put(main.getKey().toString(), new VersionChange(main.getValue(), toDep));
 			} else {
-				downgraded.put(main.getKey().toString(), new VersionChange(toDep, main.getValue()));
+				upgraded.put(main.getKey().toString(), new VersionChange(main.getValue(), toDep));
 			}
 		}
-		toDeps.entrySet().forEach(d -> missing.put(d.getKey().toString(), d.getValue()));
+		toDeps.entrySet().forEach(d -> extra.put(d.getKey().toString(), d.getValue()));
 
 		this.missing = ordered(missing);
 		this.extra = ordered(extra);

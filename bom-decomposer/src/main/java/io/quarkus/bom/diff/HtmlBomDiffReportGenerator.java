@@ -1,9 +1,16 @@
 package io.quarkus.bom.diff;
 
 import java.io.IOException;
+import java.math.RoundingMode;
 import java.nio.file.Path;
+import java.text.NumberFormat;
+import java.util.List;
+
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.graph.Dependency;
 
 import io.quarkus.bom.decomposer.FileReportWriter;
+import io.quarkus.bom.diff.BomDiff.VersionChange;
 
 public class HtmlBomDiffReportGenerator extends FileReportWriter implements BomDiffReportGenerator {
 
@@ -24,6 +31,8 @@ public class HtmlBomDiffReportGenerator extends FileReportWriter implements BomD
 			HtmlBomDiffReportGenerator.this.report(bomDiff);
 		}
 	}
+
+	private NumberFormat numberFormat;
 
 	private HtmlBomDiffReportGenerator(String name) {
 		super(name);
@@ -103,8 +112,146 @@ public class HtmlBomDiffReportGenerator extends FileReportWriter implements BomD
 		closeTag("html");
 	}
 
-	private void generateBody(BomDiff bomDiff) {
+	private void generateBody(BomDiff bomDiff) throws IOException {
 
+		writeTag("p", "");
+		openTag("table");
+		writeTag("caption", "text-align:left;font-weight:bold", "BOM");
+		openTag("tr");
+		writeTag("td", "text-align:left;font-weight:bold;color:gray", "groupId:");
+		writeTag("td", "font-weight:bold", bomDiff.mainBom().getGroupId());
+		closeTag("tr");
+		openTag("tr");
+		writeTag("td", "text-align:left;font-weight:bold;color:gray", "artifactId:");
+		writeTag("td", "font-weight:bold", bomDiff.mainBom().getArtifactId());
+		closeTag("tr");
+		openTag("tr");
+		writeTag("td", "text-align:left;font-weight:bold;color:gray", "version:");
+		writeTag("td", "font-weight:bold", bomDiff.mainBom().getVersion());
+		closeTag("tr");
+		if (!bomDiff.mainBom().toString().equals(bomDiff.mainSource())) {
+			openTag("tr");
+			writeTag("td", "text-align:left;font-weight:bold;color:gray", "source:");
+			writeTag("td", "font-weight:bold", bomDiff.mainSource());
+			closeTag("tr");
+		}
+		openTag("tr");
+		writeTag("td", "text-align:left;font-weight:bold;color:gray", "managed dependencies:");
+		writeTag("td", "font-weight:bold", bomDiff.mainBomSize());
+		closeTag("tr");
+		closeTag("table");
 
+		writeTag("p", "");
+		openTag("table");
+		writeTag("caption", "text-align:left;font-weight:bold", "compared to");
+		if (!bomDiff.toBom().equals(bomDiff.mainBom())) {
+			openTag("tr");
+			writeTag("td", "text-align:left;font-weight:bold;color:gray", "groupId:");
+			writeTag("td", "font-weight:bold", bomDiff.mainBom().getGroupId());
+			closeTag("tr");
+			openTag("tr");
+			writeTag("td", "text-align:left;font-weight:bold;color:gray", "artifactId:");
+			writeTag("td", "font-weight:bold", bomDiff.mainBom().getArtifactId());
+			closeTag("tr");
+			openTag("tr");
+			writeTag("td", "text-align:left;font-weight:bold;color:gray", "version:");
+			writeTag("td", "font-weight:bold", bomDiff.mainBom().getVersion());
+			closeTag("tr");
+		}
+		if (!bomDiff.toBom().toString().equals(bomDiff.toSource())) {
+			openTag("tr");
+			writeTag("td", "text-align:left;font-weight:bold;color:gray", "source:");
+			writeTag("td", "font-weight:bold", bomDiff.toSource());
+			closeTag("tr");
+		}
+		openTag("tr");
+		writeTag("td", "text-align:left;font-weight:bold;color:gray", "managed dependencies:");
+		writeTag("td", "font-weight:bold", bomDiff.toBomSize());
+		closeTag("tr");
+		closeTag("table");
+
+		if(bomDiff.hasDowngraded()) {
+			versionChangeAccordion("Downgraded dependencies", bomDiff.mainBomSize(), bomDiff.downgraded());
+		}
+		if(bomDiff.hasUpgraded()) {
+			versionChangeAccordion("Upgraded dependencies", bomDiff.mainBomSize(), bomDiff.upgraded());
+		}
+		if(bomDiff.hasMissing()) {
+			depsListAccordion("Removed dependencies", bomDiff.mainBomSize(), bomDiff.missing());
+		}
+		if(bomDiff.hasExtra()) {
+			depsListAccordion("New dependencies", bomDiff.toBomSize(), bomDiff.extra());
+		}
+		if(bomDiff.hasMatching()) {
+			depsListAccordion("Matching dependencies", bomDiff.mainBomSize(), bomDiff.matching());
+		}
 	}
+
+	private void depsListAccordion(String caption, int total, List<Dependency> deps) throws IOException {
+		accordionButton(caption, total, deps.size());
+		offsetLine("<div class=\"panel\">");
+		openTag("table");
+		for(Dependency d : deps) {
+			openTag("tr");
+			writeTag("td", gact(d.getArtifact()));
+			writeTag("td", d.getArtifact().getVersion());
+			closeTag("tr");
+		}
+		closeTag("table");
+		offsetLine("</div>");
+	}
+
+	private void versionChangeAccordion(final String caption, int total, List<VersionChange> downgraded)
+			throws IOException {
+		accordionButton(caption, total, downgraded.size());
+		offsetLine("<div class=\"panel\">");
+		openTag("table");
+		for(VersionChange d : downgraded) {
+			openTag("tr");
+			writeTag("td", gact(d.from().getArtifact()));
+			writeTag("td", d.from().getArtifact().getVersion());
+			writeTag("td", d.to().getArtifact().getVersion());
+			closeTag("tr");
+		}
+		closeTag("table");
+		offsetLine("</div>");
+	}
+
+	private void accordionButton(final String caption, int whole, final int part) throws IOException {
+		offsetLine("<button class=\"accordion\">" + caption + ": " + part + " (" +  percentage(part, whole) + "%)</button>");
+	}
+
+	private String gact(Artifact a) {
+		final StringBuilder buf = buf();
+		buf.append(a.getGroupId()).append(':').append(a.getArtifactId());
+		if(!a.getClassifier().isEmpty()) {
+			buf.append(':').append(a.getClassifier());
+		}
+		if(!a.getExtension().equals("jar")) {
+			if(a.getClassifier().isEmpty()) {
+				buf.append(':');
+			}
+			buf.append(':').append(a.getExtension());
+		}
+		return buf.toString();
+	}
+
+	private String percentage(long part, long whole) {
+		return format(((double)part*100)/whole);
+	}
+
+	private String format(double d) {
+		return numberFormat().format(d);
+	}
+
+	private NumberFormat numberFormat() {
+		if (numberFormat == null) {
+			final NumberFormat numberFormat = NumberFormat.getInstance();
+			numberFormat.setMaximumFractionDigits(1);
+			numberFormat.setRoundingMode(RoundingMode.HALF_DOWN);
+			this.numberFormat = numberFormat;
+		}
+		return numberFormat;
+	}
+
 }
