@@ -1,10 +1,9 @@
 package io.quarkus.bom.decomposer;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
-
 import org.eclipse.aether.artifact.Artifact;
 
 import io.quarkus.bootstrap.model.AppArtifactKey;
@@ -16,30 +15,35 @@ public class ProjectRelease {
 		private Builder() {
 		}
 
-		private Set<AppArtifactKey> depKeys;
+		private LinkedHashMap<AppArtifactKey, ProjectDependency> deps = new LinkedHashMap<>();
 
-		public Builder add(Artifact artifact) {
+		public ReleaseId id() {
+			return id;
+		}
+
+		public Builder add(Artifact artifact) throws BomDecomposerException {
 			return add(ProjectDependency.create(id, artifact));
 		}
 
-		public Builder add(ProjectDependency dep) {
-			deps.add(dep);
-			if(depKeys != null) {
-				depKeys.add(dep.key());
+		public Builder add(ProjectDependency dep) throws BomDecomposerException {
+			final ProjectDependency existing = deps.put(dep.key(), dep);
+			if (existing != null && !dep.artifact().getVersion().equals(existing.artifact().getVersion())) {
+				throw new BomDecomposerException(
+						"Failed to add " + dep + " since the release already include " + existing);
 			}
 			return this;
 		}
 
 		public boolean includes(AppArtifactKey key) {
-			if(depKeys == null) {
-				final Set<AppArtifactKey> depKeys = new HashSet<>(deps.size());
-				deps.forEach(d -> depKeys.add(d.key()));
-				this.depKeys = depKeys;
-			}
-			return depKeys.contains(key);
+			return deps.containsKey(key);
+		}
+
+		public Collection<ProjectDependency> dependencies() {
+			return deps.values();
 		}
 
 		public ProjectRelease build() {
+			ProjectRelease.this.deps = new ArrayList<>(deps.values());
 			return ProjectRelease.this;
 		}
 	}

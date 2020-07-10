@@ -34,12 +34,13 @@ public interface DecomposedBomVisitor {
 	 *
 	 * @param releaseVersion  release version
 	 * @param artifacts  artifacts included in the release version
+	 * @throws BomDecomposerException
 	 */
-	void visitProjectRelease(ProjectRelease release);
+	void visitProjectRelease(ProjectRelease release) throws BomDecomposerException;
 
 	/**
 	 * Called after the last processed release version in the BOM.
-	 * @throws BomDecomposerException 
+	 * @throws BomDecomposerException
 	 */
 	void leaveBom() throws BomDecomposerException;
 }

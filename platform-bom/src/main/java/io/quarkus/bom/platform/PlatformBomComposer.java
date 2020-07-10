@@ -54,9 +54,11 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 	private Collection<ReleaseVersion> quarkusVersions;
 	private LinkedHashMap<String, ReleaseId> preferredVersions;
 
-	private Map<AppArtifactKey, ProjectDependency> quarkusDeps = new HashMap<>();
+	private Map<AppArtifactKey, ProjectDependency> quarkusBomDeps = new HashMap<>();
 
-	private Map<ReleaseOrigin, Map<ReleaseVersion, List<ProjectRelease>>> extensionReleases = new HashMap<>();
+	private Map<ReleaseOrigin, Map<ReleaseVersion, ProjectRelease.Builder>> externalReleaseDeps = new HashMap<>();
+
+	private List<DecomposedBom> originalImportedBoms = new ArrayList<>();
 
 	private final DecomposedBom platformBom;
 
@@ -69,7 +71,7 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 				.bomArtifact(config.quarkusBom())
 				.decompose();
 		quarkusBom.releases().forEach(r -> {
-			r.dependencies().forEach(d -> quarkusDeps.put(d.key(), d));
+			r.dependencies().forEach(d -> quarkusBomDeps.put(d.key(), d));
 		});
 
 		for(Artifact directDep : config.directDeps()) {
@@ -90,71 +92,69 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 					.decompose();
 		}
 
-		final Map<ReleaseId, ProjectRelease.Builder> releaseBuilders = new HashMap<>();
-		for(ProjectDependency dep : quarkusDeps.values()) {
-			releaseBuilders.computeIfAbsent(dep.releaseId(), id -> ProjectRelease.builder(id)).add(dep);
+		platformBom = generatePlatformBom(config);
+	}
+
+	private DecomposedBom generatePlatformBom(PlatformBomConfig config) throws BomDecomposerException {
+		final Map<ReleaseId, ProjectRelease.Builder> platformReleaseBuilders = new HashMap<>();
+		for(ProjectDependency dep : quarkusBomDeps.values()) {
+			platformReleaseBuilders.computeIfAbsent(dep.releaseId(), id -> ProjectRelease.builder(id)).add(dep);
 		}
 
 		final Map<AppArtifactKey, ProjectDependency> extensionDeps = new HashMap<>();
-		for(Map<ReleaseVersion, List<ProjectRelease>> releases : extensionReleases.values()) {
-			if(releases.size() == 1) {
-				for(ProjectRelease release : releases.values().iterator().next()) {
-				    mergeExtensionDeps(release, extensionDeps);
-				}
+		for(Map<ReleaseVersion, ProjectRelease.Builder> extReleaseBuilders : externalReleaseDeps.values()) {
+			final List<ProjectRelease> releases = new ArrayList<>(extReleaseBuilders.size());
+			extReleaseBuilders.values().forEach(b -> releases.add(b.build()));
+
+			if(extReleaseBuilders.size() == 1) {
+    		    mergeExtensionDeps(releases.get(0), extensionDeps);
 				continue;
 			}
 
-			final List<ProjectRelease> samples = new ArrayList<>();
-			for(Map.Entry<ReleaseVersion, List<ProjectRelease>> entry : releases.entrySet()) {
-				samples.add(entry.getValue().get(0));
-			}
-
-			final LinkedHashMap<String, ReleaseId> preferredVersions = preferredVersions(samples);
-			for (List<ProjectRelease> releaseList : releases.values()) {
-				for (ProjectRelease release : releaseList) {
-					for (Map.Entry<String, ReleaseId> preferred : preferredVersions.entrySet()) {
-						if (release.id().equals(preferred.getValue())) {
-							mergeExtensionDeps(release, extensionDeps);
-							break;
+			final LinkedHashMap<String, ReleaseId> preferredVersions = preferredVersions(releases);
+			for (ProjectRelease release : releases) {
+				for (Map.Entry<String, ReleaseId> preferred : preferredVersions.entrySet()) {
+					if (release.id().equals(preferred.getValue())) {
+						mergeExtensionDeps(release, extensionDeps);
+						break;
+					}
+					for (ProjectDependency dep : release.dependencies()) {
+						if (quarkusBomDeps.containsKey(dep.key())) {
+							continue;
 						}
-						for (ProjectDependency dep : release.dependencies()) {
-							if (quarkusDeps.containsKey(dep.key())) {
-								continue;
-							}
-							final String depVersion = dep.artifact().getVersion();
-							if (!preferred.getKey().equals(depVersion)) {
-								for (Map.Entry<String, ReleaseId> preferredVersion : preferredVersions.entrySet()) {
-									final Artifact artifact = dep.artifact().setVersion(preferredVersion.getKey());
-									try {
-										resolver().resolve(artifact);
-										// logger.info(" EXISTS IN " + preferredVersion);
-										dep = ProjectDependency.create(preferredVersion.getValue(), artifact);
-										break;
-									} catch (BootstrapMavenException e) {
-									}
+						final String depVersion = dep.artifact().getVersion();
+						if (!preferred.getKey().equals(depVersion)) {
+							for (Map.Entry<String, ReleaseId> preferredVersion : preferredVersions.entrySet()) {
+								final Artifact artifact = dep.artifact().setVersion(preferredVersion.getKey());
+								try {
+									resolver().resolve(artifact);
+									// logger.info(" EXISTS IN " + preferredVersion);
+									dep = ProjectDependency.create(preferredVersion.getValue(), artifact);
+									break;
+								} catch (BootstrapMavenException e) {
 								}
 							}
-							addNonQuarkusDep(dep, extensionDeps);
 						}
+						addNonQuarkusDep(dep, extensionDeps);
 					}
 				}
 			}
 		}
 
 		for(ProjectDependency dep : extensionDeps.values()) {
-			releaseBuilders.computeIfAbsent(dep.releaseId(), id -> ProjectRelease.builder(id)).add(dep);
+			platformReleaseBuilders.computeIfAbsent(dep.releaseId(), id -> ProjectRelease.builder(id)).add(dep);
 		}
 		final DecomposedBom.Builder platformBuilder = DecomposedBom.builder().bomArtifact(config.bomArtifact());
-		for (ProjectRelease.Builder builder : releaseBuilders.values()) {
+		for (ProjectRelease.Builder builder : platformReleaseBuilders.values()) {
 			platformBuilder.addRelease(builder.build());
 		}
-		platformBom = platformBuilder.build();
+		return platformBuilder.build();
 	}
 
-	private void mergeExtensionDeps(final ProjectRelease release, Map<AppArtifactKey, ProjectDependency> extensionDeps) {
+	private void mergeExtensionDeps(ProjectRelease release, Map<AppArtifactKey, ProjectDependency> extensionDeps) {
 		for(ProjectDependency dep : release.dependencies()) {
 			// the origin may have changed in the release of the dependency
-			if(quarkusDeps.containsKey(dep.key())) {
+			if(quarkusBomDeps.containsKey(dep.key())) {
 				return;
 			}
 			addNonQuarkusDep(dep, extensionDeps);
@@ -181,6 +181,7 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 	@Override
 	public DecomposedBom transform(BomDecomposer decomposer, DecomposedBom decomposedBom)
 			throws BomDecomposerException {
+		originalImportedBoms.add(decomposedBom);
 		decomposedBom.visit(this);
 		return decomposedBom;
 	}
@@ -204,14 +205,19 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 	}
 
 	@Override
-	public void visitProjectRelease(ProjectRelease release) {
+	public void visitProjectRelease(ProjectRelease release) throws BomDecomposerException {
 		if(quarkusVersions.isEmpty()) {
-			extensionReleases.computeIfAbsent(release.id().origin(), id -> new HashMap<>()).computeIfAbsent(release.id().version(), id -> new ArrayList<>()).add(release);
+			final ProjectRelease.Builder releaseBuilder = externalReleaseDeps
+					.computeIfAbsent(release.id().origin(), id -> new HashMap<>())
+					.computeIfAbsent(release.id().version(), id -> ProjectRelease.builder(release.id()));
+			for(ProjectDependency dep : release.dependencies()) {
+				releaseBuilder.add(dep);
+			}
 			return;
 		}
 		if(quarkusVersions.contains(release.id().version())) {
 			for(ProjectDependency dep : release.dependencies()) {
-				quarkusDeps.putIfAbsent(dep.key(), dep);
+				quarkusBomDeps.putIfAbsent(dep.key(), dep);
 			}
 			return;
 		}
@@ -231,7 +237,7 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 					}
 				}
 			}
-			quarkusDeps.putIfAbsent(dep.key(), dep);
+			quarkusBomDeps.putIfAbsent(dep.key(), dep);
 	    }
 	}
 
