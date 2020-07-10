@@ -199,7 +199,7 @@ public class HtmlBomDiffReportGenerator extends FileReportWriter implements BomD
 			openTag("tr", listBackground[i ^= 1]);
 			writeTag("td", gact(d.getArtifact()));
 			writeTag("td", warn ? "color:red" : "color:green", d.getArtifact().getVersion());
-			writeTag("td", warn ? "color:red" : "color:green", warn ? "&#9888" : "&#9745");
+			//writeTag("td", warn ? "color:red" : "color:green", warn ? "&#9888" : "&#9745");
 			closeTag("tr");
 		}
 		closeTag("table");
@@ -218,7 +218,7 @@ public class HtmlBomDiffReportGenerator extends FileReportWriter implements BomD
 			writeTag("td", d.from().getArtifact().getVersion());
 			writeTag("td", d.upgrade() ? "color:green" : "color:red", "&#8702");
 			writeTag("td", d.upgrade() ? "color:green" : "color:red", d.to().getArtifact().getVersion());
-			writeTag("td", d.upgrade() ? "color:green" : "color:red", d.upgrade() ? "&#9745" : "&#9888");
+			//writeTag("td", d.upgrade() ? "color:green" : "color:red", d.upgrade() ? "&#9745" : "&#9888");
 			closeTag("tr");
 		}
 		closeTag("table");

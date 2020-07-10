@@ -15,6 +15,7 @@ public class FileReportWriter {
 	private int tagDepth;
 	private int indentChars = 4;
 	private StringBuilder buf;
+	private boolean closed;
 
 	public FileReportWriter(String name) {
 		this(Paths.get(name));
@@ -25,6 +26,10 @@ public class FileReportWriter {
 		reportFile = p;
 	}
 
+	protected boolean isClosed() {
+		return closed;
+	}
+	
 	protected void indentChars(int indentChars) {
 		this.indentChars = indentChars;
 	}
@@ -41,7 +46,7 @@ public class FileReportWriter {
 	}
 
 	protected BufferedWriter writer() throws IOException {
-		return writer == null ? writer = initWriter() : writer;
+		return closed ? null : (writer == null ? writer = initWriter() : writer);
 	}
 
 	protected void writeLine(Object line) throws IOException {
@@ -79,6 +84,17 @@ public class FileReportWriter {
 		}
 		buf.append('>').append(value).append("</").append(name).append('>');
 		writeLine(buf);
+	}
+
+	protected void writeAnchor(String url, String text) throws IOException {
+		offset();
+		writeLine(generateAnchor(url, text));
+	}
+
+	protected String generateAnchor(String url, String text) {
+		final StringBuilder buf = buf();
+		buf.append("<a href=\"").append(url).append("\">").append(text).append("</a>");
+		return buf.toString();
 	}
 
 	protected void openTag(String name) throws IOException {
@@ -131,6 +147,8 @@ public class FileReportWriter {
 				writer.close();
 			} catch (IOException e) {
 			}
+			writer = null;
 		}
+		closed = true;
 	}
 }

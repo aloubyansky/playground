@@ -54,6 +54,7 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 
 	private Collection<ReleaseVersion> quarkusVersions;
 	private LinkedHashMap<String, ReleaseId> preferredVersions;
+	private boolean transformingBom;
 
 	private Map<AppArtifactKey, ProjectDependency> quarkusBomDeps = new HashMap<>();
 
@@ -79,7 +80,8 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 
 		for(Artifact directDep : config.directDeps()) {
 			final Iterable<Artifact> artifacts;
-			if(directDep.getExtension().equals("pom")) {
+			transformingBom = directDep.getExtension().equals("pom");
+			if(transformingBom) {
 				artifacts = managedDepsExcludingQuarkusBom(directDep);
 			} else {
 				artifacts = Collections.singleton(directDep);
@@ -229,7 +231,9 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 	@Override
 	public DecomposedBom transform(BomDecomposer decomposer, DecomposedBom decomposedBom)
 			throws BomDecomposerException {
-		this.importedBoms.add(decomposedBom);
+		if (transformingBom) {
+			this.importedBoms.add(decomposedBom);
+		}
 		decomposedBom.visit(this);
 		return decomposedBom;
 	}
@@ -364,16 +368,20 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 		//PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.githubPom("quarkusio/quarkus-platform/master/bom/runtime/pom.xml"));
 		PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.githubPom("quarkusio/quarkus-platform/1.5.2.Final/bom/runtime/pom.xml"));
 
-		final PlatformBomComposer bomComposer = new PlatformBomComposer(config);
-		final DecomposedBom platformBom = bomComposer.platformBom();
-		generateBom(outputDir, platformBom);
+		try (ReportIndexPageGenerator index = new ReportIndexPageGenerator(outputDir.resolve("index.html"))) {
+			final PlatformBomComposer bomComposer = new PlatformBomComposer(config);
+			final DecomposedBom platformBom = bomComposer.platformBom();
+			
+			
+			generateBom(platformBom, outputDir, index);
 
-		for(DecomposedBom importedBom : bomComposer.upgradedImportedBoms()) {
-			generateBom(outputDir, importedBom);
+			for (DecomposedBom importedBom : bomComposer.upgradedImportedBoms()) {
+				generateBom(importedBom, outputDir, index);
+			}
 		}
 	}
 
-	private static void generateBom(Path outputDir, final DecomposedBom platformBom)
+	private static void generateBom(DecomposedBom platformBom, Path outputDir, ReportIndexPageGenerator index)
 			throws IOException, BomDecomposerException {
 		outputDir = outputDir.resolve(bomDirName(platformBom.bomArtifact()));
 		final Path platformBomXml = outputDir.resolve("pom.xml");
@@ -383,11 +391,14 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 				.compare(platformBom.bomArtifact())
 				.to(platformBomXml);
 
-		//BomDiffLogger.config().report(bomDiff);
-		HtmlBomDiffReportGenerator.config(outputDir.resolve("diff.html")).report(bomDiff);
+		final Path diffFile = outputDir.resolve("diff.html");
+		HtmlBomDiffReportGenerator.config(diffFile).report(bomDiff);
 
-		platformBom.visit(DecomposedBomHtmlReportGenerator.builder(outputDir.resolve("releases.html"))
+		final Path releasesFile = outputDir.resolve("releases.html");
+		platformBom.visit(DecomposedBomHtmlReportGenerator.builder(releasesFile)
 				.skipOriginsWithSingleRelease().build());
+		
+		index.bomReport(platformBom, releasesFile, diffFile);
 	}
 
 	private static String bomDirName(Artifact a) {
