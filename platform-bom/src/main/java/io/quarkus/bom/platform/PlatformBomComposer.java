@@ -1,5 +1,6 @@
 package io.quarkus.bom.platform;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -58,7 +59,9 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 
 	private Map<ReleaseOrigin, Map<ReleaseVersion, ProjectRelease.Builder>> externalReleaseDeps = new HashMap<>();
 
-	private List<DecomposedBom> originalImportedBoms = new ArrayList<>();
+	final Map<AppArtifactKey, ProjectDependency> externalExtensionDeps = new HashMap<>();
+
+	private List<DecomposedBom> importedBoms = new ArrayList<>();
 
 	private final DecomposedBom platformBom;
 
@@ -93,6 +96,56 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 		}
 
 		platformBom = generatePlatformBom(config);
+
+		generatedUpdatedImportedBoms();
+	}
+
+	public DecomposedBom platformBom() {
+		return platformBom;
+	}
+
+	public List<DecomposedBom> upgradedImportedBoms() {
+		return importedBoms;
+	}
+
+	private void generatedUpdatedImportedBoms() {
+		final Set<AppArtifactKey> bomDeps = new HashSet<>();
+		final Map<ReleaseId, ProjectRelease.Builder> releaseBuilders = new HashMap<>();
+		int i = 0;
+		while(i < importedBoms.size()) {
+			bomDeps.clear();
+			releaseBuilders.clear();
+
+			final DecomposedBom importedBomMinusQuarkusBom = importedBoms.get(i);
+			quarkusBom.releases().forEach(r -> {
+				r.dependencies().forEach(d -> {
+					bomDeps.add(d.key());
+					releaseBuilders.computeIfAbsent(d.releaseId(), id -> ProjectRelease.builder(id)).add(d);
+				});
+			});
+
+			for(ProjectRelease release : importedBomMinusQuarkusBom.releases()) {
+				for(ProjectDependency dep : release.dependencies()) {
+					if(!bomDeps.add(dep.key())) {
+						continue;
+					}
+					ProjectDependency platformDep = quarkusBomDeps.get(dep.key());
+					if(platformDep == null) {
+						platformDep = externalExtensionDeps.get(dep.key());
+					}
+					if(platformDep == null) {
+						throw new IllegalStateException("Failed to locate " + dep.key() + " in the generated platform BOM");
+					}
+					releaseBuilders.computeIfAbsent(dep.releaseId(), id -> ProjectRelease.builder(id)).add(dep);
+				}
+			}
+
+			final DecomposedBom.Builder updatedBom = DecomposedBom.builder().bomArtifact(importedBomMinusQuarkusBom.bomArtifact()).bomSource(PomSource.of(importedBomMinusQuarkusBom.bomArtifact()));
+			for(ProjectRelease.Builder releaseBuilder : releaseBuilders.values()) {
+				updatedBom.addRelease(releaseBuilder.build());
+			}
+			importedBoms.set(i++, updatedBom.build());
+		}
 	}
 
 	private DecomposedBom generatePlatformBom(PlatformBomConfig config) throws BomDecomposerException {
@@ -101,13 +154,12 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 			platformReleaseBuilders.computeIfAbsent(dep.releaseId(), id -> ProjectRelease.builder(id)).add(dep);
 		}
 
-		final Map<AppArtifactKey, ProjectDependency> extensionDeps = new HashMap<>();
 		for(Map<ReleaseVersion, ProjectRelease.Builder> extReleaseBuilders : externalReleaseDeps.values()) {
 			final List<ProjectRelease> releases = new ArrayList<>(extReleaseBuilders.size());
 			extReleaseBuilders.values().forEach(b -> releases.add(b.build()));
 
 			if(extReleaseBuilders.size() == 1) {
-    		    mergeExtensionDeps(releases.get(0), extensionDeps);
+    		    mergeExtensionDeps(releases.get(0), externalExtensionDeps);
 				continue;
 			}
 
@@ -115,7 +167,7 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 			for (ProjectRelease release : releases) {
 				for (Map.Entry<String, ReleaseId> preferred : preferredVersions.entrySet()) {
 					if (release.id().equals(preferred.getValue())) {
-						mergeExtensionDeps(release, extensionDeps);
+						mergeExtensionDeps(release, externalExtensionDeps);
 						break;
 					}
 					for (ProjectDependency dep : release.dependencies()) {
@@ -135,13 +187,13 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 								}
 							}
 						}
-						addNonQuarkusDep(dep, extensionDeps);
+						addNonQuarkusDep(dep, externalExtensionDeps);
 					}
 				}
 			}
 		}
 
-		for(ProjectDependency dep : extensionDeps.values()) {
+		for(ProjectDependency dep : externalExtensionDeps.values()) {
 			platformReleaseBuilders.computeIfAbsent(dep.releaseId(), id -> ProjectRelease.builder(id)).add(dep);
 		}
 		final DecomposedBom.Builder platformBuilder = DecomposedBom.builder().bomArtifact(config.bomArtifact());
@@ -174,14 +226,10 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 		}
 	}
 
-	public DecomposedBom platformBom() {
-		return platformBom;
-	}
-
 	@Override
 	public DecomposedBom transform(BomDecomposer decomposer, DecomposedBom decomposedBom)
 			throws BomDecomposerException {
-		originalImportedBoms.add(decomposedBom);
+		this.importedBoms.add(decomposedBom);
 		decomposedBom.visit(this);
 		return decomposedBom;
 	}
@@ -307,25 +355,42 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 	}
 
 	public static void main(String[] args) throws Exception {
-		final Path pomDir = Paths.get(System.getProperty("user.home")).resolve("git")
+		final Path srcPomDir = Paths.get(System.getProperty("user.home")).resolve("git")
 				.resolve("quarkus-platform").resolve("bom").resolve("runtime");
+
+		final Path outputDir = Paths.get("target").resolve("boms"); // pomDir
+
 		//PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.of(pomDir.resolve("pom.xml")));
 		//PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.githubPom("quarkusio/quarkus-platform/master/bom/runtime/pom.xml"));
 		PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.githubPom("quarkusio/quarkus-platform/1.5.2.Final/bom/runtime/pom.xml"));
 
-		final DecomposedBom platformBom = compose(config);
-		Path outputDir = Paths.get("target"); // pomDir
-		PomUtils.toPom(platformBom, outputDir.resolve("platform-bom.xml"));
+		final PlatformBomComposer bomComposer = new PlatformBomComposer(config);
+		final DecomposedBom platformBom = bomComposer.platformBom();
+		generateBom(outputDir, platformBom);
+
+		for(DecomposedBom importedBom : bomComposer.upgradedImportedBoms()) {
+			generateBom(outputDir, importedBom);
+		}
+	}
+
+	private static void generateBom(Path outputDir, final DecomposedBom platformBom)
+			throws IOException, BomDecomposerException {
+		outputDir = outputDir.resolve(bomDirName(platformBom.bomArtifact()));
+		final Path platformBomXml = outputDir.resolve("pom.xml");
+		PomUtils.toPom(platformBom, platformBomXml);
 
 		final BomDiff bomDiff = BomDiff.config()
-				//.compare(pomDir.resolve("pom.xml"))
-				.compare(new DefaultArtifact("io.quarkus", "quarkus-universe-bom", null, "pom", "1.5.2.Final"))
-				.to(outputDir.resolve("platform-bom.xml"));
+				.compare(platformBom.bomArtifact())
+				.to(platformBomXml);
 
 		//BomDiffLogger.config().report(bomDiff);
-		HtmlBomDiffReportGenerator.config(outputDir.resolve("platform-bom-diff.html")).report(bomDiff);
+		HtmlBomDiffReportGenerator.config(outputDir.resolve("diff.html")).report(bomDiff);
 
-		platformBom.visit(DecomposedBomHtmlReportGenerator.builder(outputDir.resolve("platform-bom-releases.html"))
+		platformBom.visit(DecomposedBomHtmlReportGenerator.builder(outputDir.resolve("releases.html"))
 				.skipOriginsWithSingleRelease().build());
+	}
+
+	private static String bomDirName(Artifact a) {
+		return a.getGroupId() + "." + a.getArtifactId() + "-" + a.getVersion();
 	}
 }

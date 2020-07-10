@@ -1,6 +1,7 @@
 package io.quarkus.bom.decomposer;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,6 +56,9 @@ public class PomUtils {
 	}
 
 	public static void toPom(DecomposedBom decomposed, Path file) throws IOException {
+		if(!Files.exists(file.getParent())) {
+			Files.createDirectories(file.getParent());
+		}
 		ModelUtils.persistModel(file, toModel(decomposed));
 	}
 }

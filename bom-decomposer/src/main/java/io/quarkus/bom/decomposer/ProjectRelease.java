@@ -21,14 +21,14 @@ public class ProjectRelease {
 			return id;
 		}
 
-		public Builder add(Artifact artifact) throws BomDecomposerException {
+		public Builder add(Artifact artifact) {
 			return add(ProjectDependency.create(id, artifact));
 		}
 
-		public Builder add(ProjectDependency dep) throws BomDecomposerException {
+		public Builder add(ProjectDependency dep) {
 			final ProjectDependency existing = deps.put(dep.key(), dep);
 			if (existing != null && !dep.artifact().getVersion().equals(existing.artifact().getVersion())) {
-				throw new BomDecomposerException(
+				throw new IllegalArgumentException(
 						"Failed to add " + dep + " since the release already include " + existing);
 			}
 			return this;
