@@ -180,17 +180,17 @@ public class HtmlBomDiffReportGenerator extends FileReportWriter implements BomD
 			versionChangeAccordion("Upgraded dependencies", bomDiff.mainBomSize(), bomDiff.upgraded());
 		}
 		if(bomDiff.hasMissing()) {
-			depsListAccordion("Removed dependencies", bomDiff.mainBomSize(), bomDiff.missing());
+			depsListAccordion("Removed dependencies", bomDiff.mainBomSize(), bomDiff.missing(), true);
 		}
 		if(bomDiff.hasExtra()) {
-			depsListAccordion("New dependencies", bomDiff.toBomSize(), bomDiff.extra());
+			depsListAccordion("New dependencies", bomDiff.toBomSize(), bomDiff.extra(), false);
 		}
 		if(bomDiff.hasMatching()) {
-			depsListAccordion("Matching dependencies", bomDiff.mainBomSize(), bomDiff.matching());
+			depsListAccordion("Matching dependencies", bomDiff.mainBomSize(), bomDiff.matching(), false);
 		}
 	}
 
-	private void depsListAccordion(String caption, int total, List<Dependency> deps) throws IOException {
+	private void depsListAccordion(String caption, int total, List<Dependency> deps, boolean warn) throws IOException {
 		accordionButton(caption, total, deps.size());
 		offsetLine("<div class=\"panel\">");
 		openTag("table");
@@ -198,7 +198,8 @@ public class HtmlBomDiffReportGenerator extends FileReportWriter implements BomD
 		for(Dependency d : deps) {
 			openTag("tr", listBackground[i ^= 1]);
 			writeTag("td", gact(d.getArtifact()));
-			writeTag("td", d.getArtifact().getVersion());
+			writeTag("td", warn ? "color:red" : "color:green", d.getArtifact().getVersion());
+			writeTag("td", warn ? "color:red" : "color:green", warn ? "&#9888" : "&#9745");
 			closeTag("tr");
 		}
 		closeTag("table");
@@ -215,8 +216,9 @@ public class HtmlBomDiffReportGenerator extends FileReportWriter implements BomD
 			openTag("tr", listBackground[i ^= 1]);
 			writeTag("td", gact(d.from().getArtifact()));
 			writeTag("td", d.from().getArtifact().getVersion());
-			writeTag("td", d.upgrade() ? "color:green" : "color:red", d.upgrade() ? "&#9745" : "&#9888");
+			writeTag("td", d.upgrade() ? "color:green" : "color:red", "&#8702");
 			writeTag("td", d.upgrade() ? "color:green" : "color:red", d.to().getArtifact().getVersion());
+			writeTag("td", d.upgrade() ? "color:green" : "color:red", d.upgrade() ? "&#9745" : "&#9888");
 			closeTag("tr");
 		}
 		closeTag("table");
