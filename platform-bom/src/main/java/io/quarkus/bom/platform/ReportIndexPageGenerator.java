@@ -1,6 +1,7 @@
 package io.quarkus.bom.platform;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +11,11 @@ import io.quarkus.bom.decomposer.FileReportWriter;
 
 public class ReportIndexPageGenerator extends FileReportWriter implements AutoCloseable {
 
-	private List<DecomposedBom> boms = new ArrayList<>();
-	private List<Path> releasesHtml = new ArrayList<>();
+	private List<URL> mainUrl = new ArrayList<>();
+	private List<URL> toUrl = new ArrayList<>();
+	private List<DecomposedBom> toBoms = new ArrayList<>();
+	private List<Path> mainReleasesHtml = new ArrayList<>();
+	private List<Path> toReleasesHtml = new ArrayList<>();
 	private List<Path> diffHtml = new ArrayList<>();
 	
 	public ReportIndexPageGenerator(String name) throws IOException {
@@ -52,18 +56,24 @@ public class ReportIndexPageGenerator extends FileReportWriter implements AutoCl
 		writeTag("p", "");
 		openTag("table");
 		writeTag("caption", "text-align:left;font-weight:bold", "Generated BOMs");
-		for(int i = 0; i < boms.size(); ++i) {
+		for(int i = 0; i < toBoms.size(); ++i) {
 			openTag("tr");			
-			writeTag("td", "text-align:left;font-weight:bold;color:gray", boms.get(i).bomArtifact());
+			writeTag("td", "text-align:left;font-weight:bold;color:gray", toBoms.get(i).bomArtifact());
+			writeTag("td", "text-align:left", generateAnchor(mainUrl.get(i).toExternalForm(), "original"));
+			writeTag("td", "text-align:left", generateAnchor(mainReleasesHtml.get(i).toUri().toURL().toExternalForm(), "decomposed"));
+			writeTag("td", "text-align:left", generateAnchor(toUrl.get(i).toExternalForm(), "target"));
+			writeTag("td", "text-align:left", generateAnchor(toReleasesHtml.get(i).toUri().toURL().toExternalForm(), "decomposed"));
 			writeTag("td", "text-align:left", generateAnchor(diffHtml.get(i).toUri().toURL().toExternalForm(), "diff"));
-			writeTag("td", "text-align:left", generateAnchor(releasesHtml.get(i).toUri().toURL().toExternalForm(), "decomposed"));
 			closeTag("tr");
 		}
 		closeTag("table");
 	}
-	public void bomReport(DecomposedBom bom, Path releasesHtml, Path diffHtml) {
-		this.boms.add(bom);
-		this.releasesHtml.add(releasesHtml);
+	public void bomReport(URL mainUrl, URL toUrl, DecomposedBom toBom, Path mainReleasesHtml, Path toReleasesHtml, Path diffHtml) {
+		this.mainUrl.add(mainUrl);
+		this.toUrl.add(toUrl);
+		this.toBoms.add(toBom);
+		this.mainReleasesHtml.add(mainReleasesHtml);
+		this.toReleasesHtml.add(toReleasesHtml);
 		this.diffHtml.add(diffHtml);
 	}
 	

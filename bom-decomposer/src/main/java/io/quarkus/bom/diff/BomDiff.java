@@ -1,5 +1,7 @@
 package io.quarkus.bom.diff;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,8 +31,10 @@ public class BomDiff {
 
 		private Artifact mainBom;
 		private String mainSource;
+		private URL mainUrl;
 		private Artifact toBom;
 		private String toSource;
+		private URL toUrl;
 		private List<Dependency> mainDeps;
 		private List<Dependency> toDeps;
 
@@ -45,9 +49,11 @@ public class BomDiff {
 		}
 
 		public Config compare(Artifact bomArtifact) {
-			final ArtifactDescriptorResult descr = descriptor(defaultResolver(), bomArtifact);
+			final MavenArtifactResolver resolver = defaultResolver();
+			final ArtifactDescriptorResult descr = descriptor(resolver, bomArtifact);
 			mainBom = descr.getArtifact();
 			mainSource = bomArtifact.toString();
+			mainUrl = toUrl(resolve(resolver, bomArtifact));
 			mainDeps = descr.getManagedDependencies();
 			return this;
 		}
@@ -56,6 +62,7 @@ public class BomDiff {
 			final ArtifactDescriptorResult descr = descriptor(bomPath);
 			mainBom = descr.getArtifact();
 			mainSource = bomPath.toString();
+			mainUrl = toUrl(bomPath);
 			mainDeps = descr.getManagedDependencies();
 			return this;
 		}
@@ -65,9 +72,11 @@ public class BomDiff {
 		}
 
 		public BomDiff to(Artifact bomArtifact) {
-			final ArtifactDescriptorResult descr = descriptor(defaultResolver(), bomArtifact);
+			final MavenArtifactResolver resolver = defaultResolver();
+			final ArtifactDescriptorResult descr = descriptor(resolver, bomArtifact);
 			toBom = descr.getArtifact();
 			toSource = bomArtifact.toString();
+			toUrl = toUrl(resolve(resolver, bomArtifact));
 			toDeps = descr.getManagedDependencies();
 			return diff();
 		}
@@ -76,6 +85,7 @@ public class BomDiff {
 			final ArtifactDescriptorResult descr = descriptor(bomPath);
 			toBom = descr.getArtifact();
 			toSource = bomPath.toString();
+			toUrl = toUrl(bomPath);
 			toDeps = descr.getManagedDependencies();
 			return diff();
 		}
@@ -105,6 +115,14 @@ public class BomDiff {
 			}
 		}
 
+		private Path resolve(MavenArtifactResolver resolver, Artifact artifact) {
+			try {
+				return resolver.resolve(artifact).getArtifact().getFile().toPath();
+			} catch (BootstrapMavenException e) {
+				throw new RuntimeException("Failed to resolve " + artifact, e);
+			}
+		}
+
 		private MavenArtifactResolver defaultResolver() {
 			if (resolver == null) {
 				try {
@@ -116,6 +134,14 @@ public class BomDiff {
 			return resolver;
 		}
 
+		private URL toUrl(Path p) {
+			try {
+				return p.toUri().toURL();
+			} catch (MalformedURLException e) {
+				throw new RuntimeException("Failed to translate " + p + " to URL", e);
+			}
+		}
+		
 		private BomDiff diff() {
 			return new BomDiff(this);
 		}
@@ -147,8 +173,10 @@ public class BomDiff {
 
 	private final Artifact mainBom;
 	private final String mainSource;
+	private final URL mainUrl;
 	private final Artifact toBom;
 	private final String toSource;
+	private final URL toUrl;
 	private final int mainSize;
 	private final int toSize;
 	private final List<Dependency> missing;
@@ -160,8 +188,10 @@ public class BomDiff {
 	private BomDiff(Config config) {
 		mainBom = config.mainBom;
 		mainSource = config.mainSource;
+		mainUrl = config.mainUrl;
 		toBom = config.toBom;
 		toSource = config.toSource;
+		toUrl = config.toUrl;
 		mainSize = config.mainDeps.size();
 		toSize = config.toDeps.size();
 		final Map<AppArtifactKey, Dependency> mainDeps = toMap(config.mainDeps);
@@ -213,6 +243,10 @@ public class BomDiff {
 		return mainSource;
 	}
 
+	public URL mainUrl() {
+		return mainUrl;
+	}
+	
 	public Artifact toBom() {
 		return toBom;
 	}
@@ -221,6 +255,10 @@ public class BomDiff {
 		return toSource;
 	}
 
+	public URL toUrl() {
+		return toUrl;
+	}
+	
 	public int mainBomSize() {
 		return mainSize;
 	}
