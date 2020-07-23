@@ -11,13 +11,16 @@ import io.quarkus.bom.decomposer.FileReportWriter;
 
 public class ReportIndexPageGenerator extends FileReportWriter implements AutoCloseable {
 
+	private static final String[] listBackground = new String[] { "background-color:#EBF4FA",
+	"background-color:#FFFFFF" };
+
 	private List<URL> mainUrl = new ArrayList<>();
 	private List<URL> toUrl = new ArrayList<>();
 	private List<DecomposedBom> toBoms = new ArrayList<>();
 	private List<Path> mainReleasesHtml = new ArrayList<>();
 	private List<Path> toReleasesHtml = new ArrayList<>();
 	private List<Path> diffHtml = new ArrayList<>();
-	
+
 	public ReportIndexPageGenerator(String name) throws IOException {
 		super(name);
 		initHtmlBody();
@@ -51,13 +54,14 @@ public class ReportIndexPageGenerator extends FileReportWriter implements AutoCl
 			throw e;
 		}
 	}
-	
+
 	private void generateContents() throws IOException {
 		writeTag("p", "");
 		openTag("table");
 		writeTag("caption", "text-align:left;font-weight:bold", "Generated BOMs");
+		int backgroundIndex = 0;
 		for(int i = 0; i < toBoms.size(); ++i) {
-			openTag("tr");			
+			openTag("tr", listBackground[backgroundIndex ^= 1]);
 			writeTag("td", "text-align:left;font-weight:bold;color:gray", toBoms.get(i).bomArtifact());
 			writeTag("td", "text-align:left", generateAnchor(mainUrl.get(i).toExternalForm(), "original"));
 			writeTag("td", "text-align:left", generateAnchor(mainReleasesHtml.get(i).toUri().toURL().toExternalForm(), "decomposed"));
@@ -76,7 +80,7 @@ public class ReportIndexPageGenerator extends FileReportWriter implements AutoCl
 		this.toReleasesHtml.add(toReleasesHtml);
 		this.diffHtml.add(diffHtml);
 	}
-	
+
 	@Override
 	public void close() {
 		if(!isClosed()) {

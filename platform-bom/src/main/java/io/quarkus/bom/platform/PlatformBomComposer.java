@@ -147,15 +147,12 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 
 			final DecomposedBom importedBomMinusQuarkusBom = importedBoms.get(i);
 			if (!bomsNotImportingQuarkusBom.contains(importedBomMinusQuarkusBom.bomArtifact())) {
-				logger.info(importedBomMinusQuarkusBom.bomArtifact() + " imports Quarkus BOM");
 				quarkusBom.releases().forEach(r -> {
 					r.dependencies().forEach(d -> {
 						bomDeps.add(d.key());
 						releaseBuilders.computeIfAbsent(d.releaseId(), id -> ProjectRelease.builder(id)).add(d);
 					});
 				});
-			} else {
-				logger.info(importedBomMinusQuarkusBom.bomArtifact() + " DOES NOT IMPORT Quarkus BOM");
 			}
 
 			for(ProjectRelease release : importedBomMinusQuarkusBom.releases()) {

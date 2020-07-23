@@ -18,6 +18,9 @@ import io.quarkus.bom.decomposer.ProjectDependency.UpdateStatus;
 
 public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWriter {
 
+	private static final String[] listBackground = new String[] { "background-color:#EBF4FA",
+	"background-color:#FFFFFF" };
+
 	public static HtmlWriterBuilder builder(String file) {
 		return new DecomposedBomHtmlReportGenerator(file).new HtmlWriterBuilder();
 	}
@@ -227,32 +230,34 @@ public class DecomposedBomHtmlReportGenerator extends DecomposedBomReportFileWri
 	@Override
 	protected void writeEndBom(BufferedWriter writer) throws IOException {
 
+		int backgroundIndex = 0;
+
 		writeTag("p", "");
 		openTag("table");
 		writeTag("caption", "text-align:left;font-weight:bold", "Total:");
-		openTag("tr");
-		writeTag("td", "text-align:left;", "Release origins:");
-		writeTag("td", "text-align:right;", releaseOriginsTotal);
-		closeTag("tr");
-		openTag("tr");
-		writeTag("td", "text-align:left;", "Release origins with conflicts:");
-		writeTag("td", "text-align:right;", releaseOriginsWithConflictsTotal);
-		closeTag("tr");
-		openTag("tr");
-		writeTag("td", "text-align:left;", "Release versions:");
-		writeTag("td", "text-align:right;", releaseVersionsTotal);
-		closeTag("tr");
-		openTag("tr");
-		writeTag("td", "text-align:left;", "Artifacts:");
-		writeTag("td", "text-align:right;", artifactsTotal);
-		closeTag("tr");
-		openTag("tr");
+		openTag("tr", listBackground[backgroundIndex ^= 1]);
 		writeTag("td", "text-align:left;", "Resolvable version conflicts:");
 		writeTag("td", "text-align:right;", resolvableConflictsTotal);
 		closeTag("tr");
-		openTag("tr");
+		openTag("tr", listBackground[backgroundIndex ^= 1]);
 		writeTag("td", "text-align:left;", "Unresolvable version conflicts:");
 		writeTag("td", "text-align:right;", unresolvableConflictsTotal);
+		closeTag("tr");
+		openTag("tr", listBackground[backgroundIndex ^= 1]);
+		writeTag("td", "text-align:left;", "Release origins:");
+		writeTag("td", "text-align:right;", releaseOriginsTotal);
+		closeTag("tr");
+		openTag("tr", listBackground[backgroundIndex ^= 1]);
+		writeTag("td", "text-align:left;", "Release origins with conflicts:");
+		writeTag("td", "text-align:right;", releaseOriginsWithConflictsTotal);
+		closeTag("tr");
+		openTag("tr", listBackground[backgroundIndex ^= 1]);
+		writeTag("td", "text-align:left;", "Release versions:");
+		writeTag("td", "text-align:right;", releaseVersionsTotal);
+		closeTag("tr");
+		openTag("tr", listBackground[backgroundIndex ^= 1]);
+		writeTag("td", "text-align:left;", "Artifacts:");
+		writeTag("td", "text-align:right;", artifactsTotal);
 		closeTag("tr");
 		closeTag("table");
 
