@@ -44,7 +44,7 @@
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-bom-decomposer</artifactId>
+            <artifactId>quarkus-platform-bom</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
