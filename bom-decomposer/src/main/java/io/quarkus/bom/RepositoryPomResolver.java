@@ -16,7 +16,10 @@ public class RepositoryPomResolver implements PomResolver {
 
 	@Override
 	public Path pomPath() {
-		throw new UnsupportedOperationException();
+		if(isResolved()) {
+			return pomArtifact.getFile().toPath();
+		}
+		throw new RuntimeException(pomArtifact + " has not been resolved");
 	}
 
 	@Override
@@ -32,5 +35,10 @@ public class RepositoryPomResolver implements PomResolver {
 	@Override
 	public Artifact pomArtifact() {
 		return pomArtifact;
+	}
+
+	@Override
+	public boolean isResolved() {
+		return pomArtifact.getFile() != null;
 	}
 }

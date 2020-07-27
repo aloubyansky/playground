@@ -60,4 +60,9 @@ public class FsPomResolver implements PomResolver {
 		}
 		return artifact;
 	}
+
+	@Override
+	public boolean isResolved() {
+		return true;
+	}
 }

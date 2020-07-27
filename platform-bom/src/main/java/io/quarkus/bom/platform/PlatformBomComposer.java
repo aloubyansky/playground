@@ -229,7 +229,7 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 		for(ProjectDependency dep : externalExtensionDeps.values()) {
 			platformReleaseBuilders.computeIfAbsent(dep.releaseId(), id -> ProjectRelease.builder(id)).add(dep);
 		}
-		final DecomposedBom.Builder platformBuilder = DecomposedBom.builder().bomArtifact(config.bomArtifact());
+		final DecomposedBom.Builder platformBuilder = DecomposedBom.builder().bomArtifact(config.bomArtifact()).bomSource(config.bomResolver());
 		for (ProjectRelease.Builder builder : platformReleaseBuilders.values()) {
 			platformBuilder.addRelease(builder.build());
 		}
@@ -419,7 +419,6 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 			final PlatformBomComposer bomComposer = new PlatformBomComposer(config);
 			final DecomposedBom generatedBom = bomComposer.platformBom();
 
-
 			report(bomComposer.originalPlatformBom(), generatedBom, outputDir, index);
 
 			for (DecomposedBom importedBom : bomComposer.upgradedImportedBoms()) {
@@ -434,9 +433,13 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 		final Path platformBomXml = outputDir.resolve("pom.xml");
 		PomUtils.toPom(generatedBom, platformBomXml);
 
-		final BomDiff bomDiff = BomDiff.config()
-				.compare(generatedBom.bomArtifact())
-				.to(platformBomXml);
+		final BomDiff.Config config = BomDiff.config();
+		if(generatedBom.bomResolver().isResolved()) {
+			config.compare(generatedBom.bomResolver().pomPath());
+		} else {
+			config.compare(generatedBom.bomArtifact());
+		}
+		final BomDiff bomDiff = config.to(platformBomXml);
 
 		final Path diffFile = outputDir.resolve("diff.html");
 		HtmlBomDiffReportGenerator.config(diffFile).report(bomDiff);

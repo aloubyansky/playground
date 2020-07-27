@@ -8,6 +8,7 @@ import org.eclipse.aether.artifact.Artifact;
 
 public interface PomResolver {
 	Artifact pomArtifact();
+	boolean isResolved();
 	Path pomPath();
 	String source();
 	Model readLocalModel(Path pom) throws IOException;

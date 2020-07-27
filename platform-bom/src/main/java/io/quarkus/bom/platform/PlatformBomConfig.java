@@ -48,7 +48,7 @@ public class PlatformBomConfig {
 				parent = parentModel.getParent();
 				pom = parentPom;
 			}
-			return fromManagedDeps(new DefaultArtifact(ModelUtils.getGroupId(model),
+			return fromManagedDeps(pomResolver, new DefaultArtifact(ModelUtils.getGroupId(model),
 					model.getArtifactId(), null, "pom", ModelUtils.getVersion(model)),
 					dm.getDependencies(), allProps);
 		} catch (Exception e) {
@@ -56,8 +56,9 @@ public class PlatformBomConfig {
 		}
 	}
 
-	private static PlatformBomConfig fromManagedDeps(Artifact bomArtifact, final List<Dependency> managedDeps, Properties props) {
+	private static PlatformBomConfig fromManagedDeps(PomResolver bomResolver, Artifact bomArtifact, final List<Dependency> managedDeps, Properties props) {
 		final PlatformBomConfig config = new PlatformBomConfig();
+		config.bomResolver = bomResolver;
 		config.bomArtifact = Objects.requireNonNull(bomArtifact);
 		for(Dependency dep : managedDeps) {
 			String version = dep.getVersion();
@@ -81,11 +82,16 @@ public class PlatformBomConfig {
 		return config;
 	}
 
+	private PomResolver bomResolver;
 	private Artifact bomArtifact;
 	private Artifact quarkusBom;
 	private List<Artifact> directDeps = new ArrayList<>();
 
 	private PlatformBomConfig() {
+	}
+
+	public PomResolver bomResolver() {
+		return bomResolver;
 	}
 
 	public Artifact bomArtifact() {

@@ -67,4 +67,9 @@ public class UrlPomResolver implements PomResolver {
 		}
 		return pomArtifact;
 	}
+
+	@Override
+	public boolean isResolved() {
+		return baseUrl.getProtocol().equals("file");
+	}
 }

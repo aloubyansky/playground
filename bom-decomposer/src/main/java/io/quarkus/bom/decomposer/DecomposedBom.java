@@ -58,6 +58,10 @@ public class DecomposedBom {
 		return bomArtifact;
 	}
 
+	public PomResolver bomResolver() {
+		return bomSource;
+	}
+
 	public boolean includes(ReleaseOrigin origin) {
 		return releases.containsKey(origin);
 	}

@@ -48,7 +48,7 @@ public class ReportIndexPageGenerator extends FileReportWriter implements AutoCl
 
 			openTag("body");
 
-			writeTag("h1", "Platform BOM summary");
+			writeTag("h1", "Platform BOM Summary");
 		} catch(IOException e) {
 			close();
 			throw e;
@@ -57,15 +57,31 @@ public class ReportIndexPageGenerator extends FileReportWriter implements AutoCl
 
 	private void generateContents() throws IOException {
 		writeTag("p", "");
+
+		writeTag("h2", "Platform BOM");
+
+		int i = 0;
+		int backgroundIndex = 1;
 		openTag("table");
-		writeTag("caption", "text-align:left;font-weight:bold", "Generated BOMs");
-		int backgroundIndex = 0;
-		for(int i = 0; i < toBoms.size(); ++i) {
+		openTag("tr", listBackground[backgroundIndex]);
+		writeTag("td", "text-align:left;font-weight:bold;color:gray", toBoms.get(i).bomArtifact());
+		writeTag("td", "text-align:left", generateAnchor(mainUrl.get(i).toExternalForm(), "original"));
+		writeTag("td", "text-align:left", generateAnchor(mainReleasesHtml.get(i).toUri().toURL().toExternalForm(), "decomposed"));
+		writeTag("td", "text-align:left", generateAnchor(toUrl.get(i).toExternalForm(), "generated"));
+		writeTag("td", "text-align:left", generateAnchor(toReleasesHtml.get(i).toUri().toURL().toExternalForm(), "decomposed"));
+		writeTag("td", "text-align:left", generateAnchor(diffHtml.get(i).toUri().toURL().toExternalForm(), "diff"));
+		closeTag("tr");
+		closeTag("table");
+
+		writeTag("p", "");
+		openTag("table");
+		writeTag("caption", "text-align:left;font-weight:bold", "Extension BOMs");
+		while(++i < toBoms.size()) {
 			openTag("tr", listBackground[backgroundIndex ^= 1]);
 			writeTag("td", "text-align:left;font-weight:bold;color:gray", toBoms.get(i).bomArtifact());
 			writeTag("td", "text-align:left", generateAnchor(mainUrl.get(i).toExternalForm(), "original"));
 			writeTag("td", "text-align:left", generateAnchor(mainReleasesHtml.get(i).toUri().toURL().toExternalForm(), "decomposed"));
-			writeTag("td", "text-align:left", generateAnchor(toUrl.get(i).toExternalForm(), "target"));
+			writeTag("td", "text-align:left", generateAnchor(toUrl.get(i).toExternalForm(), "generated"));
 			writeTag("td", "text-align:left", generateAnchor(toReleasesHtml.get(i).toUri().toURL().toExternalForm(), "decomposed"));
 			writeTag("td", "text-align:left", generateAnchor(diffHtml.get(i).toUri().toURL().toExternalForm(), "diff"));
 			closeTag("tr");
