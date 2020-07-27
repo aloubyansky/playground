@@ -141,7 +141,7 @@ public class BomDiff {
 				throw new RuntimeException("Failed to translate " + p + " to URL", e);
 			}
 		}
-		
+
 		private BomDiff diff() {
 			return new BomDiff(this);
 		}
@@ -165,7 +165,7 @@ public class BomDiff {
 		public Dependency to() {
 			return to;
 		}
-		
+
 		public boolean upgrade() {
 			return upgrade;
 		}
@@ -246,7 +246,7 @@ public class BomDiff {
 	public URL mainUrl() {
 		return mainUrl;
 	}
-	
+
 	public Artifact toBom() {
 		return toBom;
 	}
@@ -258,7 +258,7 @@ public class BomDiff {
 	public URL toUrl() {
 		return toUrl;
 	}
-	
+
 	public int mainBomSize() {
 		return mainSize;
 	}

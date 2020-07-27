@@ -412,8 +412,8 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 		final Path outputDir = Paths.get("target").resolve("boms"); // pomDir
 
 		PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.of(srcPomDir.resolve("pom.xml")));
-		//PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.githubPom("quarkusio/quarkus-platform/master/bom/runtime/pom.xml"));
 		//PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.githubPom("quarkusio/quarkus-platform/1.5.2.Final/bom/runtime/pom.xml"));
+		//PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.githubPom("quarkusio/quarkus-platform/master/bom/pom.xml"));
 
 		try (ReportIndexPageGenerator index = new ReportIndexPageGenerator(outputDir.resolve("index.html"))) {
 			final PlatformBomComposer bomComposer = new PlatformBomComposer(config);
