@@ -45,7 +45,7 @@ public class PomUtils {
 		}
 
 		final Model model = new Model();
-		model.setVersion("4.0.0");
+		model.setModelVersion("4.0.0");
 		model.setGroupId(decomposed.bomArtifact().getGroupId());
 		model.setArtifactId(decomposed.bomArtifact().getArtifactId());
 		model.setVersion(decomposed.bomArtifact().getVersion());
