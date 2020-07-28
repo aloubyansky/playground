@@ -25,7 +25,7 @@ import io.quarkus.bom.platform.PlatformBomComposer;
 import io.quarkus.bom.platform.PlatformBomConfig;
 import io.quarkus.bom.platform.ReportIndexPageGenerator;
 
-@Mojo(name = "generate-platform-bom", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, requiresDependencyCollection = ResolutionScope.COMPILE_PLUS_RUNTIME)
+@Mojo(name = "generate-platform-bom", defaultPhase = LifecyclePhase.INITIALIZE, requiresDependencyCollection = ResolutionScope.NONE)
 public class GeneratePlatformBomMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project}")
@@ -49,7 +49,7 @@ public class GeneratePlatformBomMojo extends AbstractMojo {
 	private void doExecute() throws Exception {
 		//final MojoMessageWriter msgWriter = new MojoMessageWriter(getLog());
 
-		final Path outputDir = Paths.get("target").resolve("boms");
+		final Path outputDir = Paths.get(project.getBuild().getDirectory()).resolve("boms");
 
 		//PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.of(new DefaultArtifact(project.getArtifact().getGroupId(), project.getArtifact().getArtifactId(), "", "pom", project.getArtifact().getVersion())));
 		PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.of(project.getFile().toPath()));
@@ -63,7 +63,7 @@ public class GeneratePlatformBomMojo extends AbstractMojo {
 			if(!generatedPom.exists()) {
 				throw new MojoExecutionException("Failed to locate the generated platform pom.xml at " + generatedPom);
 			} else {
-				System.out.println("GENERATED PLATFORM BOM " + generatedBom);
+				System.out.println("GENERATED PLATFORM BOM " + generatedPom);
 			}
 			project.setPomFile(generatedPom);
 
