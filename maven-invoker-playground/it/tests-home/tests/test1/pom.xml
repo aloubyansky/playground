@@ -13,10 +13,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.acme</groupId>
-            <artifactId>acme-bom</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-bootstrap-maven-resolver</artifactId>
         </dependency>
     </dependencies>
 

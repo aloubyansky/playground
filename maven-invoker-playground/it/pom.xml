@@ -6,13 +6,14 @@
         <groupId>org.acme</groupId>
         <artifactId>acme-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>../</relativePath>
     </parent>
 
     <artifactId>acme-it</artifactId>
     <packaging>pom</packaging>
 
     <modules>
-        <module>tests</module>
+        <!-- module>tests</module -->
     </modules>
 
     <dependencies>
@@ -30,8 +31,10 @@
                 <artifactId>maven-invoker-plugin</artifactId>
                 <version>3.2.1</version>
                 <configuration>
-                    <projectsDirectory>tests</projectsDirectory>
-                    <!-- localRepositoryPath>target/local-repo</localRepositoryPath -->
+                    <projectsDirectory>tests-home/tests</projectsDirectory>
+                    <streamLogs>true</streamLogs>
+                    <suppressSummaries>true</suppressSummaries>
+                    <goals>clean test</goals>
                 </configuration>
                 <executions>
                     <execution>
