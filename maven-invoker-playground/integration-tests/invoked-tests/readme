@@ -1,3 +1,3 @@
-This directory is necessary is the root directory for the IT maven project.
+This directory is necessary as the root directory for the IT maven project.
 It is necessary to prevent Quarkus bootstrap Maven workspace discovery to locate
 the root platform project and then the original platform BOM.

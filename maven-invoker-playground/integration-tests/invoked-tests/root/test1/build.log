@@ -1,0 +1,46 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------------< org.acme:acme-test1 >-------------------------
+[INFO] Building acme-test1 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ acme-test1 ---
+[INFO] Deleting /home/aloubyansky/git/playground/maven-invoker-playground/integration-tests/invoked-tests/root/test1/target
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ acme-test1 ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /home/aloubyansky/git/playground/maven-invoker-playground/integration-tests/invoked-tests/root/test1/src/main/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ acme-test1 ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ acme-test1 ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /home/aloubyansky/git/playground/maven-invoker-playground/integration-tests/invoked-tests/root/test1/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ acme-test1 ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 1 source file to /home/aloubyansky/git/playground/maven-invoker-playground/integration-tests/invoked-tests/root/test1/target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.0.0-M4:test (default-test) @ acme-test1 ---
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running org.acme.test.OneTest
+Hello from test
+Current project: org.acme:acme-test1::pom:1.0-SNAPSHOT
+ - org.junit.jupiter:junit-jupiter:jar:5.6.0
+ - io.quarkus:quarkus-bootstrap-maven-resolver:jar:1.7.0.Final
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.256 s - in org.acme.test.OneTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.745 s
+[INFO] Finished at: 2020-08-26T14:32:56+02:00
+[INFO] ------------------------------------------------------------------------

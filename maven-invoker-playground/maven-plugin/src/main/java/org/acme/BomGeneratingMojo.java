@@ -36,7 +36,7 @@ public class BomGeneratingMojo extends AbstractMojo {
 		final Dependency dep = new Dependency();
 		dep.setGroupId("io.quarkus");
 		dep.setArtifactId("quarkus-bootstrap-maven-resolver");
-		dep.setVersion("1.6.1.Final");
+		dep.setVersion("1.7.0.Final");
 		DependencyManagement dm = model.getDependencyManagement();
 		if(dm == null) {
 			dm = new DependencyManagement();

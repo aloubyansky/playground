@@ -17,7 +17,7 @@
     <modules>
         <module>maven-plugin</module>
         <module>bom</module>
-        <module>it</module>
+        <module>integration-tests</module>
     </modules>
 
 </project>
