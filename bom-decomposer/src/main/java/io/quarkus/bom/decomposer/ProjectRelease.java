@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
-import org.eclipse.aether.artifact.Artifact;
-
 import io.quarkus.bootstrap.model.AppArtifactKey;
 
 public class ProjectRelease {
@@ -21,15 +19,11 @@ public class ProjectRelease {
 			return id;
 		}
 
-		public Builder add(Artifact artifact) {
-			return add(ProjectDependency.create(id, artifact));
-		}
-
 		public Builder add(ProjectDependency dep) {
 			final ProjectDependency existing = deps.put(dep.key(), dep);
 			if (existing != null && !dep.artifact().getVersion().equals(existing.artifact().getVersion())) {
 				throw new IllegalArgumentException(
-						"Failed to add " + dep + " since the release already include " + existing);
+						"Failed to add " + dep + " since the release already includes " + existing);
 			}
 			return this;
 		}

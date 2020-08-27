@@ -27,6 +27,7 @@ public class UpdateAvailabilityTransformer implements DecomposedBomTransformer {
 			@Override
 			public void leaveReleaseOrigin(ReleaseOrigin releaseOrigin) throws BomDecomposerException {
 
+				// sort the collected release versions
 				final List<ArtifactVersion> releaseVersions = new ArrayList<>();
 				for(String versionStr : versions.keySet()) {
 					releaseVersions.add(new DefaultArtifactVersion(versionStr));
@@ -43,6 +44,7 @@ public class UpdateAvailabilityTransformer implements DecomposedBomTransformer {
 							continue;
 						}
 
+						// the latest version is the preferred one
 						int i = releaseVersions.size() - 1;
 						String versionStr = releaseVersions.get(i).toString();
 						if(release.id().version().asString().equals(versionStr)) {
@@ -53,6 +55,7 @@ public class UpdateAvailabilityTransformer implements DecomposedBomTransformer {
 						while(i >= 0) {
 							versionStr = releaseVersions.get(i--).toString();
 							if(release.id().version().asString().equals(versionStr)) {
+								// we've reached the release version the dep belongs to
 								break;
 							}
 							final String updatedDepVersion = versionStr.substring(depVersionIndex, versionStr.length() - (releaseVersionStr.length() - depVersionIndex - dep.artifact().getVersion().length()));
