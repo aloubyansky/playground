@@ -88,6 +88,7 @@ public class ReportIndexPageGenerator extends FileReportWriter implements AutoCl
 		}
 		closeTag("table");
 	}
+
 	public void bomReport(URL mainUrl, URL toUrl, DecomposedBom toBom, Path mainReleasesHtml, Path toReleasesHtml, Path diffHtml) {
 		this.mainUrl.add(mainUrl);
 		this.toUrl.add(toUrl);

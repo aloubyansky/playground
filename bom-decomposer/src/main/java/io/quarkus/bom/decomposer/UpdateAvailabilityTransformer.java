@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.eclipse.aether.artifact.Artifact;
@@ -21,51 +20,48 @@ public class UpdateAvailabilityTransformer implements DecomposedBomTransformer {
 		decomposer.logger().debug("Transforming decomposed %s", params);
 		decomposedBom.visit(new NoopDecomposedBomVisitor(true) {
 
-			final List<ProjectRelease> releases = new ArrayList<>();
-			Map<String, ReleaseId> versions = new HashMap<>();
+			List<ProjectRelease> releases = new ArrayList<>();
 
 			@Override
 			public void leaveReleaseOrigin(ReleaseOrigin releaseOrigin) throws BomDecomposerException {
 
 				// sort the collected release versions
 				final List<ArtifactVersion> releaseVersions = new ArrayList<>();
-				for(String versionStr : versions.keySet()) {
-					releaseVersions.add(new DefaultArtifactVersion(versionStr));
+				final Map<ArtifactVersion, ReleaseId> versionToReleaseId = new HashMap<>();
+				for(ProjectRelease release : releases) {
+					for(String versionStr : release.artifactVersions) {
+					    final ArtifactVersion version = new DefaultArtifactVersion(versionStr);
+						releaseVersions.add(version);
+					    final ReleaseId prevReleaseId = versionToReleaseId.put(version, release.id());
+					    if(prevReleaseId != null) {
+							if (new DefaultArtifactVersion(prevReleaseId.version().asString())
+									.compareTo(new DefaultArtifactVersion(release.id().version().asString())) > 0) {
+								versionToReleaseId.put(version, prevReleaseId);
+							}
+					    }
+					}
 				}
 				Collections.sort(releaseVersions);
 
 				for(ProjectRelease release : releases) {
 					for(ProjectDependency dep : release.dependencies()) {
-						// see if the dependency version can be derived from the project release tag/version
-						final String releaseVersionStr = dep.releaseId().version().asString();
-						final int depVersionIndex = releaseVersionStr.indexOf(dep.artifact().getVersion());
-						if(depVersionIndex < 0 || releaseVersionStr.indexOf(dep.artifact().getVersion(), depVersionIndex + 1) > 0) {
-							// give up
-							continue;
-						}
-
 						// the latest version is the preferred one
 						int i = releaseVersions.size() - 1;
-						String versionStr = releaseVersions.get(i).toString();
-						if(release.id().version().asString().equals(versionStr)) {
+						if(release.id().equals(versionToReleaseId.get(releaseVersions.get(i)))) {
 							dep.preferredVersion = true;
 							continue;
 						}
 
 						while(i >= 0) {
-							versionStr = releaseVersions.get(i--).toString();
-							if(release.id().version().asString().equals(versionStr)) {
+							final ArtifactVersion version = releaseVersions.get(i--);
+							final ReleaseId releaseId = versionToReleaseId.get(version);
+							if(release.id().equals(releaseId)) {
 								// we've reached the release version the dep belongs to
 								break;
 							}
-							final String updatedDepVersion = versionStr.substring(depVersionIndex, versionStr.length() - (releaseVersionStr.length() - depVersionIndex - dep.artifact().getVersion().length()));
-							final Artifact updatedArtifact = dep.artifact().setVersion(updatedDepVersion);
+							final Artifact updatedArtifact = dep.artifact().setVersion(version.toString());
 							if(isAvailable(decomposer, updatedArtifact)) {
-								final ReleaseId updatedReleaseId = versions.get(versionStr);
-								if(updatedReleaseId == null) {
-									throw new BomDecomposerException("Failed to locate release ID for " + versionStr);
-								}
-								dep.setAvailableUpdate(ProjectDependency.create(updatedReleaseId, updatedArtifact));
+								dep.setAvailableUpdate(ProjectDependency.create(releaseId, updatedArtifact));
 								break;
 							}
 						}
@@ -76,13 +72,11 @@ public class UpdateAvailabilityTransformer implements DecomposedBomTransformer {
 					}
 				}
 				releases.clear();
-				versions.clear();
 			}
 
 			@Override
 			public void visitProjectRelease(ProjectRelease release) {
 				releases.add(release);
-				versions.put(release.id().version().asString(), release.id());
 			}
 		});
 		Object[] params1 = { decomposedBom.bomArtifact() };

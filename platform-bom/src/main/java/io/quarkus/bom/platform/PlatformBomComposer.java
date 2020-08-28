@@ -332,17 +332,14 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 
 	private LinkedHashMap<String,ReleaseId> preferredVersions(Collection<ProjectRelease> releases) {
 		final TreeMap<ArtifactVersion, ReleaseId> treeMap = new TreeMap<>(Collections.reverseOrder());
-
 		for (ProjectRelease release : releases) {
-			final String releaseVersionStr = release.id().version().asString();
-			for(ProjectDependency dep : release.dependencies()) {
-				final int versionIndex = releaseVersionStr.indexOf(dep.artifact().getVersion());
-				if(versionIndex < 0 || releaseVersionStr.indexOf(dep.artifact().getVersion(), versionIndex + 1) > 0) {
-					// give up
-					continue;
+			for(String versionStr : release.artifactVersions()) {
+			    final DefaultArtifactVersion version = new DefaultArtifactVersion(versionStr);
+				final ReleaseId prevReleaseId = treeMap.put(version, release.id());
+				if (prevReleaseId != null && new DefaultArtifactVersion(prevReleaseId.version().asString())
+						.compareTo(new DefaultArtifactVersion(release.id().version().asString())) > 0) {
+					treeMap.put(version, prevReleaseId);
 				}
-				treeMap.put(new DefaultArtifactVersion(dep.artifact().getVersion()), release.id());
-				break;
 			}
 		}
 		final LinkedHashMap<String, ReleaseId> result = new LinkedHashMap<>(treeMap.size());
