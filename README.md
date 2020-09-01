@@ -18,7 +18,7 @@ The utility can invoked using a public API or a Maven plugin with a minimal conf
         <plugins>
             <plugin>
                 <groupId>io.quarkus</groupId>
-                <artifactId>quarkus-bom-decomposer-maven-plugin</artifactId>
+                <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
                 <version>999-SNAPSHOT</version>
                 <executions>
                     <execution>
@@ -41,7 +41,7 @@ Here is a complete set of supported options
         <plugins>
             <plugin>
                 <groupId>io.quarkus</groupId>
-                <artifactId>quarkus-bom-decomposer-maven-plugin</artifactId>
+                <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
                 <version>999-SNAPSHOT</version>
                 <configuration>
                     <!-- Whether to skip this goal during the build -->
