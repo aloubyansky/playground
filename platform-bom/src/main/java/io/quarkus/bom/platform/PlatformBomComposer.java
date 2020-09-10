@@ -69,7 +69,11 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 	private final DecomposedBom platformBom;
 	private final DecomposedBom originalPlatformBom;
 
+	private PlatformBomConfig config;
+
 	public PlatformBomComposer(PlatformBomConfig config) throws BomDecomposerException {
+
+		this.config = config;
 
 		originalPlatformBom = BomDecomposer.config()
 				.mavenArtifactResolver(resolver())
@@ -116,7 +120,7 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 					.decompose();
 		}
 
-		platformBom = generatePlatformBom(config);
+		platformBom = generatePlatformBom();
 
 		generatedUpdatedImportedBoms();
 	}
@@ -149,15 +153,17 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 			if (!bomsNotImportingQuarkusBom.contains(importedBomMinusQuarkusBom.bomArtifact())) {
 				quarkusBom.releases().forEach(r -> {
 					r.dependencies().forEach(d -> {
-						bomDeps.add(d.key());
-						releaseBuilders.computeIfAbsent(d.releaseId(), id -> ProjectRelease.builder(id)).add(d);
+						if (!config.excluded(d.key())) {
+							bomDeps.add(d.key());
+							releaseBuilders.computeIfAbsent(d.releaseId(), id -> ProjectRelease.builder(id)).add(d);
+						}
 					});
 				});
 			}
 
 			for(ProjectRelease release : importedBomMinusQuarkusBom.releases()) {
 				for(ProjectDependency dep : release.dependencies()) {
-					if(!bomDeps.add(dep.key())) {
+					if(!bomDeps.add(dep.key()) || config.excluded(dep.key())) {
 						continue;
 					}
 					ProjectDependency platformDep = quarkusBomDeps.get(dep.key());
@@ -167,7 +173,7 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 					if(platformDep == null) {
 						throw new IllegalStateException("Failed to locate " + dep.key() + " in the generated platform BOM");
 					}
-					releaseBuilders.computeIfAbsent(dep.releaseId(), id -> ProjectRelease.builder(id)).add(dep);
+					releaseBuilders.computeIfAbsent(platformDep.releaseId(), id -> ProjectRelease.builder(id)).add(platformDep);
 				}
 			}
 
@@ -181,9 +187,13 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 		}
 	}
 
-	private DecomposedBom generatePlatformBom(PlatformBomConfig config) throws BomDecomposerException {
+	private DecomposedBom generatePlatformBom() throws BomDecomposerException {
 		final Map<ReleaseId, ProjectRelease.Builder> platformReleaseBuilders = new HashMap<>();
 		for(ProjectDependency dep : quarkusBomDeps.values()) {
+			dep = effectiveDep(dep);
+			if(dep == null) {
+				continue;
+			}
 			platformReleaseBuilders.computeIfAbsent(dep.releaseId(), id -> ProjectRelease.builder(id)).add(dep);
 		}
 
@@ -236,6 +246,17 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 		return platformBuilder.build();
 	}
 
+	private ProjectDependency effectiveDep(ProjectDependency dep) {
+		if(config.excluded(dep.key())) {
+			return null;
+		}
+		Artifact enforced = config.enforced(dep.key());
+		if(enforced == null) {
+			return dep;
+		}
+		return ProjectDependency.create(dep.releaseId(), enforced);
+	}
+
 	private void mergeExtensionDeps(ProjectRelease release, Map<AppArtifactKey, ProjectDependency> extensionDeps) {
 		for(ProjectDependency dep : release.dependencies()) {
 			// the origin may have changed in the release of the dependency
@@ -247,6 +268,16 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 	}
 
 	private void addNonQuarkusDep(ProjectDependency dep, Map<AppArtifactKey, ProjectDependency> extensionDeps) {
+		if (config.excluded(dep.key())) {
+			return;
+		}
+		final Artifact enforced = config.enforced(dep.key());
+		if(enforced != null) {
+			if(!extensionDeps.containsKey(dep.key())) {
+			    extensionDeps.put(dep.key(), ProjectDependency.create(dep.releaseId(), enforced));
+			}
+			return;
+		}
 		final ProjectDependency currentDep = extensionDeps.get(dep.key());
 		if(currentDep != null) {
 			final ArtifactVersion currentVersion = new DefaultArtifactVersion(currentDep.artifact().getVersion());
@@ -408,7 +439,9 @@ public class PlatformBomComposer implements DecomposedBomTransformer, Decomposed
 
 		final Path outputDir = Paths.get("target").resolve("boms"); // pomDir
 
-		PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.of(srcPomDir.resolve("pom.xml")));
+		PlatformBomConfig config = PlatformBomConfig.builder()
+				.pomResolver(PomSource.of(srcPomDir.resolve("pom.xml")))
+				.build();
 		//PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.githubPom("quarkusio/quarkus-platform/1.5.2.Final/bom/runtime/pom.xml"));
 		//PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.githubPom("quarkusio/quarkus-platform/master/bom/pom.xml"));
 

@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -14,6 +16,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+
 import io.quarkus.bom.PomSource;
 import io.quarkus.bom.decomposer.BomDecomposerException;
 import io.quarkus.bom.decomposer.DecomposedBom;
@@ -24,6 +28,9 @@ import io.quarkus.bom.diff.HtmlBomDiffReportGenerator;
 import io.quarkus.bom.platform.PlatformBomComposer;
 import io.quarkus.bom.platform.PlatformBomConfig;
 import io.quarkus.bom.platform.ReportIndexPageGenerator;
+import io.quarkus.bootstrap.model.AppArtifact;
+import io.quarkus.bootstrap.model.AppArtifactCoords;
+import io.quarkus.bootstrap.model.AppArtifactKey;
 
 @Mojo(name = "generate-platform-bom", defaultPhase = LifecyclePhase.INITIALIZE, requiresDependencyCollection = ResolutionScope.NONE)
 public class GeneratePlatformBomMojo extends AbstractMojo {
@@ -33,6 +40,12 @@ public class GeneratePlatformBomMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${skipPlatformBom}")
     protected boolean skip;
+
+    @Parameter
+    protected Set<String> enforcedDependencies = new HashSet<>(0);
+
+    @Parameter
+    protected Set<String> excludedDependencies = new HashSet<>(0);
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -51,8 +64,22 @@ public class GeneratePlatformBomMojo extends AbstractMojo {
 
 		final Path outputDir = Paths.get(project.getBuild().getDirectory()).resolve("boms");
 
-		//PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.of(new DefaultArtifact(project.getArtifact().getGroupId(), project.getArtifact().getArtifactId(), "", "pom", project.getArtifact().getVersion())));
-		PlatformBomConfig config = PlatformBomConfig.forPom(PomSource.of(project.getFile().toPath()));
+		final PlatformBomConfig.Builder configBuilder = PlatformBomConfig.builder().pomResolver(PomSource.of(project.getFile().toPath()));
+
+		if(enforcedDependencies != null) {
+			for(String enforced : enforcedDependencies) {
+				final AppArtifactCoords coords = AppArtifact.fromString(enforced);
+				configBuilder.enforce(new DefaultArtifact(coords.getGroupId(), coords.getArtifactId(), coords.getClassifier(), coords.getType(), coords.getVersion()));
+			}
+		}
+
+		if(excludedDependencies != null) {
+			for(String excluded : excludedDependencies) {
+				configBuilder.exclude(AppArtifactKey.fromString(excluded));
+			}
+		}
+
+		final PlatformBomConfig config = configBuilder.build();
 
 		try (ReportIndexPageGenerator index = new ReportIndexPageGenerator(outputDir.resolve("index.html"))) {
 			final PlatformBomComposer bomComposer = new PlatformBomComposer(config);
@@ -63,7 +90,7 @@ public class GeneratePlatformBomMojo extends AbstractMojo {
 			if(!generatedPom.exists()) {
 				throw new MojoExecutionException("Failed to locate the generated platform pom.xml at " + generatedPom);
 			} else {
-				System.out.println("GENERATED PLATFORM BOM " + generatedPom);
+				//System.out.println("GENERATED PLATFORM BOM " + generatedPom);
 			}
 			project.setPomFile(generatedPom);
 
