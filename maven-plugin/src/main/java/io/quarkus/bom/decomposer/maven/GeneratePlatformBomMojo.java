@@ -47,6 +47,9 @@ public class GeneratePlatformBomMojo extends AbstractMojo {
     @Parameter
     protected Set<String> excludedDependencies = new HashSet<>(0);
 
+    @Parameter
+    protected Set<String> excludedGroups = new HashSet<>(0);
+
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		if(skip) {
@@ -76,6 +79,12 @@ public class GeneratePlatformBomMojo extends AbstractMojo {
 		if(excludedDependencies != null) {
 			for(String excluded : excludedDependencies) {
 				configBuilder.exclude(AppArtifactKey.fromString(excluded));
+			}
+		}
+
+		if(excludedGroups != null) {
+			for(String excluded : excludedGroups) {
+				configBuilder.excludeGroupId(excluded);
 			}
 		}
 
