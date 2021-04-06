@@ -51,7 +51,7 @@
         <graalvmHome>${env.GRAALVM_HOME}</graalvmHome>
         <postgres.url>jdbc:postgresql:hibernate_orm_test</postgres.url>
 
-        <quarkus.version>999-SNAPSHOT</quarkus.version>
+        <quarkus.version>1.13.0.Final</quarkus.version>
 
         <!-- After upgrading camel-quarkus regenerate the test modules by running
 
@@ -70,8 +70,8 @@
 
              mvn validate -Pregen-kogito -N
         -->
-        <kogito-quarkus.version>1.4.1.Final</kogito-quarkus.version>
-        <optaplanner-quarkus.version>8.4.1.Final</optaplanner-quarkus.version>
+        <kogito-quarkus.version>1.4.0.Final</kogito-quarkus.version>
+        <optaplanner-quarkus.version>8.4.0.Final</optaplanner-quarkus.version>
 
         <build-helper-maven-plugin.version>3.1.0</build-helper-maven-plugin.version>
         <rpkgtests-maven-plugin.version>0.8.0</rpkgtests-maven-plugin.version>
@@ -158,10 +158,11 @@
                     <platformConfig>
                         <!-- coordinates of the generated platform BOM -->
                         <bom>${project.groupId}:playground-quarkus-platform-bom:${project.version}</bom>
+                        <skipInstall>true</skipInstall>
                         <!-- the platform stack key and version -->
                         <platformStack>
-                            <key>${project.groupId}:playground-quarkus-platform-bom</key>
-                            <version>${project.version}</version>
+                            <key>${project.groupId}:playground-quarkus-platform-bom:1.13</key>
+                            <version>1</version>
                         </platformStack>
                         <!-- Quarkus core -->
                         <core>
@@ -183,9 +184,13 @@
                                     <artifact>org.optaplanner:optaplanner-quarkus-jackson-integration-test:${optaplanner-quarkus.version}</artifact>
                                 </tests>
                             </member>
-                            <!-- member>
+                            <member>
+                                <name>Kogito</name>
                                 <bom>org.kie.kogito:kogito-bom:${kogito-quarkus.version}</bom>
-                            </member -->
+                                <release>
+                                    <upcoming>${project.groupId}:kogito-bom:${kogito-quarkus.version}-redhat-00001</upcoming>
+                                </release>
+                            </member>
                         </members>
                         <!-- Platform BOM generator configuration -->
                         <bomGenerator>
