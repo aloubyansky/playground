@@ -187,6 +187,7 @@
                             <member>
                                 <name>Kogito</name>
                                 <bom>org.kie.kogito:kogito-bom:${kogito-quarkus.version}</bom>
+                                <disabled>true</disabled>
                                 <release>
                                     <upcoming>${project.groupId}:kogito-bom:${kogito-quarkus.version}-redhat-00001</upcoming>
                                 </release>
