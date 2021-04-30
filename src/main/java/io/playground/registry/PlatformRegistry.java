@@ -52,7 +52,7 @@ public class PlatformRegistry {
 		final ExtensionCatalog newPlatformDescr = resolveCatalog(artifact, false);
 
 		final Map<Object, Object> newPlatformStack = (Map<Object, Object>) newPlatformDescr.getMetadata()
-				.get("platform-stack");
+				.get("platform-release");
 		final PlatformStackInfo newStackInfo = new PlatformStackInfo((String) newPlatformStack.get("stream"), (String) newPlatformStack.get("version"),
 				newPlatformDescr, ((List<String>) newPlatformStack.get("members")).stream()
 						.map(ArtifactCoords::fromString).collect(Collectors.toList()));
@@ -74,25 +74,16 @@ public class PlatformRegistry {
 
 		final Map<String, ExtensionCatalog> platformDescriptors = streamPlatformDescriptors.computeIfAbsent(newStackInfo.stream, s -> new TreeMap<>()); // just to make a more consistent ordering on the web
 		platformDescriptors.clear();
-		platformCatalog = new JsonPlatformCatalog();
 		final Set<String> processedUnions = new HashSet<>(4);
 		final ElementCatalogBuilder catalogBuilder = ElementCatalogBuilder.newInstance();
 		for (PlatformStackInfo stackInfo : stackInfoList) {
 			final ExtensionCatalog c = stackInfo.origin;
 			platformDescriptors.put(stackInfo.coords().getKey().toString(), c);
 
-			final JsonPlatform p = new JsonPlatform();
-			p.setBom(c.getBom());
-			p.setQuarkusCoreVersion(c.getQuarkusCoreVersion());
-			platformCatalog.addPlatform(p);
-			if (c.getBom().getArtifactId().equals("quarkus-bom")) {
-				platformCatalog.setDefaultPlatform(c.getBom());
-			}
-
 			if (!processedUnions.add(stackInfo.stackVersion)) {
 				continue;
 			}
-			stackInfo.unionBuilder = catalogBuilder.newUnion(Integer.parseInt(stackInfo.stackVersion));
+			stackInfo.unionBuilder = catalogBuilder.getOrCreateUnion(Integer.parseInt(stackInfo.stackVersion));
 
 			addMember(stackInfo.unionBuilder, c);
 		}
@@ -121,12 +112,29 @@ public class PlatformRegistry {
 		elementCatalogs.put(newStackInfo.stream, catalogBuilder.build());
 		extensionCatalogs.put(newStackInfo.stream, JsonCatalogMerger.merge(new ArrayList<>(platformDescriptors.values())));
 
+		platformCatalog = new JsonPlatformCatalog();
+		
+		for (List<PlatformStackInfo> stream : stackInfoMap.values()) {
+			for (PlatformStackInfo stackInfo : stream) {
+				final ExtensionCatalog c = stackInfo.origin;
+				platformDescriptors.put(stackInfo.coords().getKey().toString(), c);
+
+				final JsonPlatform p = new JsonPlatform();
+				p.setBom(c.getBom());
+				p.setQuarkusCoreVersion(c.getQuarkusCoreVersion());
+				platformCatalog.addPlatform(p);
+				if (c.getBom().getArtifactId().equals("quarkus-bom")) {
+					platformCatalog.setDefaultPlatform(c.getBom());
+				}
+			}
+		}
+		
 		return newPlatformDescr;
 	}
 
 	private static void addMember(final UnionBuilder union, ExtensionCatalog member) {
 		if(union != null) {
-			final MemberBuilder builder = union.addMember(
+			final MemberBuilder builder = union.getOrCreateMember(
 					member.getBom().getGroupId() + ":" + member.getBom().getArtifactId(), member.getBom().getVersion());
 			member.getExtensions()
 			.forEach(e -> builder.addElement(e.getArtifact().getGroupId() + ":" + e.getArtifact().getArtifactId()));
