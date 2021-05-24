@@ -24,11 +24,16 @@ import io.quarkus.maven.ArtifactCoords;
 import io.quarkus.maven.ArtifactKey;
 import io.quarkus.registry.catalog.ExtensionCatalog;
 import io.quarkus.registry.catalog.PlatformCatalog;
+import io.quarkus.registry.catalog.PlatformRelease;
+import io.quarkus.registry.catalog.PlatformStream;
 import io.quarkus.registry.catalog.json.JsonCatalogMapperHelper;
 import io.quarkus.registry.catalog.json.JsonCatalogMerger;
 import io.quarkus.registry.catalog.json.JsonExtensionCatalog;
 import io.quarkus.registry.catalog.json.JsonPlatform;
 import io.quarkus.registry.catalog.json.JsonPlatformCatalog;
+import io.quarkus.registry.catalog.json.JsonPlatformRelease;
+import io.quarkus.registry.catalog.json.JsonPlatformReleaseVersion;
+import io.quarkus.registry.catalog.json.JsonPlatformStream;
 import io.quarkus.registry.union.ElementCatalog;
 import io.quarkus.registry.union.ElementCatalogBuilder;
 import io.quarkus.registry.union.ElementCatalogBuilder.MemberBuilder;
@@ -53,7 +58,11 @@ public class PlatformRegistry {
 
 		final Map<Object, Object> newPlatformStack = (Map<Object, Object>) newPlatformDescr.getMetadata()
 				.get("platform-release");
-		final PlatformStackInfo newStackInfo = new PlatformStackInfo((String) newPlatformStack.get("stream"), (String) newPlatformStack.get("version"),
+		if(newPlatformStack == null) {
+			System.out.println("NO STACK INFO " + groupId + ":" + artifactId + ":" + version);
+			return null;
+		}
+		final PlatformStackInfo newStackInfo = new PlatformStackInfo((String) newPlatformStack.get("platform-key"), (String) newPlatformStack.get("stream"), (String) newPlatformStack.get("version"),
 				newPlatformDescr, ((List<String>) newPlatformStack.get("members")).stream()
 						.map(ArtifactCoords::fromString).collect(Collectors.toList()));
 
@@ -108,27 +117,60 @@ public class PlatformRegistry {
 				}
 			}
 		}
-		
+
 		elementCatalogs.put(newStackInfo.stream, catalogBuilder.build());
 		extensionCatalogs.put(newStackInfo.stream, JsonCatalogMerger.merge(new ArrayList<>(platformDescriptors.values())));
 
 		platformCatalog = new JsonPlatformCatalog();
-		
+
+		final Map<String, JsonPlatform> platforms = new HashMap<>();
 		for (List<PlatformStackInfo> stream : stackInfoMap.values()) {
 			for (PlatformStackInfo stackInfo : stream) {
 				final ExtensionCatalog c = stackInfo.origin;
 				platformDescriptors.put(stackInfo.coords().getKey().toString(), c);
 
-				final JsonPlatform p = new JsonPlatform();
-				p.setBom(c.getBom());
-				p.setQuarkusCoreVersion(c.getQuarkusCoreVersion());
-				platformCatalog.addPlatform(p);
-				if (c.getBom().getArtifactId().equals("quarkus-bom")) {
-					platformCatalog.setDefaultPlatform(c.getBom());
+				final JsonPlatform p = platforms.computeIfAbsent(stackInfo.platformKey, k -> {
+					final JsonPlatform pl = new JsonPlatform();
+					pl.setPlatformKey(stackInfo.platformKey);
+					platformCatalog.addPlatform(pl);
+					return pl;});
+
+				JsonPlatformStream s = null;
+				if(p.getStreams().isEmpty()) {
+					p.setStreams(new ArrayList<>());
+				}
+				for(PlatformStream st : p.getStreams()) {
+					if(st.getId().equals(stackInfo.stream)) {
+						s = (JsonPlatformStream) st;
+						break;
+					}
+				}
+				if(s == null) {
+					s = new JsonPlatformStream();
+					s.setId(stackInfo.stream);
+					p.getStreams().add(s);
+				}
+
+				JsonPlatformRelease r = null;
+				if(s.getReleases().isEmpty()) {
+					s.setReleases(new ArrayList<>());
+				}
+				for(PlatformRelease rel : s.getReleases()) {
+					if(rel.getVersion().equals(JsonPlatformReleaseVersion.fromString(stackInfo.stackVersion))) {
+						r = (JsonPlatformRelease) rel;
+						break;
+					}
+				}
+				if(r == null) {
+					r = new JsonPlatformRelease();
+					r.setVersion(JsonPlatformReleaseVersion.fromString(stackInfo.stackVersion));
+					r.setQuarkusCoreVersion(c.getQuarkusCoreVersion());
+					r.setMemberBoms(stackInfo.members);
+					s.getReleases().add(r);
 				}
 			}
 		}
-		
+
 		return newPlatformDescr;
 	}
 
@@ -170,7 +212,7 @@ public class PlatformRegistry {
 	public Collection<String> streams() {
 		return stackInfoMap.keySet();
 	}
-	
+
 	public ExtensionCatalog catalog(String stream) {
 		return extensionCatalogs.get(stream);
 	}
@@ -181,6 +223,7 @@ public class PlatformRegistry {
 	}
 
 	private static class PlatformStackInfo {
+		final String platformKey;
 		final String stream;
 		final String stackVersion;
 		final ExtensionCatalog origin;
@@ -189,7 +232,8 @@ public class PlatformRegistry {
 		private ArtifactCoords coords;
 		private Set<ArtifactKey> memberGAs;
 
-		PlatformStackInfo(String stream, String stackVersion, ExtensionCatalog origin, List<ArtifactCoords> members) {
+		PlatformStackInfo(String platformKey, String stream, String stackVersion, ExtensionCatalog origin, List<ArtifactCoords> members) {
+			this.platformKey = platformKey;
 			this.stream = stream;
 			this.stackVersion = stackVersion;
 			this.origin = origin;
