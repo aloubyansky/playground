@@ -25,9 +25,9 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:git:git@github.com:quarkusio/quarkus-platform.git</connection>
-    <developerConnection>scm:git:git@github.com:quarkusio/quarkus-platform.git</developerConnection>
-    <url>https://github.com/quarkusio/quarkus-platform</url>
+    <connection>scm:git:git@github.com:aloubyansky/playground.git</connection>
+    <developerConnection>scm:git:git@github.com:aloubyansky/playground.git</developerConnection>
+    <url>https://github.com/aloubyansky/playground</url>
   </scm>
   <issueManagement>
     <system>GitHub</system>
