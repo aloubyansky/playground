@@ -2,6 +2,7 @@ package io.playground.registry;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,9 +39,15 @@ import io.quarkus.registry.union.ElementCatalog;
 import io.quarkus.registry.union.ElementCatalogBuilder;
 import io.quarkus.registry.union.ElementCatalogBuilder.MemberBuilder;
 import io.quarkus.registry.union.ElementCatalogBuilder.UnionBuilder;
+import io.quarkus.registry.util.PlatformArtifacts;
 
 @Singleton
 public class PlatformRegistry {
+
+	private static final PlatformStackInfo QUARKUS_1_PLATFORM;
+	static {
+		QUARKUS_1_PLATFORM = new PlatformStackInfo("io.quarkus.platform", "1.13", "5", null, Arrays.asList(PlatformArtifacts.getCatalogArtifactForBom(ArtifactCoords.fromString("io.quarkus:quarkus-universe-bom:1.13.5.Final"))));
+	}
 
 	@Inject
 	MavenArtifactResolver resolver;
@@ -129,49 +136,55 @@ public class PlatformRegistry {
 				final ExtensionCatalog c = stackInfo.origin;
 				platformDescriptors.put(stackInfo.coords().getKey().toString(), c);
 
-				final JsonPlatform p = platforms.computeIfAbsent(stackInfo.platformKey, k -> {
-					final JsonPlatform pl = new JsonPlatform();
-					pl.setPlatformKey(stackInfo.platformKey);
-					platformCatalog.addPlatform(pl);
-					return pl;});
-
-				JsonPlatformStream s = null;
-				if(p.getStreams().isEmpty()) {
-					p.setStreams(new ArrayList<>());
-				}
-				for(PlatformStream st : p.getStreams()) {
-					if(st.getId().equals(stackInfo.stream)) {
-						s = (JsonPlatformStream) st;
-						break;
-					}
-				}
-				if(s == null) {
-					s = new JsonPlatformStream();
-					s.setId(stackInfo.stream);
-					p.getStreams().add(s);
-				}
-
-				JsonPlatformRelease r = null;
-				if(s.getReleases().isEmpty()) {
-					s.setReleases(new ArrayList<>());
-				}
-				for(PlatformRelease rel : s.getReleases()) {
-					if(rel.getVersion().equals(JsonPlatformReleaseVersion.fromString(stackInfo.stackVersion))) {
-						r = (JsonPlatformRelease) rel;
-						break;
-					}
-				}
-				if(r == null) {
-					r = new JsonPlatformRelease();
-					r.setVersion(JsonPlatformReleaseVersion.fromString(stackInfo.stackVersion));
-					r.setQuarkusCoreVersion(c.getQuarkusCoreVersion());
-					r.setMemberBoms(stackInfo.members);
-					s.getReleases().add(r);
-				}
+				addPlatform(platforms, stackInfo, c.getQuarkusCoreVersion());
 			}
 		}
 
+		addPlatform(platforms, QUARKUS_1_PLATFORM, "1.13.5.Final");
 		return newPlatformDescr;
+	}
+
+	private void addPlatform(final Map<String, JsonPlatform> platforms, PlatformStackInfo stackInfo,
+			String quarkusVersion) {
+		final JsonPlatform p = platforms.computeIfAbsent(stackInfo.platformKey, k -> {
+			final JsonPlatform pl = new JsonPlatform();
+			pl.setPlatformKey(stackInfo.platformKey);
+			platformCatalog.addPlatform(pl);
+			return pl;});
+
+		JsonPlatformStream s = null;
+		if(p.getStreams().isEmpty()) {
+			p.setStreams(new ArrayList<>());
+		}
+		for(PlatformStream st : p.getStreams()) {
+			if(st.getId().equals(stackInfo.stream)) {
+				s = (JsonPlatformStream) st;
+				break;
+			}
+		}
+		if(s == null) {
+			s = new JsonPlatformStream();
+			s.setId(stackInfo.stream);
+			p.getStreams().add(s);
+		}
+
+		JsonPlatformRelease r = null;
+		if(s.getReleases().isEmpty()) {
+			s.setReleases(new ArrayList<>());
+		}
+		for(PlatformRelease rel : s.getReleases()) {
+			if(rel.getVersion().equals(JsonPlatformReleaseVersion.fromString(stackInfo.stackVersion))) {
+				r = (JsonPlatformRelease) rel;
+				break;
+			}
+		}
+		if(r == null) {
+			r = new JsonPlatformRelease();
+			r.setVersion(JsonPlatformReleaseVersion.fromString(stackInfo.stackVersion));
+			r.setQuarkusCoreVersion(quarkusVersion);
+			r.setMemberBoms(stackInfo.members);
+			s.getReleases().add(r);
+		}
 	}
 
 	private static void addMember(final UnionBuilder union, ExtensionCatalog member) {
