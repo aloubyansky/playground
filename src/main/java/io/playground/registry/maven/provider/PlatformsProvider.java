@@ -14,7 +14,7 @@ public class PlatformsProvider implements ArtifactContentProvider {
 	public PlatformsProvider(PlatformRegistry registry) {
 		this.registry = registry;
 	}
-	
+
 	@Override
 	public String getType() {
 		return "json";
@@ -22,6 +22,7 @@ public class PlatformsProvider implements ArtifactContentProvider {
 
 	@Override
 	public String artifactContent(ArtifactCoords coords, QerConfig qerConfig, UriInfo uriInfo) {
-		return JsonUtil.toJson(registry.platformCatalog());
+		return JsonUtil
+				.toJson(registry.platformCatalog(coords.getClassifier().isEmpty() ? null : coords.getClassifier()));
 	}
 }

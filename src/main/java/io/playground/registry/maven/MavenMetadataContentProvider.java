@@ -4,9 +4,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 import javax.ws.rs.core.UriInfo;
 
@@ -16,6 +15,7 @@ import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 
+import io.playground.registry.PlatformRegistry;
 import io.quarkus.maven.ArtifactCoords;
 
 public class MavenMetadataContentProvider implements ArtifactContentProvider {
@@ -23,14 +23,10 @@ public class MavenMetadataContentProvider implements ArtifactContentProvider {
 	private static final MetadataXpp3Writer METADATA_WRITER = new MetadataXpp3Writer();
 	private static final List<String> EMPTY_CLASSIFIER = Arrays.asList("");
 
-	private List<String> recognizedClassifiers;
+	private final PlatformRegistry registry;
 
-	public MavenMetadataContentProvider() {
-		this(Collections.emptyList());
-	}
-
-	public MavenMetadataContentProvider(List<String> supportedQuarkusVersions) {
-		this.recognizedClassifiers = Objects.requireNonNull(supportedQuarkusVersions);
+	public MavenMetadataContentProvider(PlatformRegistry registry) {
+		this.registry = registry;
 	}
 
 	@Override
@@ -59,7 +55,8 @@ public class MavenMetadataContentProvider implements ArtifactContentProvider {
 
 		final String baseVersion = coords.getVersion().substring(0, coords.getVersion().length() - "SNAPSHOT".length());
 		addSnapshotVersion(versioning, snapshot, baseVersion, EMPTY_CLASSIFIER, "pom");
-		addSnapshotVersion(versioning, snapshot, baseVersion, recognizedClassifiers, "json");
+		addSnapshotVersion(versioning, snapshot, baseVersion, EMPTY_CLASSIFIER, "json");
+		addSnapshotVersion(versioning, snapshot, baseVersion, registry.recognizedQuarkusVersions(), "json");
 
 		final StringWriter stringWriter = new StringWriter();
 		try (BufferedWriter writer = new BufferedWriter(stringWriter)) {
@@ -71,7 +68,7 @@ public class MavenMetadataContentProvider implements ArtifactContentProvider {
 	}
 
 	private static void addSnapshotVersion(Versioning versioning, Snapshot snapshot, final String baseVersion,
-			List<String> classifiers, String extension) {
+			Collection<String> classifiers, String extension) {
 		final String version = baseVersion + snapshot.getTimestamp() + "-" + snapshot.getBuildNumber();
 		for (String classifier : classifiers) {
 			final SnapshotVersion sv = new SnapshotVersion();
