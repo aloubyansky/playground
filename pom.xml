@@ -138,7 +138,7 @@
             <plugin>
                 <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
-                <version>0.0.15</version>
+                <version>0.0.16-SNAPSHOT</version>
                 <inherited>false</inherited>
                 <extensions>true</extensions>
                 <executions>
