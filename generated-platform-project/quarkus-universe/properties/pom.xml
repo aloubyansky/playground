@@ -12,6 +12,9 @@
   <artifactId>quarkus-universe-bom-quarkus-platform-properties</artifactId>
   <packaging>pom</packaging>
   <name>Quarkus Platform - Quarkus Universe - Quarkus Platform Properties</name>
+  <properties>
+    <platform.quarkus.native.builder-image>quay.io/quarkus/ubi-quarkus-native-image:21.1-java11</platform.quarkus.native.builder-image>
+  </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
