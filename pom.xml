@@ -574,6 +574,7 @@
                     <plugin>
                         <artifactId>maven-release-plugin</artifactId>
                         <configuration>
+                            <preparationGoals>process-resources</preparationGoals>
                             <completionGoals>process-resources</completionGoals>
                         </configuration>
                     </plugin>
