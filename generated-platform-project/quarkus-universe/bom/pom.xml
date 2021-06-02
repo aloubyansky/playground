@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.quarkus</groupId>
   <artifactId>quarkus-universe-bom</artifactId>
-  <version>0.0.12</version>
+  <version>999-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Quarkus Platform - Quarkus Universe - Quarkus Platform BOM</name>
   <description>Quarkus Universe platform aggregates extensions from Quarkus Core and those developed by the community into a single compatible and versioned set that application developers can reference from their applications to align the dependency versions</description>
@@ -27,7 +27,6 @@
   <scm>
     <connection>scm:git:git@github.com:aloubyansky/playground.git</connection>
     <developerConnection>scm:git:git@github.com:aloubyansky/playground.git</developerConnection>
-    <tag>0.0.12</tag>
     <url>https://github.com/aloubyansky/playground</url>
   </scm>
   <issueManagement>
@@ -49,14 +48,14 @@
       <dependency>
         <groupId>io.quarkus</groupId>
         <artifactId>quarkus-universe-bom-quarkus-platform-descriptor</artifactId>
-        <version>0.0.12</version>
+        <version>999-SNAPSHOT</version>
         <type>json</type>
-        <classifier>0.0.12</classifier>
+        <classifier>999-SNAPSHOT</classifier>
       </dependency>
       <dependency>
         <groupId>io.quarkus</groupId>
         <artifactId>quarkus-universe-bom-quarkus-platform-properties</artifactId>
-        <version>0.0.12</version>
+        <version>999-SNAPSHOT</version>
         <type>properties</type>
       </dependency>
       <dependency>
