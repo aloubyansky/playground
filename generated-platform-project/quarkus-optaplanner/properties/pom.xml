@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.quarkus.platform</groupId>
     <artifactId>quarkus-optaplanner-parent</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.0.8</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>quarkus-optaplanner-bom-quarkus-platform-properties</artifactId>
@@ -16,7 +16,7 @@
       <dependency>
         <groupId>io.quarkus.platform</groupId>
         <artifactId>quarkus-optaplanner-bom</artifactId>
-        <version>999-SNAPSHOT</version>
+        <version>0.0.8</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
