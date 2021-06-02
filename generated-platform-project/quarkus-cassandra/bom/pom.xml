@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.quarkus.platform</groupId>
   <artifactId>quarkus-cassandra-bom</artifactId>
-  <version>0.0.8</version>
+  <version>999-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Quarkus Platform - Cassandra - Quarkus Platform BOM</name>
   <description>Quarkus Universe platform aggregates extensions from Quarkus Core and those developed by the community into a single compatible and versioned set that application developers can reference from their applications to align the dependency versions</description>
@@ -27,7 +26,7 @@
   <scm>
     <connection>scm:git:git@github.com:aloubyansky/playground.git</connection>
     <developerConnection>scm:git:git@github.com:aloubyansky/playground.git</developerConnection>
-    <tag>0.0.8</tag>
+    <tag>HEAD</tag>
     <url>https://github.com/aloubyansky/playground</url>
   </scm>
   <issueManagement>
@@ -49,14 +48,14 @@
       <dependency>
         <groupId>io.quarkus.platform</groupId>
         <artifactId>quarkus-cassandra-bom-quarkus-platform-descriptor</artifactId>
-        <version>0.0.8</version>
+        <version>999-SNAPSHOT</version>
         <type>json</type>
         <classifier>0.0.8</classifier>
       </dependency>
       <dependency>
         <groupId>io.quarkus.platform</groupId>
         <artifactId>quarkus-cassandra-bom-quarkus-platform-properties</artifactId>
-        <version>0.0.8</version>
+        <version>999-SNAPSHOT</version>
         <type>properties</type>
       </dependency>
       <dependency>
