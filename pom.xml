@@ -564,11 +564,9 @@
     <profiles>
         <profile>
             <id>release</id>
-<!--
             <modules>
                 <module>generated-platform-project</module>
             </modules>
--->
             <build>
                 <plugins>
                     <plugin>
