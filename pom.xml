@@ -562,9 +562,12 @@
     </build>
 
     <profiles>
-    <!--
         <profile>
             <id>release</id>
+            <modules>
+                <module>generated-platform-project</module>
+            </modules>
+            <!--
             <build>
                 <plugins>
                     <plugin>
@@ -589,8 +592,8 @@
                     </plugin>
                 </plugins>
             </build>
+            -->
         </profile>
-        -->
         <profile>
             <id>rhproduct</id>
             <properties>
