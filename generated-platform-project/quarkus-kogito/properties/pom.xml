@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.quarkus.platform</groupId>
     <artifactId>quarkus-kogito-parent</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.0.13</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>quarkus-kogito-bom-quarkus-platform-properties</artifactId>
@@ -16,7 +16,7 @@
       <dependency>
         <groupId>io.quarkus.platform</groupId>
         <artifactId>quarkus-kogito-bom</artifactId>
-        <version>999-SNAPSHOT</version>
+        <version>0.0.13</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
