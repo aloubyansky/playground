@@ -132,13 +132,17 @@
                     <artifactId>maven-plugin-plugin</artifactId>
                     <version>${maven-plugin-plugin.version}</version>
                 </plugin>
+                <plugin>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+                    <version>0.0.16-SNAPSHOT</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
-                <version>0.0.16-SNAPSHOT</version>
                 <inherited>false</inherited>
                 <extensions>true</extensions>
                 <executions>
@@ -570,10 +574,26 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>io.quarkus</groupId>
+                        <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>build-platform-project</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>invoke-platform-project</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>true</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <artifactId>maven-release-plugin</artifactId>
                         <configuration>
-                            <preparationGoals>process-resources</preparationGoals>
-                            <completionGoals>process-resources</completionGoals>
+                            <preparationGoals>clean verify</preparationGoals>
+                            <completionGoals>clean process-resources</completionGoals>
                         </configuration>
                     </plugin>
                     <!--
