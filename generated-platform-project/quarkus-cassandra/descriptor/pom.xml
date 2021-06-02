@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.quarkus.platform</groupId>
     <artifactId>quarkus-cassandra-parent</artifactId>
-    <version>0.0.11</version>
+    <version>999-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>quarkus-cassandra-bom-quarkus-platform-descriptor</artifactId>
@@ -15,7 +15,7 @@
     <dependency>
       <groupId>io.quarkus.platform</groupId>
       <artifactId>quarkus-cassandra-bom</artifactId>
-      <version>0.0.11</version>
+      <version>999-SNAPSHOT</version>
       <type>pom</type>
     </dependency>
   </dependencies>
@@ -37,18 +37,18 @@
           <quarkusCoreVersion>2.0.0.CR2</quarkusCoreVersion>
           <platformRelease>
             <platformKey>io.quarkus.platform</platformKey>
-            <stream>0.0</stream>
-            <version>11</version>
+            <stream>999-SNAPSHOT</stream>
+            <version>0</version>
             <members>
-              <member>io.quarkus.platform:quarkus-bom-quarkus-platform-descriptor:0.0.11:json:0.0.11</member>
-              <member>io.quarkus.platform:quarkus-cassandra-bom-quarkus-platform-descriptor:0.0.11:json:0.0.11</member>
-              <member>io.quarkus.platform:quarkus-hazelcast-client-quarkus-platform-descriptor:0.0.11:json:0.0.11</member>
-              <member>io.quarkus.platform:quarkus-optaplanner-bom-quarkus-platform-descriptor:0.0.11:json:0.0.11</member>
-              <member>io.quarkus.platform:quarkus-qpid-jms-bom-quarkus-platform-descriptor:0.0.11:json:0.0.11</member>
-              <member>io.quarkus.platform:quarkus-blaze-persistence-bom-quarkus-platform-descriptor:0.0.11:json:0.0.11</member>
-              <member>io.quarkus.platform:quarkus-debezium-outbox-quarkus-platform-descriptor:0.0.11:json:0.0.11</member>
-              <member>io.quarkus.platform:quarkus-camel-bom-quarkus-platform-descriptor:0.0.11:json:0.0.11</member>
-              <member>io.quarkus.platform:quarkus-kogito-bom-quarkus-platform-descriptor:0.0.11:json:0.0.11</member>
+              <member>io.quarkus.platform:quarkus-bom-quarkus-platform-descriptor:999-SNAPSHOT:json:999-SNAPSHOT</member>
+              <member>io.quarkus.platform:quarkus-cassandra-bom-quarkus-platform-descriptor:999-SNAPSHOT:json:999-SNAPSHOT</member>
+              <member>io.quarkus.platform:quarkus-hazelcast-client-quarkus-platform-descriptor:999-SNAPSHOT:json:999-SNAPSHOT</member>
+              <member>io.quarkus.platform:quarkus-optaplanner-bom-quarkus-platform-descriptor:999-SNAPSHOT:json:999-SNAPSHOT</member>
+              <member>io.quarkus.platform:quarkus-qpid-jms-bom-quarkus-platform-descriptor:999-SNAPSHOT:json:999-SNAPSHOT</member>
+              <member>io.quarkus.platform:quarkus-blaze-persistence-bom-quarkus-platform-descriptor:999-SNAPSHOT:json:999-SNAPSHOT</member>
+              <member>io.quarkus.platform:quarkus-debezium-outbox-quarkus-platform-descriptor:999-SNAPSHOT:json:999-SNAPSHOT</member>
+              <member>io.quarkus.platform:quarkus-camel-bom-quarkus-platform-descriptor:999-SNAPSHOT:json:999-SNAPSHOT</member>
+              <member>io.quarkus.platform:quarkus-kogito-bom-quarkus-platform-descriptor:999-SNAPSHOT:json:999-SNAPSHOT</member>
             </members>
           </platformRelease>
           <overridesFile>${project.basedir}/../../../src/main/resources/extensions-overrides.json</overridesFile>
