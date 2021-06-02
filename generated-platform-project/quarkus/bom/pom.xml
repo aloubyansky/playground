@@ -36,11 +36,11 @@
   <distributionManagement>
     <repository>
       <id>my-nexus-releases</id>
-      <url>http://localhost:8081/repository/maven-releases</url>
+      <url>http://localhost:8085/repository/maven-releases</url>
     </repository>
     <snapshotRepository>
       <id>my-nexus-snapshots</id>
-      <url>http://localhost:8081/repository/maven-snapshots</url>
+      <url>http://localhost:8085/repository/maven-snapshots</url>
     </snapshotRepository>
   </distributionManagement>
   <dependencyManagement>

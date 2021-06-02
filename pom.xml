@@ -88,23 +88,13 @@
     </properties>
 
     <distributionManagement>
-    <!--
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>sonatype-nexus-release</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    -->
         <snapshotRepository>
             <id>my-nexus-snapshots</id>
-            <url>http://localhost:8081/repository/maven-snapshots</url>
+            <url>http://localhost:8085/repository/maven-snapshots</url>
         </snapshotRepository>
         <repository>
             <id>my-nexus-releases</id>
-            <url>http://localhost:8081/repository/maven-releases</url>
+            <url>http://localhost:8085/repository/maven-releases</url>
         </repository>
     </distributionManagement>
 
@@ -148,7 +138,7 @@
             <plugin>
                 <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
-                <version>0.0.13-SNAPSHOT</version>
+                <version>0.0.15</version>
                 <inherited>false</inherited>
                 <extensions>true</extensions>
                 <executions>
@@ -206,7 +196,7 @@
                                     <next>${project.groupId}:quarkus-optaplanner-bom:${project.version}</next>
                                 </release>
                                 <defaultTestConfig>
-                                    <enabled>true</enabled>
+                                    <skip>false</skip>
                                 </defaultTestConfig>
                                 <tests>
                                     <test>
@@ -225,7 +215,7 @@
                                     <next>${project.groupId}:quarkus-kogito-bom:${project.version}</next>
                                 </release>
                                 <defaultTestConfig>
-                                    <enabled>true</enabled>
+                                    <skip>false</skip>
                                 </defaultTestConfig>
                                 <tests>
                                     <test>
@@ -251,7 +241,7 @@
                                 </release>
                                 <tests>
                                     <test>
-                                        <enabled>true</enabled>
+                                        <skip>false</skip>
                                         <artifact>org.amqphub.quarkus:quarkus-qpid-jms-integration-tests:${quarkus-qpid-jms.version}</artifact>
                                     </test>
                                 </tests>
@@ -264,7 +254,7 @@
                                     <next>${project.groupId}:quarkus-cassandra-bom:${project.version}</next>
                                 </release>
                                 <defaultTestConfig>
-                                    <enabled>false</enabled>
+                                    <skip>true</skip>
                                 </defaultTestConfig>
                                 <tests>
                                     <test>
@@ -295,7 +285,7 @@
                                     <next>${project.groupId}:quarkus-camel-bom:${project.version}</next>
                                 </release>
                                 <defaultTestConfig>
-                                    <enabled>true</enabled>
+                                    <skip>false</skip>
                                     <jvmSystemProperties>
                                         <quarkus.http.test-port>$${test.http.port.jvm}</quarkus.http.test-port>
                                         <quarkus.http.test-ssl-port>$${test.https.port.jvm}</quarkus.http.test-ssl-port>
@@ -309,164 +299,164 @@
                                 <testCatalogArtifact>org.apache.camel.quarkus:camel-quarkus-test-list::xml:${camel-quarkus.version}</testCatalogArtifact>
                                 <tests>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-arangodb:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-as2:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-atlasmap:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-avro-rpc:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-azure-storage-blob:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-azure-storage-queue:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <!-- the pom seems to be missing -->
-                                        <enabled>false</enabled>
+                                        <!-- the pom seems to be missing, do not create a project module for this one -->
+                                        <excluded>true</excluded>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-bean-validation:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-cassandraql:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-dataformats-json:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-debezium:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-geocoder:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-grpc:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-http:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-jslt:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-jta:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-kafka:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-lumberjack:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-main-xml-io:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-main-xml-jaxb:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-main-yaml:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-main:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-messaging:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-microprofile:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-minio:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-openapi-java:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-opentracing:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-platform-http-engine:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-platform-http:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-pubnub:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-rest-binding-mode-xml:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-rest-openapi:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-rest:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-sap-netweaver:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-slack:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-solr:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-splunk:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-twilio:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-vertx-kafka:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-vertx-websocket:${camel-quarkus.version}</artifact>
                                     </test>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-vertx:${camel-quarkus.version}</artifact>
                                     </test>
                                 </tests>
@@ -481,7 +471,7 @@
                                 <tests>
                                     <test>
                                         <artifact>com.hazelcast:quarkus-hazelcast-client-integration-tests:${quarkus-hazelcast-client.version}</artifact>
-                                        <enabled>true</enabled>
+                                        <skip>false</skip>
                                     </test>
                                 </tests>
                             </member>
@@ -497,7 +487,7 @@
                                 </release>
                                 <tests>
                                     <test>
-                                        <enabled>false</enabled>
+                                        <skip>true</skip>
                                         <artifact>io.debezium:debezium-quarkus-outbox-integration-tests:${debezium-quarkus-outbox.version}</artifact>
                                     </test>
                                 </tests>
@@ -515,7 +505,7 @@
                                     <next>${project.groupId}:quarkus-blaze-persistence-bom:${project.version}</next>
                                 </release>
                                 <defaultTestConfig>
-                                    <enabled>true</enabled>
+                                    <skip>false</skip>
                                     <dependencies>
                                         <dependency>io.quarkus:quarkus-jdbc-h2:${quarkus.version}</dependency>
                                     </dependencies>
@@ -525,14 +515,14 @@
                                 </defaultTestConfig>
                                 <tests>
                                     <test>
-                                        <nativeEnabled>false</nativeEnabled>
+                                        <skipNative>true</skipNative>
                                         <artifact>com.blazebit:blaze-persistence-examples-quarkus-testsuite-base:${quarkus-blaze-persistence.version}</artifact>
                                         <systemProperties>
                                             <quarkus.test.profile>h2</quarkus.test.profile>
                                         </systemProperties>
                                     </test>
                                     <test>
-                                        <jvmEnabled>false</jvmEnabled>
+                                        <skipJvm>true</skipJvm>
                                         <artifact>com.blazebit:blaze-persistence-examples-quarkus-testsuite-native-h2:${quarkus-blaze-persistence.version}</artifact>
                                     </test>
                                 </tests>
@@ -570,14 +560,17 @@
             </plugin>
         </plugins>
     </build>
-<!--
+
     <profiles>
+    <!--
         <profile>
             <id>release</id>
             <build>
                 <plugins>
                     <plugin>
-                        < ! - - ## IMPORTANT ## In your ~/.m2/settings.xml you need to add and edit the following profile:
+                        < ! - -
+                        ## IMPORTANT ##
+                        In your ~/.m2/settings.xml you need to add and edit the following profile:
                         <profile>
                             <id>release</id>
                             <properties>
@@ -600,6 +593,7 @@
                 </plugins>
             </build>
         </profile>
+        -->
         <profile>
             <id>rhproduct</id>
             <properties>
@@ -611,5 +605,5 @@
         </profile>
 
     </profiles>
--->
+
 </project>

@@ -11,6 +11,9 @@
   <artifactId>quarkus-debezium-integration-tests-parent</artifactId>
   <packaging>pom</packaging>
   <name>Quarkus Platform - Debezium-Outbox - Integration Tests - Parent</name>
+  <modules>
+    <module>debezium-quarkus-outbox-integration-tests</module>
+  </modules>
   <dependencyManagement>
     <dependencies>
       <dependency>

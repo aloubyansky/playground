@@ -12,6 +12,45 @@
   <packaging>pom</packaging>
   <name>Quarkus Platform - Camel - Integration Tests - Parent</name>
   <modules>
+    <module>camel-quarkus-integration-test-arangodb</module>
+    <module>camel-quarkus-integration-test-as2</module>
+    <module>camel-quarkus-integration-test-atlasmap</module>
+    <module>camel-quarkus-integration-test-avro-rpc</module>
+    <module>camel-quarkus-integration-test-azure-storage-blob</module>
+    <module>camel-quarkus-integration-test-azure-storage-queue</module>
+    <module>camel-quarkus-integration-test-cassandraql</module>
+    <module>camel-quarkus-integration-test-dataformats-json</module>
+    <module>camel-quarkus-integration-test-debezium</module>
+    <module>camel-quarkus-integration-test-geocoder</module>
+    <module>camel-quarkus-integration-test-grpc</module>
+    <module>camel-quarkus-integration-test-http</module>
+    <module>camel-quarkus-integration-test-jslt</module>
+    <module>camel-quarkus-integration-test-jta</module>
+    <module>camel-quarkus-integration-test-kafka</module>
+    <module>camel-quarkus-integration-test-lumberjack</module>
+    <module>camel-quarkus-integration-test-main-xml-io</module>
+    <module>camel-quarkus-integration-test-main-xml-jaxb</module>
+    <module>camel-quarkus-integration-test-main-yaml</module>
+    <module>camel-quarkus-integration-test-main</module>
+    <module>camel-quarkus-integration-test-messaging</module>
+    <module>camel-quarkus-integration-test-microprofile</module>
+    <module>camel-quarkus-integration-test-minio</module>
+    <module>camel-quarkus-integration-test-openapi-java</module>
+    <module>camel-quarkus-integration-test-opentracing</module>
+    <module>camel-quarkus-integration-test-platform-http-engine</module>
+    <module>camel-quarkus-integration-test-platform-http</module>
+    <module>camel-quarkus-integration-test-pubnub</module>
+    <module>camel-quarkus-integration-test-rest-binding-mode-xml</module>
+    <module>camel-quarkus-integration-test-rest-openapi</module>
+    <module>camel-quarkus-integration-test-rest</module>
+    <module>camel-quarkus-integration-test-sap-netweaver</module>
+    <module>camel-quarkus-integration-test-slack</module>
+    <module>camel-quarkus-integration-test-solr</module>
+    <module>camel-quarkus-integration-test-splunk</module>
+    <module>camel-quarkus-integration-test-twilio</module>
+    <module>camel-quarkus-integration-test-vertx-kafka</module>
+    <module>camel-quarkus-integration-test-vertx-websocket</module>
+    <module>camel-quarkus-integration-test-vertx</module>
     <module>camel-quarkus-integration-test-activemq</module>
     <module>camel-quarkus-integration-test-amqp</module>
     <module>camel-quarkus-integration-test-avro</module>
