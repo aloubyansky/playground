@@ -564,12 +564,20 @@
     <profiles>
         <profile>
             <id>release</id>
+<!--
             <modules>
                 <module>generated-platform-project</module>
             </modules>
-            <!--
+-->
             <build>
                 <plugins>
+                    <plugin>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <configuration>
+                            <completionGoals>process-resources</completionGoals>
+                        </configuration>
+                    </plugin>
+                    <!--
                     <plugin>
                         < ! - - ## IMPORTANT ## In your ~/.m2/settings.xml you need to add and edit the following profile: <profile>
                             <id>release</id>
@@ -590,9 +598,9 @@
                             </execution>
                         </executions>
                     </plugin>
+                    -->
                 </plugins>
             </build>
-            -->
         </profile>
         <profile>
             <id>rhproduct</id>
