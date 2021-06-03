@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.quarkus.platform</groupId>
     <artifactId>quarkus-cassandra-parent</artifactId>
-    <version>0.0.14</version>
+    <version>999-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>quarkus-cassandra-bom-quarkus-platform-descriptor</artifactId>
@@ -15,7 +15,7 @@
     <dependency>
       <groupId>io.quarkus.platform</groupId>
       <artifactId>quarkus-cassandra-bom</artifactId>
-      <version>0.0.14</version>
+      <version>999-SNAPSHOT</version>
       <type>pom</type>
     </dependency>
   </dependencies>
