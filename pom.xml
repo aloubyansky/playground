@@ -589,15 +589,13 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!--
                     <plugin>
                         <artifactId>maven-release-plugin</artifactId>
                         <configuration>
-                            <preparationGoals>clean verify</preparationGoals>
-                            <completionGoals>clean process-resources</completionGoals>
+                            <preparationGoals>process-resources</preparationGoals>
+                            <completionGoals>process-resources</completionGoals>
                         </configuration>
                     </plugin>
-                    -->
                     <!--
                     <plugin>
                         < ! - - ## IMPORTANT ## In your ~/.m2/settings.xml you need to add and edit the following profile: <profile>
