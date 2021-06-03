@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.quarkus.platform</groupId>
     <artifactId>quarkus-platform-config</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.0.14</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>quarkus-platform-parent</artifactId>
@@ -24,6 +24,11 @@
     <module>quarkus-kogito</module>
     <module>quarkus-maven-plugin</module>
   </modules>
+  <properties>
+    <platform.key>io.quarkus.platform</platform.key>
+    <platform.stream>0.0</platform.stream>
+    <platform.release>14</platform.release>
+  </properties>
   <build>
     <pluginManagement>
       <plugins>

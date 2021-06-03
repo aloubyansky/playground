@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.quarkus.platform</groupId>
     <artifactId>quarkus-debezium-parent</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.0.14</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>quarkus-debezium-outbox-quarkus-platform-descriptor</artifactId>
@@ -15,7 +15,7 @@
     <dependency>
       <groupId>io.quarkus.platform</groupId>
       <artifactId>quarkus-debezium-outbox</artifactId>
-      <version>999-SNAPSHOT</version>
+      <version>0.0.14</version>
       <type>pom</type>
     </dependency>
   </dependencies>
@@ -53,9 +53,9 @@
           <bomArtifactId>quarkus-debezium-outbox</bomArtifactId>
           <quarkusCoreVersion>2.0.0.CR2</quarkusCoreVersion>
           <platformRelease>
-            <platformKey>io.quarkus.platform</platformKey>
-            <stream>999-SNAPSHOT</stream>
-            <version>0</version>
+            <platformKey>${platform.key}</platformKey>
+            <stream>${platform.stream}</stream>
+            <version>${platform.release}</version>
             <members>
               <member>${project.groupId}:quarkus-bom-quarkus-platform-descriptor:${project.version}:json:${project.version}</member>
               <member>${project.groupId}:quarkus-cassandra-bom-quarkus-platform-descriptor:${project.version}:json:${project.version}</member>
