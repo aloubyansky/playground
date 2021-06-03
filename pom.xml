@@ -592,7 +592,7 @@
                     <plugin>
                         <artifactId>maven-release-plugin</artifactId>
                         <configuration>
-                            <preparationGoals>process-resources -P !release</preparationGoals>
+                            <preparationGoals>clean verify -P !release</preparationGoals>
                             <completionGoals>process-resources -P !release</completionGoals>
                         </configuration>
                     </plugin>
