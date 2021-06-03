@@ -16,7 +16,7 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-universe-bom</artifactId>
-      <version>999-SNAPSHOT</version>
+      <version>${project.version}</version>
       <type>pom</type>
     </dependency>
   </dependencies>
@@ -52,7 +52,7 @@
         </executions>
         <configuration>
           <bomArtifactId>quarkus-universe-bom</bomArtifactId>
-          <quarkusCoreVersion>2.0.0.CR2</quarkusCoreVersion>
+          <quarkusCoreVersion>${quarkus.version}</quarkusCoreVersion>
           <overridesFile>${project.basedir}/../../../src/main/resources/extensions-overrides.json</overridesFile>
           <skipCategoryCheck>true</skipCategoryCheck>
         </configuration>

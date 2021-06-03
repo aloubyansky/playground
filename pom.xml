@@ -589,6 +589,7 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <!--
                     <plugin>
                         <artifactId>maven-release-plugin</artifactId>
                         <configuration>
@@ -596,6 +597,7 @@
                             <completionGoals>clean process-resources</completionGoals>
                         </configuration>
                     </plugin>
+                    -->
                     <!--
                     <plugin>
                         < ! - - ## IMPORTANT ## In your ~/.m2/settings.xml you need to add and edit the following profile: <profile>

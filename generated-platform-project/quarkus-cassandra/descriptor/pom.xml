@@ -15,7 +15,7 @@
     <dependency>
       <groupId>io.quarkus.platform</groupId>
       <artifactId>quarkus-cassandra-bom</artifactId>
-      <version>999-SNAPSHOT</version>
+      <version>${project.version}</version>
       <type>pom</type>
     </dependency>
   </dependencies>
@@ -51,7 +51,7 @@
         </executions>
         <configuration>
           <bomArtifactId>quarkus-cassandra-bom</bomArtifactId>
-          <quarkusCoreVersion>2.0.0.CR2</quarkusCoreVersion>
+          <quarkusCoreVersion>${quarkus.version}</quarkusCoreVersion>
           <platformRelease>
             <platformKey>${platform.key}</platformKey>
             <stream>${platform.stream}</stream>
