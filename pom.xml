@@ -65,6 +65,7 @@
         <kogito-quarkus.version>1.6.0.Final</kogito-quarkus.version>
         <optaplanner-quarkus.version>8.6.0.Final</optaplanner-quarkus.version>
 
+        <quarkus-platform-bom-generator.version>0.0.18-SNAPSHOT</quarkus-platform-bom-generator.version>
         <build-helper-maven-plugin.version>3.1.0</build-helper-maven-plugin.version>
         <rpkgtests-maven-plugin.version>0.8.0</rpkgtests-maven-plugin.version>
         <groovy-maven-plugin.version>2.1.1</groovy-maven-plugin.version>
@@ -135,7 +136,7 @@
                 <plugin>
                     <groupId>io.quarkus</groupId>
                     <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
-                    <version>0.0.16-SNAPSHOT</version>
+                    <version>${quarkus-platform-bom-generator.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -163,25 +164,28 @@
                 </executions>
                 <configuration>
                     <platformConfig>
-                        <!-- coordinates of the generated all-inclusive platform BOM -->
-                        <bom>io.quarkus:quarkus-universe-bom:${project.version}</bom>
-                        <!-- whether to skip installation of the all-inclusive platform BOM -->
-                        <skipInstall>false</skipInstall>
                         <!-- the platform release info -->
-                        <platformRelease>
+                        <release>
                             <!--
-                                |  the platform (dev stack) key, defaults to the platform's groudId
+                                |  the platform (dev stack) key (if not specified, defaults to the root project's groudId)
                             -->
                             <!-- platformKey>${project.groupId}</platformKey -->
                             <!--
-                                | platform stream id, representing the flow of backward compatible releases, defaults to major.minor platform version
+                                | platform stream id, representing the flow of backward compatible releases (if not specified, defaults to the project's major.minor platform version)
                             -->
                             <!-- stream>2.0</stream -->
                             <!--
-                                | platform (comparable) version, must be unique in the scope of the stream, defaults to the micro version of the platform
+                                | platform (comparable) version, must be unique in the scope of the stream, (if not specified, defaults to the micro version of the complete platform version)
                             -->
                             <!-- version>0</version> -->
-                        </platformRelease>
+                        </release>
+                        <!-- Universal / all-inclusive platform -->
+                        <universal>
+                            <!-- coordinates of the generated all-inclusive platform BOM -->
+                            <bom>io.quarkus:quarkus-universe-bom:${project.version}</bom>
+                            <!-- whether to skip installation of the all-inclusive platform BOM -->
+                            <skipInstall>false</skipInstall>
+                        </universal>
                         <!-- Quarkus core -->
                         <core>
                             <name>Core</name>
@@ -195,7 +199,7 @@
                             <member>
                                 <name>OptaPlanner</name>
                                 <bom>org.optaplanner:optaplanner-bom:${optaplanner-quarkus.version}</bom>
-                                <enabled>true</enabled>
+                                <enabled>false</enabled>
                                 <release>
                                     <next>${project.groupId}:quarkus-optaplanner-bom:${project.version}</next>
                                 </release>
@@ -214,7 +218,7 @@
                             <member>
                                 <name>Kogito</name>
                                 <bom>org.kie.kogito:kogito-bom:${kogito-quarkus.version}</bom>
-                                <enabled>true</enabled>
+                                <enabled>false</enabled>
                                 <release>
                                     <next>${project.groupId}:quarkus-kogito-bom:${project.version}</next>
                                 </release>
@@ -245,7 +249,6 @@
                                 </release>
                                 <tests>
                                     <test>
-                                        <skip>false</skip>
                                         <artifact>org.amqphub.quarkus:quarkus-qpid-jms-integration-tests:${quarkus-qpid-jms.version}</artifact>
                                     </test>
                                 </tests>
@@ -253,7 +256,7 @@
                             <member>
                                 <name>Cassandra</name>
                                 <bom>com.datastax.oss.quarkus:cassandra-quarkus-bom:${quarkus-cassandra-client.version}</bom>
-                                <enabled>true</enabled>
+                                <enabled>false</enabled>
                                 <release>
                                     <next>${project.groupId}:quarkus-cassandra-bom:${project.version}</next>
                                 </release>
@@ -284,7 +287,7 @@
                             <member>
                                 <name>Camel</name>
                                 <bom>org.apache.camel.quarkus:camel-quarkus-bom:${camel-quarkus.version}</bom>
-                                <enabled>true</enabled>
+                                <enabled>false</enabled>
                                 <release>
                                     <next>${project.groupId}:quarkus-camel-bom:${project.version}</next>
                                 </release>
@@ -475,7 +478,6 @@
                                 <tests>
                                     <test>
                                         <artifact>com.hazelcast:quarkus-hazelcast-client-integration-tests:${quarkus-hazelcast-client.version}</artifact>
-                                        <skip>false</skip>
                                     </test>
                                 </tests>
                             </member>
@@ -485,7 +487,7 @@
                                     <dependency>io.debezium:debezium-quarkus-outbox:${debezium-quarkus-outbox.version}</dependency>
                                     <dependency>io.debezium:debezium-quarkus-outbox-deployment:${debezium-quarkus-outbox.version}</dependency>
                                 </dependencyManagement>
-                                <enabled>true</enabled>
+                                <enabled>false</enabled>
                                 <release>
                                     <next>${project.groupId}:quarkus-debezium-outbox:${project.version}</next>
                                 </release>
@@ -569,10 +571,14 @@
         <profile>
             <id>release</id>
             <modules>
+                <!-- To properly push the generated platform project as part of the release, it has to be added as a module to make it visible
+                     to the release plugin which will then be able to transform the generated POMs -->
                 <module>generated-platform-project</module>
             </modules>
             <build>
                 <plugins>
+                    <!-- Given that the generated platform project is included as a module in this profile,
+                         the platform invoker goal becomes redundant and can be disabled -->
                     <plugin>
                         <groupId>io.quarkus</groupId>
                         <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
@@ -592,13 +598,20 @@
                     <plugin>
                         <artifactId>maven-release-plugin</artifactId>
                         <configuration>
+                            <!-- After the release plugin has transformed all the POMs, we need to re-generate the platform configs (mainly to re-generated POM properties)
+                                 taking into account the upcoming release version. Although this will happen at the `process-resources` phase anyway, this should be done
+                                 using the platform invoker goal (otherwise, some dependencies relying on the generated properties may fail to resolve).
+                                 Here we are deactivating the release profile to exclude the generated-platform-project module. -->
                             <preparationGoals>clean verify -P !release</preparationGoals>
                             <completionGoals>process-resources -P !release</completionGoals>
                         </configuration>
                     </plugin>
                     <!--
                     <plugin>
-                        < ! - - ## IMPORTANT ## In your ~/.m2/settings.xml you need to add and edit the following profile: <profile>
+                        < ! - -
+                        ## IMPORTANT ##
+                        In your ~/.m2/settings.xml you need to add and edit the following profile:
+                        <profile>
                             <id>release</id>
                             <properties>
                                 <gpg.useagent>false</gpg.useagent>
