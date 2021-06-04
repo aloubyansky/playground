@@ -82,10 +82,6 @@
            | The registry service to notify about the new platform release
         -->
         <!-- quarkus.registry.url>http://localhost:8080/registry/new-platform</quarkus.registry.url -->
-        <!--
-           | Whether to update the platform release config in this POM after successuflly installing the platform artifacts
-        -->
-        <!-- updatePomOnInstall>false</updatePomOnInstall -->
     </properties>
 
     <distributionManagement>
@@ -602,7 +598,7 @@
                                  taking into account the upcoming release version. Although this will happen at the `process-resources` phase anyway, this should be done
                                  using the platform invoker goal (otherwise, some dependencies relying on the generated properties may fail to resolve).
                                  Here we are deactivating the release profile to exclude the generated-platform-project module. -->
-                            <preparationGoals>clean verify -P !release -DupdatePomOnInstall</preparationGoals>
+                            <preparationGoals>clean verify -P !release -DupdatePreviousReleaseVersions</preparationGoals>
                             <completionGoals>process-resources -P !release</completionGoals>
                         </configuration>
                     </plugin>
