@@ -603,7 +603,7 @@
                                  using the platform invoker goal (otherwise, some dependencies relying on the generated properties may fail to resolve).
                                  Here we are deactivating the release profile to exclude the generated-platform-project module. -->
                             <preparationGoals>clean verify -P !release -DupdatePreviousMemberReleases</preparationGoals>
-                            <completionGoals>clean process-resources -P !release</completionGoals>
+                            <completionGoals>process-resources -P !release</completionGoals>
                         </configuration>
                     </plugin>
                     <!--
