@@ -21,7 +21,8 @@
         "gradle-wrapper-version" : "6.9"
       }
     },
-    "codestarts-artifacts" : [ "io.quarkus:quarkus-project-core-extension-codestarts::jar:2.0.0.CR2" ]
+    "codestarts-artifacts" : [ "io.quarkus:quarkus-project-core-extension-codestarts::jar:2.0.0.CR2" ],
+    "last-bom-update" : "${member.last-bom-update}"
   },
   "categories" : [ {
     "id" : "web",
