@@ -12,7 +12,7 @@
   <packaging>pom</packaging>
   <name>Quarkus Platform - Blaze-Persistence - Quarkus Platform Descriptor</name>
   <properties>
-    <member.last-bom-update>io.quarkus.platform:quarkus-blaze-persistence-bom:0.0.41</member.last-bom-update>
+    <member.last-bom-update>io.quarkus.platform:quarkus-blaze-persistence-bom:999-SNAPSHOT</member.last-bom-update>
   </properties>
   <dependencies>
     <dependency>

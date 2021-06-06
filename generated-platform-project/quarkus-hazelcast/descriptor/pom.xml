@@ -12,7 +12,7 @@
   <packaging>pom</packaging>
   <name>Quarkus Platform - Hazelcast - Quarkus Platform Descriptor</name>
   <properties>
-    <member.last-bom-update>io.quarkus.platform:quarkus-hazelcast-client:0.0.41</member.last-bom-update>
+    <member.last-bom-update>io.quarkus.platform:quarkus-hazelcast-client:999-SNAPSHOT</member.last-bom-update>
   </properties>
   <dependencies>
     <dependency>
