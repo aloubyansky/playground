@@ -189,7 +189,7 @@ public class PlatformRegistry {
 		if (s == null) {
 			s = new JsonPlatformStream();
 			s.setId(stackInfo.stream);
-			p.getStreams().add(s);
+			p.addStream(s);
 		}
 
 		JsonPlatformRelease r = null;
@@ -207,7 +207,7 @@ public class PlatformRegistry {
 			r.setVersion(JsonPlatformReleaseVersion.fromString(stackInfo.stackVersion));
 			r.setQuarkusCoreVersion(quarkusVersion);
 			r.setMemberBoms(stackInfo.members);
-			s.getReleases().add(r);
+			s.addRelease(r);
 		}
 		recognizedQuarkusVersions.add(quarkusVersion);
 		platformCatalogs.computeIfAbsent(quarkusVersion, v -> new JsonPlatformCatalog()).addPlatform(p);

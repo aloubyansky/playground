@@ -38,7 +38,7 @@ public class RegistryDescriptorProvider implements ArtifactContentProvider {
 		final JsonRegistryNonPlatformExtensionsConfig nonPlatforms = new JsonRegistryNonPlatformExtensionsConfig();
 		config.setNonPlatformExtensions(nonPlatforms);
 		nonPlatforms.setArtifact(new ArtifactCoords(qerConfig.groupId(), qerConfig.nonPlatformExtensions(), null, "json", qerConfig.version()));
-		nonPlatforms.setDisabled(true);
+		nonPlatforms.setDisabled(false);
 
 		return toJson(config);
 	}

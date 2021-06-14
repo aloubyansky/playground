@@ -16,17 +16,18 @@ public class NonPlatformExtensionsProvider extends QuarkusVersionSpecificContent
 
 	@Override
 	protected String provideContent(ArtifactCoords coords) {
+		
 		final JsonExtensionCatalog catalog = new JsonExtensionCatalog();
 		catalog.setId(coords.toString());
 
 		final ArtifactCoords bom = ArtifactCoords
-				.fromString("io.quarkus:quarkus-bom::pom:" + RegistryConstants.QUARKUS_VERSION);
+				.fromString("io.quarkus:quarkus-bom::pom:" + coords.getClassifier());
 		catalog.setBom(bom);
 		catalog.setQuarkusCoreVersion(bom.getVersion());
 
 		JsonExtension e = new JsonExtension();
 		catalog.addExtension(e);
-		e.setArtifact(ArtifactCoords.fromString("io.playground:playground-quarkus-extension::jar:1"));
+		e.setArtifact(ArtifactCoords.fromString("io.playground:playground-quarkus-extension::jar:" + coords.getClassifier()));
 		e.setName("Playgound Quarkus Extension");
 		e.setOrigins(Arrays.asList(catalog));
 
