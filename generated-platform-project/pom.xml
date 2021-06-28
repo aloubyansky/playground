@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.quarkus.platform</groupId>
     <artifactId>quarkus-platform-config</artifactId>
-    <version>0.0.48</version>
+    <version>999-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>quarkus-platform-parent</artifactId>
@@ -25,9 +25,9 @@
   </modules>
   <properties>
     <platform.key>io.quarkus.platform</platform.key>
-    <platform.release>0.0.48</platform.release>
-    <platform.stream>0.0</platform.stream>
-    <universal.bom.version>0.0.48</universal.bom.version>
+    <platform.release>999-SNAPSHOT</platform.release>
+    <platform.stream>999-SNAPSHOT</platform.stream>
+    <universal.bom.version>999-SNAPSHOT</universal.bom.version>
   </properties>
   <build>
     <pluginManagement>
