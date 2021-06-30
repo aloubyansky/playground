@@ -27,7 +27,6 @@
     <platform.key>io.quarkus.platform</platform.key>
     <platform.release>999-SNAPSHOT</platform.release>
     <platform.stream>999-SNAPSHOT</platform.stream>
-    <universal.bom.version>999-SNAPSHOT</universal.bom.version>
   </properties>
   <build>
     <pluginManagement>
