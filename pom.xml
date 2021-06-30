@@ -67,7 +67,7 @@
 
         <quarkus-google-cloud-services.version>0.8.0</quarkus-google-cloud-services.version>
 
-        <quarkus-platform-bom-generator.version>0.0.21-SNAPSHOT</quarkus-platform-bom-generator.version>
+        <quarkus-platform-bom-generator.version>0.0.22-SNAPSHOT</quarkus-platform-bom-generator.version>
         <build-helper-maven-plugin.version>3.1.0</build-helper-maven-plugin.version>
         <rpkgtests-maven-plugin.version>0.8.0</rpkgtests-maven-plugin.version>
         <groovy-maven-plugin.version>2.1.1</groovy-maven-plugin.version>
@@ -484,15 +484,14 @@
                             <completionGoals>process-resources -P !release</completionGoals>
                         </configuration>
                     </plugin>
-                    <!--
                     <plugin>
-                        < ! - - ## IMPORTANT ## In your ~/.m2/settings.xml you need to add and edit the following profile: <profile>
+                        <!-- ## IMPORTANT ## In your ~/.m2/settings.xml you need to add and edit the following profile: <profile>
                             <id>release</id>
                             <properties>
                                 <gpg.useagent>false</gpg.useagent>
                                 <gpg.executable>/usr/local/Cellar/gnupg@1.4/1.4.23_1/bin/gpg1</gpg.executable> <- use gpg1 on Mac OS X <gpg.homedir>~/.gnupg</gpg.homedir>  <- Update to your own directory <gpg.passphrase>******</gpg.passphrase> <- Add your passphrase </properties>
                         </profile>
-                         - - >
+                         -->
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
                         <executions>
@@ -505,7 +504,6 @@
                             </execution>
                         </executions>
                     </plugin>
-                    -->
                 </plugins>
             </build>
         </profile>
