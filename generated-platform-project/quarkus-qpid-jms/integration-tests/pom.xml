@@ -14,9 +14,6 @@
   <modules>
     <module>quarkus-qpid-jms-integration-tests</module>
   </modules>
-  <properties>
-    <gpg.skip>true</gpg.skip>
-  </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
