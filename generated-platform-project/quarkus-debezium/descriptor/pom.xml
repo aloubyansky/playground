@@ -5,14 +5,14 @@
   <parent>
     <groupId>io.quarkus.platform</groupId>
     <artifactId>quarkus-debezium-parent</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.0.49</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>quarkus-debezium-outbox-quarkus-platform-descriptor</artifactId>
   <packaging>pom</packaging>
   <name>Quarkus Platform - Debezium-Outbox - Quarkus Platform Descriptor</name>
   <properties>
-    <member.last-bom-update>io.quarkus.platform:quarkus-debezium-outbox:0.0.48</member.last-bom-update>
+    <member.last-bom-update>io.quarkus.platform:quarkus-debezium-outbox:0.0.49</member.last-bom-update>
   </properties>
   <dependencies>
     <dependency>

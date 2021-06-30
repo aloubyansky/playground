@@ -11,7 +11,7 @@
     <groupId>io.quarkus.platform</groupId>
     <artifactId>quarkus-platform-config</artifactId>
     <name>Quarkus Platform - Configuration pom</name>
-    <version>999-SNAPSHOT</version>
+    <version>0.0.49</version>
     <packaging>pom</packaging>
     <description>Quarkus Universe platform aggregates extensions from Quarkus Core and those developed by the community into a single compatible and versioned set that application developers can reference from their applications to align the dependency versions</description>
     <url>https://github.com/quarkusio/quarkus-platform</url>
@@ -37,7 +37,7 @@
         <url>https://github.com/aloubyansky/playground</url>
         <connection>scm:git:git@github.com:aloubyansky/playground.git</connection>
         <developerConnection>scm:git:git@github.com:aloubyansky/playground.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>0.0.49</tag>
     </scm>
 
     <issueManagement>
@@ -184,7 +184,7 @@
                             <name>Core</name>
                             <bom>io.quarkus:quarkus-bom:${quarkus.version}</bom>
                             <release>
-                                <lastDetectedBomUpdate>io.quarkus.platform:quarkus-bom:0.0.48</lastDetectedBomUpdate>
+                                <lastDetectedBomUpdate>io.quarkus.platform:quarkus-bom:0.0.49</lastDetectedBomUpdate>
                                 <next>${project.groupId}:quarkus-bom:${project.version}</next>
                             </release>
                         </core>
@@ -239,7 +239,7 @@
                                 <bom>org.amqphub.quarkus:quarkus-qpid-jms-bom:${quarkus-qpid-jms.version}</bom>
                                 <enabled>true</enabled>
                                 <release>
-                                    <lastDetectedBomUpdate>io.quarkus.platform:quarkus-qpid-jms-bom:0.0.48</lastDetectedBomUpdate>
+                                    <lastDetectedBomUpdate>io.quarkus.platform:quarkus-qpid-jms-bom:0.0.49</lastDetectedBomUpdate>
                                     <next>${project.groupId}:quarkus-qpid-jms-bom:${project.version}</next>
                                 </release>
                                 <tests>
@@ -253,7 +253,7 @@
                                 <bom>com.datastax.oss.quarkus:cassandra-quarkus-bom:${quarkus-cassandra-client.version}</bom>
                                 <enabled>true</enabled>
                                 <release>
-                                    <lastDetectedBomUpdate>io.quarkus.platform:quarkus-cassandra-bom:0.0.48</lastDetectedBomUpdate>
+                                    <lastDetectedBomUpdate>io.quarkus.platform:quarkus-cassandra-bom:0.0.49</lastDetectedBomUpdate>
                                     <next>${project.groupId}:quarkus-cassandra-bom:${project.version}</next>
                                 </release>
                                 <defaultTestConfig>
@@ -291,7 +291,7 @@
                                 <bom>org.apache.camel.quarkus:camel-quarkus-bom:${camel-quarkus.version}</bom>
                                 <enabled>true</enabled>
                                 <release>
-                                    <lastDetectedBomUpdate>io.quarkus.platform:quarkus-camel-bom:0.0.48</lastDetectedBomUpdate>
+                                    <lastDetectedBomUpdate>io.quarkus.platform:quarkus-camel-bom:0.0.49</lastDetectedBomUpdate>
                                     <next>${project.groupId}:quarkus-camel-bom:${project.version}</next>
                                 </release>
                                 <defaultTestConfig>
@@ -331,7 +331,7 @@
                                 <bom>com.hazelcast:quarkus-hazelcast-client:${quarkus-hazelcast-client.version}</bom>
                                 <enabled>true</enabled>
                                 <release>
-                                    <lastDetectedBomUpdate>io.quarkus.platform:quarkus-hazelcast-client:0.0.48</lastDetectedBomUpdate>
+                                    <lastDetectedBomUpdate>io.quarkus.platform:quarkus-hazelcast-client:0.0.49</lastDetectedBomUpdate>
                                     <next>${project.groupId}:quarkus-hazelcast-client:${project.version}</next>
                                 </release>
                                 <tests>
@@ -348,7 +348,7 @@
                                 </dependencyManagement>
                                 <enabled>true</enabled>
                                 <release>
-                                    <lastDetectedBomUpdate>io.quarkus.platform:quarkus-debezium-outbox:0.0.48</lastDetectedBomUpdate>
+                                    <lastDetectedBomUpdate>io.quarkus.platform:quarkus-debezium-outbox:0.0.49</lastDetectedBomUpdate>
                                     <next>${project.groupId}:quarkus-debezium-outbox:${project.version}</next>
                                 </release>
                                 <tests>
@@ -368,7 +368,7 @@
                                 </dependencyManagement>
                                 <enabled>true</enabled>
                                 <release>
-                                    <lastDetectedBomUpdate>io.quarkus.platform:quarkus-blaze-persistence-bom:0.0.48</lastDetectedBomUpdate>
+                                    <lastDetectedBomUpdate>io.quarkus.platform:quarkus-blaze-persistence-bom:0.0.49</lastDetectedBomUpdate>
                                     <next>${project.groupId}:quarkus-blaze-persistence-bom:${project.version}</next>
                                 </release>
                                 <defaultTestConfig>
@@ -399,7 +399,7 @@
                                 <bom>io.quarkiverse.googlecloudservices:quarkus-google-cloud-services-bom:${quarkus-google-cloud-services.version}</bom>
                                 <enabled>true</enabled>
                                 <release>
-                                    <lastDetectedBomUpdate>io.quarkus.platform:quarkus-google-cloud-services-bom:0.0.48</lastDetectedBomUpdate>
+                                    <lastDetectedBomUpdate>io.quarkus.platform:quarkus-google-cloud-services-bom:0.0.49</lastDetectedBomUpdate>
                                     <next>${project.groupId}:quarkus-google-cloud-services-bom:${project.version}</next>
                                 </release>
                                 <defaultTestConfig>
@@ -486,8 +486,7 @@
                     </plugin>
                     <!--
                     <plugin>
-                        < ! - - ## IMPORTANT ## In your ~/.m2/settings.xml you need to add and edit the following profile:
-                        <profile>
+                        < ! - - ## IMPORTANT ## In your ~/.m2/settings.xml you need to add and edit the following profile: <profile>
                             <id>release</id>
                             <properties>
                                 <gpg.useagent>false</gpg.useagent>
