@@ -144,6 +144,7 @@ public class MavenJsonCatalogResource {
 		final String artifactId = pathSegmentList.get(pathSegmentList.size() - 3).getPath();
 		String classifier = "";
 		final String type;
+		
 		if (fileName.startsWith(artifactId)) {
 
 			int typeEnd = fileName.length();
@@ -164,6 +165,7 @@ public class MavenJsonCatalogResource {
 			// artifactId-baseVersion-YYYYMMDD.HHMMSS-buildNumber
 			final String baseVersion = snapshot ? version.substring(0, version.length() - SNAPSHOT_SUFFIX.length())
 					: version;
+
 			final int versionStart = artifactId.length() + 1;
 			int versionEnd;
 			if (snapshot) {
@@ -174,7 +176,12 @@ public class MavenJsonCatalogResource {
 					final int firstDash = fileName.indexOf('-', versionStart + baseVersion.length() + 1);
 					versionEnd = fileName.indexOf('.',
 							firstDash < 0 ? versionStart + baseVersion.length() : firstDash + 1);
-					final int lastDash = fileName.lastIndexOf('-', versionEnd);
+					final int lastDash;
+					if(fileName.regionMatches(versionEnd - SNAPSHOT_SUFFIX.length(), SNAPSHOT_SUFFIX, 0, SNAPSHOT_SUFFIX.length())) {
+						lastDash = fileName.lastIndexOf('-', versionEnd - SNAPSHOT_SUFFIX.length() - 1);
+					} else {
+						lastDash = fileName.lastIndexOf('-', versionEnd);
+					}
 					if (lastDash > firstDash) {
 						versionEnd = lastDash;
 					}

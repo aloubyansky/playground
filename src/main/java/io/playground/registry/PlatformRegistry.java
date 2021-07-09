@@ -112,6 +112,7 @@ public class PlatformRegistry {
 		platformDescriptors.clear();
 		final Set<String> processedUnions = new HashSet<>(4);
 		final ElementCatalogBuilder catalogBuilder = ElementCatalogBuilder.newInstance();
+		int pi = 0;
 		for (PlatformStackInfo stackInfo : stackInfoList) {
 			final ExtensionCatalog c = stackInfo.origin;
 			platformDescriptors.put(stackInfo.coords().getKey().toString(), c);
@@ -119,7 +120,7 @@ public class PlatformRegistry {
 			if (!processedUnions.add(stackInfo.stackVersion)) {
 				continue;
 			}
-			stackInfo.unionBuilder = catalogBuilder.getOrCreateUnion(Integer.parseInt(stackInfo.stackVersion));
+			stackInfo.unionBuilder = catalogBuilder.getOrCreateUnion(++pi /*stackInfo.stackVersion*/);
 
 			addMember(stackInfo.unionBuilder, c);
 		}
@@ -176,6 +177,19 @@ public class PlatformRegistry {
 			return pl;
 		});
 
+		addPlatformRelease(p, stackInfo, quarkusVersion);
+		recognizedQuarkusVersions.add(quarkusVersion);
+		final JsonPlatformCatalog versionCatalog = platformCatalogs.computeIfAbsent(quarkusVersion, v -> new JsonPlatformCatalog());
+		JsonPlatform versionPlatform = (JsonPlatform) versionCatalog.getPlatform(p.getPlatformKey());
+		if(versionPlatform == null) {
+			versionPlatform = new JsonPlatform();
+			versionPlatform.setPlatformKey(p.getPlatformKey());
+			versionCatalog.addPlatform(versionPlatform);
+		}
+		addPlatformRelease(versionPlatform, stackInfo, quarkusVersion);
+	}
+
+	private void addPlatformRelease(final JsonPlatform p, PlatformStackInfo stackInfo, String quarkusVersion) {
 		JsonPlatformStream s = null;
 		if (p.getStreams().isEmpty()) {
 			p.setStreams(new ArrayList<>());
@@ -209,8 +223,6 @@ public class PlatformRegistry {
 			r.setMemberBoms(stackInfo.members);
 			s.addRelease(r);
 		}
-		recognizedQuarkusVersions.add(quarkusVersion);
-		platformCatalogs.computeIfAbsent(quarkusVersion, v -> new JsonPlatformCatalog()).addPlatform(p);
 	}
 
 	private static void addMember(final UnionBuilder union, ExtensionCatalog member) {
@@ -226,8 +238,7 @@ public class PlatformRegistry {
 		if (quarkusVersion == null) {
 			return globalPlatformCatalog;
 		}
-		final JsonPlatformCatalog c = platformCatalogs.get(quarkusVersion);
-		return c;
+		return platformCatalogs.get(quarkusVersion);
 	}
 
 	public Collection<String> recognizedQuarkusVersions() {
