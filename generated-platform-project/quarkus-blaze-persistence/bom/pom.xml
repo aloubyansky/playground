@@ -25,9 +25,9 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:git:git@github.com:aloubyansky/playground.git</connection>
-    <developerConnection>scm:git:git@github.com:aloubyansky/playground.git</developerConnection>
-    <url>https://github.com/aloubyansky/playground</url>
+    <connection>scm:git:git@github.com:quarkusio/quarkus-platform.git</connection>
+    <developerConnection>scm:git:git@github.com:quarkusio/quarkus-platform.git</developerConnection>
+    <url>https://github.com/quarkusio/quarkus-platform</url>
   </scm>
   <issueManagement>
     <system>GitHub</system>
@@ -35,12 +35,12 @@
   </issueManagement>
   <distributionManagement>
     <repository>
-      <id>my-nexus-releases</id>
-      <url>http://localhost:8085/repository/maven-releases</url>
+      <id>sonatype-nexus-release</id>
+      <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
     <snapshotRepository>
-      <id>my-nexus-snapshots</id>
-      <url>http://localhost:8085/repository/maven-snapshots</url>
+      <id>sonatype-nexus-snapshots</id>
+      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
   <dependencyManagement>
@@ -61,22 +61,22 @@
       <dependency>
         <groupId>com.blazebit</groupId>
         <artifactId>blaze-persistence-entity-view-processor</artifactId>
-        <version>1.6.0</version>
+        <version>1.6.2</version>
       </dependency>
       <dependency>
         <groupId>com.blazebit</groupId>
         <artifactId>blaze-persistence-integration-hibernate-5.4</artifactId>
-        <version>1.6.0</version>
+        <version>1.6.2</version>
       </dependency>
       <dependency>
         <groupId>com.blazebit</groupId>
         <artifactId>blaze-persistence-integration-quarkus-deployment</artifactId>
-        <version>1.6.0</version>
+        <version>1.6.2</version>
       </dependency>
       <dependency>
         <groupId>com.blazebit</groupId>
         <artifactId>blaze-persistence-integration-quarkus</artifactId>
-        <version>1.6.0</version>
+        <version>1.6.2</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -87,7 +87,7 @@
         <plugins>
           <plugin>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>3.0.1</version>
+            <version>1.6</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>

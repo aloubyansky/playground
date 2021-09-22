@@ -21,7 +21,7 @@ It is a low traffic list which aims to facilitate the coordination of the Platfo
 ## Platform project
 
 Quarkus platform is a project that brings various Quarkus extensions together aligning their dependency constraints to make sure they do not create conflicts for each other.
-This project does not include any code at this point but it does use tools that collect the original dependency contraints of each extension as an input and generates
+This project does not include any code at this point but it does use tools that collect the original dependency constraints of each extension as an input and generates
 a [set of platform artifacts](https://quarkus.io/guides/platform#quarkus-platform-artifacts) that represent a platform build.
 
 ## Platform members
@@ -30,7 +30,7 @@ A platform member represents a Quarkus extension project that includes one or mo
 
 ### Quarkus core
 
-[Quarkus Core](https://github.com/quarkusio/quarkus) is an essential member of a platform and is dominanting during the dependency constraint alignment in a sense that its dependency constraints
+[Quarkus Core](https://github.com/quarkusio/quarkus) is an essential member of a platform and is dominant during the dependency constraint alignment in a sense that its dependency constraints
 are immutable, i.e. other platform members will be adapted to comply with the Quarkus core build and runtime requirements and not the other way around.
 
 ### Platform member input
@@ -122,7 +122,7 @@ The platform release configuration is expressed under the `release` element, e.g
 ### The universal platform
 
 This is the BOM that contains the dependency version constraints of all the platform members. In Quarkus 1.x it is known as the `quarkus-universe-bom`.
-Its cordinates can be configured using the `bom` element, e.g.
+Its coordinates can be configured using the `bom` element, e.g.
 
 ```xml
   <platformConfig>
@@ -147,7 +147,7 @@ Quarkus core is an essential member of a platform and is configured in the `core
     </release>
   </core>
 ```
-1. Name that is used to refere to the core member in the POMs and other generated resources
+1. Name that is used to refer to the core member in the POMs and other generated resources
 1. The original Quarkus core BOM coordinates the platform is based on
 1. The coordinates under which the generated Quarkus core platform BOM should be installed and deployed
 
@@ -163,9 +163,11 @@ Platform members are configured under the `member` element, e.g.
       <enabled>true</enabled>                                                      <!-- 3 -->
       <release>
         <next>${project.groupId}:quarkus-optaplanner-bom:${project.version}</next> <!-- 4 -->
+        <!-- updated automatically -->
+        <lastDetectedBomUpdate>io.quarkus.platform:quarkus-optaplanner-bom:2.0.0.Final</lastDetectedBomUpdate> <!-- 5 -->
       </release>
-      <defaultTestConfig>                                                          <!-- 5 -->
-        <skip>false</skip>                                                         <!-- 6 -->
+      <defaultTestConfig>                                                          <!-- 6 -->
+        <skip>false</skip>                                                         <!-- 7 -->
       </defaultTestConfig>
       <tests>
         <test> <!-- 7 -->
@@ -178,8 +180,10 @@ Platform members are configured under the `member` element, e.g.
 1. The original member BOM coordinates representing members build and run times classpath constraints
 1. Whether the member actually participates in the platform build or not (if a member is disabled, the rest of its configuration will be ignored)
 1. The coordinates under which the generated member platform BOM should be installed and deployed
+1. The BOM generator detects whether the generated member BOM has changed since the previous release and records the value of the last release in which the BOM
+has actually changed. The value of this element is meant to be updated during the release process by the tool itself in case the BOM has actually changed.
 1. The default configuration options for all the tests of the member
-1. Can be used to skip all the member tests (unless explicitly overriden in a test config)
+1. Can be used to skip all the member tests (unless explicitly overridden in a test config)
 1. Specific test configuration will reference a Maven test jar artifact containing the tests that should be run as part of the platform's IT
 1. Whether the test should be skipped during the platform IT run
 
@@ -277,7 +281,7 @@ drwxrwxr-x 5 aloubyansky aloubyansky 4096 May 27 16:35 quarkus-universe
 
 * The `quarkus` module represents the [Quarkus Core](https://github.com/quarkusio/quarkus) member.
 * The `quarkus-maven-plugin` module re-publishes the `io.quarkus:quarkus-maven-plugin` from the [Quarkus Core](https://github.com/quarkusio/quarkus) under the platform's Maven groupId and version to simplify configurations of Quarkus application using the platform.
-* The `quarkus-universe` module reprsents the legacy `io.quarkus:quarkus-universe-bom` platform.
+* The `quarkus-universe` module represents the legacy `io.quarkus:quarkus-universe-bom` platform.
 
 Other modules above represent actual platform members. Every member module will have the same layout, e.g.
 
@@ -322,11 +326,7 @@ and the generated ones for every member. The reports can be found under the `tar
 ## Release steps
 
 1. Use the Maven Release Plugin to tag and deploy to the Sonatype OSS Nexus: 
-
-        TAG=0.0.5 && mvn release:prepare release:perform -DdevelopmentVersion=999-SNAPSHOT -DreleaseVersion=$TAG -Dtag=$TAG -DperformRelease -Prelease
-
-    Hint: You can also append `-DskipTests -Darguments=-DskipTests` to the command above to skip tests
-
+> TAG=0.0.5 && mvn release:prepare release:perform -DdevelopmentVersion=999-SNAPSHOT -DreleaseVersion=$TAG -Dtag=$TAG -DperformRelease -Prelease -DskipTests -Darguments=-DskipTests
 2. Go to https://s01.oss.sonatype.org/#stagingRepositories and close the repository there.
 3. Once the checks pass, click on the `Release` button and wait until it gets percolated to Central
  

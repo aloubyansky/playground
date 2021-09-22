@@ -25,9 +25,9 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:git:git@github.com:aloubyansky/playground.git</connection>
-    <developerConnection>scm:git:git@github.com:aloubyansky/playground.git</developerConnection>
-    <url>https://github.com/aloubyansky/playground</url>
+    <connection>scm:git:git@github.com:quarkusio/quarkus-platform.git</connection>
+    <developerConnection>scm:git:git@github.com:quarkusio/quarkus-platform.git</developerConnection>
+    <url>https://github.com/quarkusio/quarkus-platform</url>
   </scm>
   <issueManagement>
     <system>GitHub</system>
@@ -35,12 +35,12 @@
   </issueManagement>
   <distributionManagement>
     <repository>
-      <id>my-nexus-releases</id>
-      <url>http://localhost:8085/repository/maven-releases</url>
+      <id>sonatype-nexus-release</id>
+      <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
     <snapshotRepository>
-      <id>my-nexus-snapshots</id>
-      <url>http://localhost:8085/repository/maven-snapshots</url>
+      <id>sonatype-nexus-snapshots</id>
+      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
   <dependencyManagement>
@@ -61,32 +61,32 @@
       <dependency>
         <groupId>com.datastax.oss.quarkus</groupId>
         <artifactId>cassandra-quarkus-client-deployment</artifactId>
-        <version>1.1.0-rc2</version>
+        <version>1.1.1</version>
       </dependency>
       <dependency>
         <groupId>com.datastax.oss.quarkus</groupId>
         <artifactId>cassandra-quarkus-client</artifactId>
-        <version>1.1.0-rc2</version>
+        <version>1.1.1</version>
       </dependency>
       <dependency>
         <groupId>com.datastax.oss.quarkus</groupId>
         <artifactId>cassandra-quarkus-mapper-processor</artifactId>
-        <version>1.1.0-rc2</version>
+        <version>1.1.1</version>
       </dependency>
       <dependency>
         <groupId>com.datastax.oss.quarkus</groupId>
         <artifactId>cassandra-quarkus-test-framework</artifactId>
-        <version>1.1.0-rc2</version>
+        <version>1.1.1</version>
       </dependency>
       <dependency>
         <groupId>com.datastax.oss</groupId>
         <artifactId>java-driver-core-shaded</artifactId>
-        <version>4.12.0</version>
+        <version>4.13.0</version>
       </dependency>
       <dependency>
         <groupId>com.datastax.oss</groupId>
         <artifactId>java-driver-core</artifactId>
-        <version>4.12.0</version>
+        <version>4.13.0</version>
         <exclusions>
           <exclusion>
             <artifactId>metrics-core</artifactId>
@@ -101,27 +101,27 @@
       <dependency>
         <groupId>com.datastax.oss</groupId>
         <artifactId>java-driver-mapper-processor</artifactId>
-        <version>4.12.0</version>
+        <version>4.13.0</version>
       </dependency>
       <dependency>
         <groupId>com.datastax.oss</groupId>
         <artifactId>java-driver-mapper-runtime</artifactId>
-        <version>4.12.0</version>
+        <version>4.13.0</version>
       </dependency>
       <dependency>
         <groupId>com.datastax.oss</groupId>
         <artifactId>java-driver-metrics-micrometer</artifactId>
-        <version>4.12.0</version>
+        <version>4.13.0</version>
       </dependency>
       <dependency>
         <groupId>com.datastax.oss</groupId>
         <artifactId>java-driver-metrics-microprofile</artifactId>
-        <version>4.12.0</version>
+        <version>4.13.0</version>
       </dependency>
       <dependency>
         <groupId>com.datastax.oss</groupId>
         <artifactId>java-driver-query-builder</artifactId>
-        <version>4.12.0</version>
+        <version>4.13.0</version>
       </dependency>
       <dependency>
         <groupId>com.datastax.oss</groupId>
@@ -131,7 +131,7 @@
       <dependency>
         <groupId>com.datastax.oss</groupId>
         <artifactId>java-driver-test-infra</artifactId>
-        <version>4.12.0</version>
+        <version>4.13.0</version>
       </dependency>
       <dependency>
         <groupId>com.datastax.oss</groupId>
@@ -183,7 +183,7 @@
         <plugins>
           <plugin>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>3.0.1</version>
+            <version>1.6</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>

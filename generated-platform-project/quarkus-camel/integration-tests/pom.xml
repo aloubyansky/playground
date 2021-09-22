@@ -12,24 +12,24 @@
   <packaging>pom</packaging>
   <name>Quarkus Platform - Camel - Integration Tests - Parent</name>
   <modules>
-    <module>camel-quarkus-integration-test-avro-rpc</module>
-    <module>camel-quarkus-integration-test-azure-grouped</module>
-    <module>camel-quarkus-integration-test-cassandraql</module>
-    <module>camel-quarkus-integration-test-kafka-sasl</module>
+    <module>camel-quarkus-integration-test-main-unknown-args-ignore</module>
     <module>camel-quarkus-integration-test-activemq</module>
     <module>camel-quarkus-integration-test-amqp</module>
     <module>camel-quarkus-integration-test-arangodb</module>
     <module>camel-quarkus-integration-test-as2</module>
     <module>camel-quarkus-integration-test-atlasmap</module>
+    <module>camel-quarkus-integration-test-avro-rpc</module>
     <module>camel-quarkus-integration-test-avro</module>
     <module>camel-quarkus-integration-test-aws2-grouped</module>
     <module>camel-quarkus-integration-test-aws2</module>
+    <module>camel-quarkus-integration-test-azure-grouped</module>
     <module>camel-quarkus-integration-test-base64</module>
     <module>camel-quarkus-integration-test-bean-validator</module>
     <module>camel-quarkus-integration-test-bindy</module>
     <module>camel-quarkus-integration-test-box</module>
     <module>camel-quarkus-integration-test-braintree</module>
     <module>camel-quarkus-integration-test-caffeine</module>
+    <module>camel-quarkus-integration-test-cassandraql</module>
     <module>camel-quarkus-integration-test-cbor</module>
     <module>camel-quarkus-integration-test-compression</module>
     <module>camel-quarkus-integration-test-consul</module>
@@ -78,6 +78,8 @@
     <module>camel-quarkus-integration-test-jdbc</module>
     <module>camel-quarkus-integration-test-jing</module>
     <module>camel-quarkus-integration-test-jira</module>
+    <module>camel-quarkus-integration-test-jms-artemis-client</module>
+    <module>camel-quarkus-integration-test-jms-qpid-amqp-client</module>
     <module>camel-quarkus-integration-test-jolt</module>
     <module>camel-quarkus-integration-test-jpa</module>
     <module>camel-quarkus-integration-test-js-dsl</module>
@@ -88,6 +90,7 @@
     <module>camel-quarkus-integration-test-jsonpath</module>
     <module>camel-quarkus-integration-test-jta</module>
     <module>camel-quarkus-integration-test-kafka-sasl-ssl</module>
+    <module>camel-quarkus-integration-test-kafka-sasl</module>
     <module>camel-quarkus-integration-test-kafka-ssl</module>
     <module>camel-quarkus-integration-test-kafka</module>
     <module>camel-quarkus-integration-test-kamelet</module>
@@ -106,7 +109,6 @@
     <module>camel-quarkus-integration-test-main-xml-jaxb</module>
     <module>camel-quarkus-integration-test-main-yaml</module>
     <module>camel-quarkus-integration-test-main</module>
-    <module>camel-quarkus-integration-test-messaging</module>
     <module>camel-quarkus-integration-test-micrometer</module>
     <module>camel-quarkus-integration-test-microprofile</module>
     <module>camel-quarkus-integration-test-minio</module>
@@ -123,9 +125,11 @@
     <module>camel-quarkus-integration-test-olingo4</module>
     <module>camel-quarkus-integration-test-openapi-java</module>
     <module>camel-quarkus-integration-test-openstack</module>
+    <module>camel-quarkus-integration-test-opentelemetry</module>
     <module>camel-quarkus-integration-test-opentracing</module>
     <module>camel-quarkus-integration-test-optaplanner</module>
     <module>camel-quarkus-integration-test-paho-mqtt5</module>
+    <module>camel-quarkus-integration-test-paho</module>
     <module>camel-quarkus-integration-test-pdf</module>
     <module>camel-quarkus-integration-test-pg-replication-slot</module>
     <module>camel-quarkus-integration-test-pgevent</module>
@@ -146,6 +150,10 @@
     <module>camel-quarkus-integration-test-servicenow</module>
     <module>camel-quarkus-integration-test-servlet</module>
     <module>camel-quarkus-integration-test-shiro</module>
+    <module>camel-quarkus-integration-test-sjms-artemis-client</module>
+    <module>camel-quarkus-integration-test-sjms-qpid-amqp-client</module>
+    <module>camel-quarkus-integration-test-sjms2-artemis-client</module>
+    <module>camel-quarkus-integration-test-sjms2-qpid-amqp-client</module>
     <module>camel-quarkus-integration-test-slack</module>
     <module>camel-quarkus-integration-test-smallrye-reactive-messaging</module>
     <module>camel-quarkus-integration-test-soap</module>

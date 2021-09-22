@@ -41,6 +41,10 @@
           <groupId>javax.activation</groupId>
         </exclusion>
         <exclusion>
+          <artifactId>jakarta.activation-api</artifactId>
+          <groupId>jakarta.activation</groupId>
+        </exclusion>
+        <exclusion>
           <artifactId>jaxb-osgi</artifactId>
           <groupId>com.sun.xml.bind</groupId>
         </exclusion>
@@ -49,6 +53,12 @@
           <groupId>commons-logging</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel.quarkus</groupId>
+      <artifactId>camel-quarkus-integration-wiremock-support</artifactId>
+      <version>${camel-quarkus.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
