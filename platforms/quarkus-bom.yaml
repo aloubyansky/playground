@@ -2,6 +2,6 @@ group-id: "com.redhat.quarkus.platform"
 artifact-id: "quarkus-bom-quarkus-platform-descriptor"
 classifier-as-version: true
 platform-key: "com.redhat.quarkus.platform"
-maven-repository: "http://indy.psi.redhat.com/api/content/maven/group/static/"
+maven-repository: "http://nexus.fuse-qe.eng.rdu2.redhat.com/repository/fuse7-all/"
 versions:
-- "2.2.3.Final-redhat-00013"
+- "2.2.3.Camel-temporary-redhat-0001"

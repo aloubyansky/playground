@@ -46,8 +46,8 @@ services:
       - QUARKUS_REGISTRY_REGISTRY_QUARKUS_IO_REPO_URL=https://registry.quarkus.io/maven
 #      - BOOTSTRAP_MAVEN_REPOS=redhat-ga
 #      - BOOTSTRAP_MAVEN_REPO_REDHAT_GA_URL=https://maven.repository.redhat.com/ga
-      - BOOTSTRAP_MAVEN_REPOS=indy-static
-      - BOOTSTRAP_MAVEN_REPO_INDY_STATIC_URL=http://indy.psi.redhat.com/api/content/maven/group/static
+      - BOOTSTRAP_MAVEN_REPOS=fuse-all
+      - BOOTSTRAP_MAVEN_REPO_FUSE_ALL_URL=http://nexus.fuse-qe.eng.rdu2.redhat.com/repository/fuse7-all/
     #command: bash -c 'while [[ "$$(curl --connect-timeout 2 -s -o /dev/null -w ''%{http_code}'' http://registry:8080/client/platforms)" != "200" ]]; do echo ..; sleep 5; done; echo backend is up;'
     depends_on:
       - registry
