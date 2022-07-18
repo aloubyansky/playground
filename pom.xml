@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>io.quarkus.platform</groupId>
+    <artifactId>quarkus-platform-config</artifactId>
+    <version>2.11.0.CR1</version> <!-- The base upstream platform configuration -->
+    <relativePath></relativePath>
+  </parent>
+  <groupId>com.redhat.quarkus.platform</groupId>
+  <artifactId>quarkus-platform-config</artifactId>
+  <packaging>pom</packaging>
+  <properties>
+    <quarkus.version>2.11.0.CR1</quarkus.version> <!-- the Quarkus core version -->
+    <quarkus.upstream.version>2.11.0.CR1</quarkus.upstream.version> <!-- the upstream Quarkus core version that will be recorded in the product platform metadata -->
+    <camel-quarkus.version>2.7.1.redhat-00016</camel-quarkus.version>
+    <camel-quarkus-test-list.version>2.7.1</camel-quarkus-test-list.version>
+  </properties>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+          <version>0.0.55-SNAPSHOT</version>
+          <extensions>true</extensions>
+          <configuration>
+            <platformConfig>
+              <upstreamQuarkusCoreVersion>${quarkus.upstream.version}</upstreamQuarkusCoreVersion>
+              <universal>
+                <bom>com.redhat.quarkus:quarkus-universe-bom:${project.version}</bom>
+              </universal>
+              <core>
+                <metadataOverrideFiles>
+                  <file>${resourcesdir}/core/extensions-support-overrides.json</file>
+                </metadataOverrideFiles>
+              </core>
+              <members>
+                <member>
+                  <name>OptaPlanner</name>
+                  <hidden>true</hidden>
+                </member>
+                <member>
+                  <name>Kogito</name>
+                  <hidden>true</hidden>
+                </member>
+                <member>
+                  <name>QpidJMS</name>
+                  <hidden>true</hidden>
+                </member>
+                <member>
+                  <name>Cassandra</name>
+                  <hidden>true</hidden>
+                </member>
+                <member>
+                  <name>AmazonServices</name>
+                  <hidden>true</hidden>
+                </member>
+                <member>
+                  <name>Camel</name>
+                  <hidden>false</hidden>
+                  <testCatalogArtifact>org.apache.camel.quarkus:camel-quarkus-test-list::xml:${camel-quarkus-test-list.version}</testCatalogArtifact>
+                  <metadataOverrideArtifacts>
+                      <artifact>org.apache.camel.quarkus:camel-quarkus-product::json:${camel-quarkus.version}</artifact>
+                  </metadataOverrideArtifacts>
+                  <tests>
+                                        <test><!-- Workaround for weird issue with shared networking & keycloak container -->
+                                            <excluded>true</excluded>
+                                            <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-kafka-oauth:${camel-quarkus.version}</artifact>
+                                        </test>
+                                        <test><!-- Workaround flaky file test https://github.com/apache/camel-quarkus/issues/3627 -->
+                                            <excluded>true</excluded>
+                                            <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-file:${camel-quarkus.version}</artifact>
+                                        </test>
+                                        <test><!-- Workaround incompatible PostgreSQL JDBC driver -->
+                                            <excluded>true</excluded>
+                                            <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-debezium:${camel-quarkus.version}</artifact>
+                                        </test>
+                                        <test><!-- Workaround for Quarkus 999-SNAPSHOT & CQ <= 2.10.x Vert.x incompatibility -->
+                                            <excluded>true</excluded>
+                                            <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-platform-http:${camel-quarkus.version}</artifact>
+                                        </test>
+                                        <test><!-- Workaround for Quarkus 999-SNAPSHOT & CQ <= 2.10.x Vert.x incompatibility -->
+                                            <excluded>true</excluded>
+                                            <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-rest:${camel-quarkus.version}</artifact>
+                                        </test>
+                                    </tests>
+                </member>
+                <member>
+                  <name>Hazelcast</name>
+                  <hidden>true</hidden>
+                </member>
+                <member>
+                  <name>Debezium-Outbox</name>
+                  <hidden>true</hidden>
+                </member>
+                <member>
+                  <name>Blaze-Persistence</name>
+                  <hidden>true</hidden>
+                </member>
+                <member>
+                  <name>GoogleCloudServices</name>
+                  <hidden>true</hidden>
+                </member>
+              </members>
+              <bomGenerator>
+                <!-- Version constraint preferences during alignment -->
+                <!-- This allows to favor versions that match a certain expression even if the default Maven version comparator would do otherwise -->
+                <versionConstraintPreferences>
+                  <prefer>*redhat-*</prefer>
+                </versionConstraintPreferences>
+                <notPreferredQuarkusBomConstraint>WARN</notPreferredQuarkusBomConstraint>
+              </bomGenerator>
+            </platformConfig>
+
+            <!-- Config to dependencies-to-build report -->
+            <dependenciesToBuild>
+              <!-- exclude dependencies by groupId -->
+              <excludeGroupIds>
+                <groupId>org.testcontainers</groupId>
+                <groupId>org.junit.jupiter</groupId>
+                <groupId>org.junit.platform</groupId>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <groupId>org.jetbrains.kotlinx</groupId>
+                <groupId>org.apache.maven</groupId>
+                <groupId>org.apache.maven.resolver</groupId>
+                <groupId>org.apache.maven.shared</groupId>
+                <groupId>org.apache.maven.wagon</groupId>
+                <groupId>org.jacoco</groupId>
+                <groupId>org.bouncycastle</groupId>
+                <groupId>org.eclipse.sisu</groupId>
+                <groupId>com.h2database</groupId>
+              </excludeGroupIds>
+              <!-- exclude dependencies specifying their keys
+              <excludeKeys>
+                <key>org.testcontainers:db2</key>
+              </excludeKeys>
+              -->
+              <!-- exclude specific versions of dependencies
+              <excludeArtifacts>
+                <artifact>org.testcontainers:database-commons:1.17.2</artifact>
+              </excludeArtifacts>
+              -->
+              <!-- include dependencies by groupId -->
+              <includeGroupIds>
+                <groupId>org.hibernate.common</groupId>
+              </includeGroupIds>
+              <!-- include dependency by keys -->
+              <includeKeys>
+                <key>org.bitbucket.b_c:jose4j</key>
+              </includeKeys>
+              <!-- include specific versions of dependencies
+              <includeArtifacts>
+                <artifact>groupId:artifactId:version</artifact>
+              </includeArtifacts>
+              -->
+            </dependenciesToBuild>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+        <inherited>false</inherited>
+        <executions>
+          <execution>
+            <id>generate-platform-project</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>generate-platform-project</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>build-platform-project</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>invoke-platform-project</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

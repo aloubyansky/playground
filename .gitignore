@@ -31,3 +31,9 @@ docker/distroless/bazel-*
 /.apt_generated_tests/
 quarkus.log
 replay_*.log
+.flattened-pom.xml
+build.log
+interpolated-pom.xml
+
+# Temporary data ignored in camel-quarkus
+generated-platform-project/quarkus-camel/integration-tests/camel-quarkus-integration-test-hl7/id_file
