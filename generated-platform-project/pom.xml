@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.redhat.quarkus.platform</groupId>
     <artifactId>quarkus-platform-config</artifactId>
-    <version>2.11.0.CR1</version>
+    <version>2.11.1.Final</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>quarkus-platform-parent</artifactId>
@@ -28,7 +28,7 @@
   </modules>
   <properties>
     <platform.key>com.redhat.quarkus.platform</platform.key>
-    <platform.release>2.11.0.CR1</platform.release>
+    <platform.release>2.11.1.Final</platform.release>
     <platform.stream>2.11</platform.stream>
   </properties>
   <build>

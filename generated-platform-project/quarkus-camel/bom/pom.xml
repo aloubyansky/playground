@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.redhat.quarkus.platform</groupId>
   <artifactId>quarkus-camel-bom</artifactId>
-  <version>2.11.0.CR1</version>
+  <version>2.11.1.Final</version>
   <packaging>pom</packaging>
   <name>Quarkus Platform - Camel - Quarkus Platform BOM</name>
   <description>Quarkus Universe platform aggregates extensions from Quarkus Core and those developed by the community into a single compatible and versioned set that application developers can reference from their applications to align the dependency versions</description>
@@ -27,7 +27,7 @@
   <scm>
     <connection>scm:git:git@github.com:quarkusio/quarkus-platform.git/quarkus-platform-config</connection>
     <developerConnection>scm:git:git@github.com:quarkusio/quarkus-platform.git/quarkus-platform-config</developerConnection>
-    <tag>2.11.0.CR1</tag>
+    <tag>2.11.1.Final</tag>
     <url>https://github.com/quarkusio/quarkus-platform/quarkus-platform-config</url>
   </scm>
   <issueManagement>
@@ -49,14 +49,14 @@
       <dependency>
         <groupId>com.redhat.quarkus.platform</groupId>
         <artifactId>quarkus-camel-bom-quarkus-platform-descriptor</artifactId>
-        <version>2.11.0.CR1</version>
+        <version>2.11.1.Final</version>
         <type>json</type>
-        <classifier>2.11.0.CR1</classifier>
+        <classifier>2.11.1.Final</classifier>
       </dependency>
       <dependency>
         <groupId>com.redhat.quarkus.platform</groupId>
         <artifactId>quarkus-camel-bom-quarkus-platform-properties</artifactId>
-        <version>2.11.0.CR1</version>
+        <version>2.11.1.Final</version>
         <type>properties</type>
       </dependency>
       <dependency>
@@ -617,12 +617,12 @@
       <dependency>
         <groupId>com.google.auth</groupId>
         <artifactId>google-auth-library-credentials</artifactId>
-        <version>1.6.0</version>
+        <version>1.7.0</version>
       </dependency>
       <dependency>
         <groupId>com.google.cloud</groupId>
         <artifactId>native-image-support</artifactId>
-        <version>0.14.1</version>
+        <version>0.8.0</version>
       </dependency>
       <dependency>
         <groupId>com.google.zxing</groupId>
@@ -975,12 +975,12 @@
       <dependency>
         <groupId>org.amqphub.quarkus</groupId>
         <artifactId>quarkus-qpid-jms-deployment</artifactId>
-        <version>0.35.0</version>
+        <version>0.36.0</version>
       </dependency>
       <dependency>
         <groupId>org.amqphub.quarkus</groupId>
         <artifactId>quarkus-qpid-jms</artifactId>
-        <version>0.35.0</version>
+        <version>0.36.0</version>
         <exclusions>
           <exclusion>
             <groupId>org.apache.geronimo.specs</groupId>
@@ -10777,7 +10777,7 @@
       <dependency>
         <groupId>org.optaplanner</groupId>
         <artifactId>optaplanner-quarkus-deployment</artifactId>
-        <version>8.24.1.Final</version>
+        <version>8.25.0.Final</version>
         <exclusions>
           <exclusion>
             <groupId>jakarta.activation</groupId>
@@ -10792,7 +10792,7 @@
       <dependency>
         <groupId>org.optaplanner</groupId>
         <artifactId>optaplanner-quarkus-jackson-deployment</artifactId>
-        <version>8.24.1.Final</version>
+        <version>8.25.0.Final</version>
         <exclusions>
           <exclusion>
             <groupId>jakarta.activation</groupId>
@@ -10807,7 +10807,7 @@
       <dependency>
         <groupId>org.optaplanner</groupId>
         <artifactId>optaplanner-quarkus-jackson</artifactId>
-        <version>8.24.1.Final</version>
+        <version>8.25.0.Final</version>
         <exclusions>
           <exclusion>
             <groupId>jakarta.activation</groupId>
@@ -10822,7 +10822,7 @@
       <dependency>
         <groupId>org.optaplanner</groupId>
         <artifactId>optaplanner-quarkus</artifactId>
-        <version>8.24.1.Final</version>
+        <version>8.25.0.Final</version>
         <exclusions>
           <exclusion>
             <groupId>jakarta.activation</groupId>
@@ -10938,12 +10938,12 @@
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>annotations</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>apache-client</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -10954,197 +10954,197 @@
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>arns</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>athena</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>auth</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>aws-cbor-protocol</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>aws-core</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>aws-json-protocol</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>aws-query-protocol</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>aws-xml-protocol</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>cloudwatch</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>dynamodb</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>ec2</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>ecs</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>eks</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>eventbridge</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>firehose</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>http-client-spi</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>iam</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>json-utils</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>kafka</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>kinesis</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>kms</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>lambda</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>metrics-spi</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>mq</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>netty-nio-client</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>profiles</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>protocol-core</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>regions</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>s3</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>sdk-core</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>secretsmanager</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>ses</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>sns</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>sqs</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>sts</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>third-party-jackson-core</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>third-party-jackson-dataformat-cbor</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>translate</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>utils</artifactId>
-        <version>2.17.220</version>
+        <version>2.17.238</version>
       </dependency>
       <dependency>
         <groupId>xalan</groupId>

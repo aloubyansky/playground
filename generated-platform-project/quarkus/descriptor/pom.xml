@@ -5,14 +5,14 @@
   <parent>
     <groupId>com.redhat.quarkus.platform</groupId>
     <artifactId>quarkus-parent</artifactId>
-    <version>2.11.0.CR1</version>
+    <version>2.11.1.Final</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>quarkus-bom-quarkus-platform-descriptor</artifactId>
   <packaging>pom</packaging>
   <name>Quarkus Platform - Core - Quarkus Platform Descriptor</name>
   <properties>
-    <member.last-bom-update>io.quarkus.platform:quarkus-bom:2.11.0.CR1</member.last-bom-update>
+    <member.last-bom-update>io.quarkus.platform:quarkus-bom:2.11.1.Final</member.last-bom-update>
   </properties>
   <dependencies>
     <dependency>
@@ -55,7 +55,7 @@
         <configuration>
           <bomArtifactId>quarkus-bom</bomArtifactId>
           <quarkusCoreVersion>${quarkus.version}</quarkusCoreVersion>
-          <upstreamQuarkusCoreVersion>2.11.0.CR1</upstreamQuarkusCoreVersion>
+          <upstreamQuarkusCoreVersion>2.11.1.Final</upstreamQuarkusCoreVersion>
           <platformRelease>
             <platformKey>${platform.key}</platformKey>
             <stream>${platform.stream}</stream>
