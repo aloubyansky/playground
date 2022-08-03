@@ -23,7 +23,7 @@
         <plugin>
           <groupId>io.quarkus</groupId>
           <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
-          <version>0.0.55-SNAPSHOT</version>
+          <version>0.0.55</version>
           <extensions>true</extensions>
           <configuration>
             <platformConfig>
@@ -65,27 +65,27 @@
                       <artifact>org.apache.camel.quarkus:camel-quarkus-product::json:${camel-quarkus.version}</artifact>
                   </metadataOverrideArtifacts>
                   <tests>
-                                        <test><!-- Workaround for weird issue with shared networking & keycloak container -->
-                                            <excluded>true</excluded>
-                                            <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-kafka-oauth:${camel-quarkus.version}</artifact>
-                                        </test>
-                                        <test><!-- Workaround flaky file test https://github.com/apache/camel-quarkus/issues/3627 -->
-                                            <excluded>true</excluded>
-                                            <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-file:${camel-quarkus.version}</artifact>
-                                        </test>
-                                        <test><!-- Workaround incompatible PostgreSQL JDBC driver -->
-                                            <excluded>true</excluded>
-                                            <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-debezium:${camel-quarkus.version}</artifact>
-                                        </test>
-                                        <test><!-- Workaround for Quarkus 999-SNAPSHOT & CQ <= 2.10.x Vert.x incompatibility -->
-                                            <excluded>true</excluded>
-                                            <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-platform-http:${camel-quarkus.version}</artifact>
-                                        </test>
-                                        <test><!-- Workaround for Quarkus 999-SNAPSHOT & CQ <= 2.10.x Vert.x incompatibility -->
-                                            <excluded>true</excluded>
-                                            <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-rest:${camel-quarkus.version}</artifact>
-                                        </test>
-                                    </tests>
+                    <test><!-- Workaround for weird issue with shared networking & keycloak container -->
+                      <excluded>true</excluded>
+                      <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-kafka-oauth:${camel-quarkus.version}</artifact>
+                    </test>
+                    <test><!-- Workaround flaky file test https://github.com/apache/camel-quarkus/issues/3627 -->
+                      <excluded>true</excluded>
+                      <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-file:${camel-quarkus.version}</artifact>
+                    </test>
+                    <test><!-- Workaround incompatible PostgreSQL JDBC driver -->
+                      <excluded>true</excluded>
+                      <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-debezium:${camel-quarkus.version}</artifact>
+                    </test>
+                    <test><!-- Workaround for Quarkus 999-SNAPSHOT & CQ <= 2.10.x Vert.x incompatibility -->
+                      <excluded>true</excluded>
+                      <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-platform-http:${camel-quarkus.version}</artifact>
+                    </test>
+                    <test><!-- Workaround for Quarkus 999-SNAPSHOT & CQ <= 2.10.x Vert.x incompatibility -->
+                      <excluded>true</excluded>
+                      <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-rest:${camel-quarkus.version}</artifact>
+                    </test>
+                  </tests>
                 </member>
                 <member>
                   <name>Hazelcast</name>
@@ -132,12 +132,15 @@
                 <groupId>org.eclipse.sisu</groupId>
                 <groupId>com.h2database</groupId>
                 <groupId>org.apache.derby</groupId>
+                <!-- https://issues.redhat.com/browse/QUARKUS-1164 -->
+                <groupId>com.oracle.database.jdbc</groupId>
               </excludeGroupIds>
-              <!-- exclude dependencies specifying their keys
+              <!-- exclude dependencies specifying their keys -->
               <excludeKeys>
-                <key>org.testcontainers:db2</key>
+                <!-- https://issues.redhat.com/browse/QUARKUS-1304 -->
+                <key>com.microsoft.sqlserver:mssql-jdbc</key>
+                <key>com.microsoft.azure:adal4j</key>
               </excludeKeys>
-              -->
               <!-- exclude specific versions of dependencies
               <excludeArtifacts>
                 <artifact>org.testcontainers:database-commons:1.17.2</artifact>
