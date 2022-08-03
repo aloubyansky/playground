@@ -131,6 +131,7 @@
                 <groupId>org.bouncycastle</groupId>
                 <groupId>org.eclipse.sisu</groupId>
                 <groupId>com.h2database</groupId>
+                <groupId>org.apache.derby</groupId>
               </excludeGroupIds>
               <!-- exclude dependencies specifying their keys
               <excludeKeys>
