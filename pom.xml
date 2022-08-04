@@ -130,7 +130,7 @@
               <includeGroupIds>
                 <groupId>org.hibernate.common</groupId>
               </includeGroupIds>
-              <!-- include dependency by keys -->
+              <!-- include dependencies by keys -->
               <includeKeys>
                 <key>org.bitbucket.b_c:jose4j</key>
               </includeKeys>
