@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.quarkus.platform</groupId>
     <artifactId>quarkus-platform-config</artifactId>
-    <version>2.11.1.Final</version> <!-- The base upstream platform configuration -->
+    <version>2.11.1.Final</version> <!-- The base upstream platform version -->
     <relativePath></relativePath>
   </parent>
   <groupId>com.redhat.quarkus.platform</groupId>
@@ -14,8 +14,11 @@
   <properties>
     <quarkus.version>2.11.1.Final</quarkus.version> <!-- the Quarkus core version -->
     <quarkus.upstream.version>2.11.1.Final</quarkus.upstream.version> <!-- the upstream Quarkus core version that will be recorded in the product platform metadata -->
+    <!--
     <camel-quarkus.version>2.7.1.redhat-00016</camel-quarkus.version>
     <camel-quarkus-test-list.version>2.7.1</camel-quarkus-test-list.version>
+    -->
+    <camel-quarkus-support-overrides.version>2.7.1.redhat-00016</camel-quarkus-support-overrides.version> <!-- for now we are using the 2.7.1 support overrides list, as the latest available for Camel -->
   </properties>
   <build>
     <pluginManagement>
@@ -60,32 +63,9 @@
                 <member>
                   <name>Camel</name>
                   <hidden>false</hidden>
-                  <testCatalogArtifact>org.apache.camel.quarkus:camel-quarkus-test-list::xml:${camel-quarkus-test-list.version}</testCatalogArtifact>
                   <metadataOverrideArtifacts>
-                      <artifact>org.apache.camel.quarkus:camel-quarkus-product::json:${camel-quarkus.version}</artifact>
+                      <artifact>org.apache.camel.quarkus:camel-quarkus-product::json:${camel-quarkus-support-overrides.version}</artifact>
                   </metadataOverrideArtifacts>
-                  <tests>
-                    <test><!-- Workaround for weird issue with shared networking & keycloak container -->
-                      <excluded>true</excluded>
-                      <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-kafka-oauth:${camel-quarkus.version}</artifact>
-                    </test>
-                    <test><!-- Workaround flaky file test https://github.com/apache/camel-quarkus/issues/3627 -->
-                      <excluded>true</excluded>
-                      <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-file:${camel-quarkus.version}</artifact>
-                    </test>
-                    <test><!-- Workaround incompatible PostgreSQL JDBC driver -->
-                      <excluded>true</excluded>
-                      <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-debezium:${camel-quarkus.version}</artifact>
-                    </test>
-                    <test><!-- Workaround for Quarkus 999-SNAPSHOT & CQ <= 2.10.x Vert.x incompatibility -->
-                      <excluded>true</excluded>
-                      <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-platform-http:${camel-quarkus.version}</artifact>
-                    </test>
-                    <test><!-- Workaround for Quarkus 999-SNAPSHOT & CQ <= 2.10.x Vert.x incompatibility -->
-                      <excluded>true</excluded>
-                      <artifact>org.apache.camel.quarkus:camel-quarkus-integration-test-rest:${camel-quarkus.version}</artifact>
-                    </test>
-                  </tests>
                 </member>
                 <member>
                   <name>Hazelcast</name>
