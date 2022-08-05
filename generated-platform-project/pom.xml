@@ -37,10 +37,57 @@
         <plugin>
           <groupId>io.quarkus</groupId>
           <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
-          <version>0.0.55</version>
+          <version>0.0.56-SNAPSHOT</version>
           <extensions>true</extensions>
         </plugin>
       </plugins>
     </pluginManagement>
   </build>
+  <profiles>
+    <profile>
+      <id>depsToBuild</id>
+      <activation>
+        <property>
+          <name>depsToBuild</name>
+        </property>
+      </activation>
+      <build>
+        <defaultGoal>quarkus-platform-bom:dependencies-to-build@quarkus-bom quarkus-platform-bom:dependencies-to-build@quarkus-camel-bom</defaultGoal>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>io.quarkus</groupId>
+              <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>quarkus-bom</id>
+                  <goals>
+                    <goal>dependencies-to-build</goal>
+                  </goals>
+                  <configuration>
+                    <bom>com.redhat.quarkus.platform:quarkus-bom:${project.version}</bom>
+                  </configuration>
+                </execution>
+                <execution>
+                  <id>quarkus-camel-bom</id>
+                  <goals>
+                    <goal>dependencies-to-build</goal>
+                  </goals>
+                  <configuration>
+                    <bom>com.redhat.quarkus.platform:quarkus-camel-bom:${project.version}</bom>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
