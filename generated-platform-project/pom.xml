@@ -25,6 +25,7 @@
     <module>quarkus-blaze-persistence</module>
     <module>quarkus-google-cloud-services</module>
     <module>quarkus-maven-plugin</module>
+    <module>quarkus-dependencies-to-build</module>
   </modules>
   <properties>
     <platform.key>com.redhat.quarkus.platform</platform.key>
@@ -37,7 +38,7 @@
         <plugin>
           <groupId>io.quarkus</groupId>
           <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
-          <version>0.0.56</version>
+          <version>0.0.57-SNAPSHOT</version>
           <extensions>true</extensions>
         </plugin>
       </plugins>
