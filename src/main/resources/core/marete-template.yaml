@@ -12,24 +12,6 @@ maven-repo:
   - drools-alphanetwork-compiler-*.pom
   - geronimo-jms_2.0_spec-1.0.0.alpha-2-redhat-2.*            # Camel, ENTESB-17937
   unique-artifacts-exceptions:
-  - com.atlassian.pom:public-pom                              # Workaround for https://issues.redhat.com/browse/ENTESB-17981 , see also https://issues.redhat.com/browse/QUARKUS-1461
-  - com.fasterxml:oss-parent
-  - com.fasterxml.jackson:jackson-bom
-  - com.fasterxml.jackson:jackson-parent
-  - com.google.guava:guava-parent
-  - io.smallrye:smallrye-build-parent
-  - io.smallrye:smallrye-metrics-parent                       # https://issues.redhat.com/browse/QUARKUS-1935
-  - io.smallrye:smallrye-parent
-  - io.vertx:vertx-dependencies                               # https://issues.redhat.com/browse/QUARKUS-1990
-  - io.vertx:vertx-parent                                     # https://issues.redhat.com/browse/QUARKUS-1990
-  - org.apache:apache
-  - org.apache.commons:commons-parent
-  - org.eclipse.jetty:jetty-bom                               # https://issues.redhat.com/browse/QUARKUS-1935
-  - org.jboss:jboss-parent
-  - org.slf4j:slf4j-parent
-  - org.sonatype.oss:oss-parent
-  - commons-logging:commons-logging                           # https://issues.redhat.com/browse/QUARKUS-1981
-  - com.google.errorprone:error_prone_annotations             # workaround for https://issues.redhat.com/browse/QUARKUS-2001
   redhat-versions-strict: true
   sources-jars-exceptions:
   - com/redhat/quarkus/platform/quarkus-maven-plugin/*/quarkus-maven-plugin-*.jar

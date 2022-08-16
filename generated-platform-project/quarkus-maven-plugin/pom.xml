@@ -12,9 +12,6 @@
   <artifactId>quarkus-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Quarkus Platform - Quarkus Maven Plugin</name>
-  <properties>
-    <quarkus.version>${project.version}</quarkus.version>
-  </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
