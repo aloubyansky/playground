@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>io.playground</groupId>
+  <version>1.0-SNAPSHOT</version>
+  <artifactId>deps-to-build</artifactId>
+  <packaging>pom</packaging>
+  <name>Vert.X Dependencies to Build</name>
+
+  <properties>
+    <vertx.version>4.3.3</vertx.version>
+  </properties>
+
+  <build>
+    <defaultGoal>quarkus-platform-bom:deps-to-rebuild</defaultGoal>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+          <version>0.0.64</version>
+          <configuration>
+            <!-- The main BOM to productize -->
+            <bom>io.vertx:vertx-dependencies:${vertx.version}</bom>
+            <!-- the report file -->
+            <outputFile>deps-to-build.txt</outputFile>
+            <!-- log code repo info -->
+            <logCodeRepos>true</logCodeRepos>
+            <!-- log artifact coordinates in GAV format instead of GACTV -->
+            <logModulesToBuild>false</logModulesToBuild>
+
+            <!--
+            Top level artifacts to build. If not configured, all the dependencies with groupId
+            matching the BOM groupId will be selected as top level artifacts to be built from source.
+            <topLevelArtifactsToBuild>
+              <artifact>io.vertx:vertx-codegen:${vertx.version}</artifact>
+            </topLevelArtifactsToBuild>
+            -->
+
+            <!-- Dependency levels to build. If not configured only the managed dependencies will be selected on all levels
+            <level>0</level>
+            -->
+
+            <!-- To include dependency trees in the report
+            <logTrees>true</logTrees>
+            -->
+
+            <!-- Dependency keys to exclude -->
+            <excludeKeys>
+              <key>io.vertx:vertx-jgroups</key>
+              <key>io.vertx:vertx-consul</key>
+              <key>io.vertx:vertx-maven-service-factory-parent</key>
+              <key>io.vertx:vertx-lang-groovy-parent</key>
+              <key>io.vertx:vertx-sql-client-parent</key>
+              <key>io.vertx:vertx-grpc-parent</key>
+              <key>io.vertx:vertx-grpc-aggregator</key>
+              <key>io.vertx:vertx-infinispan-parent</key>
+              <key>io.vertx:vertx-lang-kotlin-compiler</key>
+              <key>io.vertx:vertx-jwt</key>
+              <key>io.vertx:vertx-sql-common</key>
+            </excludeKeys>
+
+            <!-- Exclude dependencies with specific groupIds
+            <excludeGroupIds>
+            </excludeGroupIds>
+            -->
+
+            <!-- Dependency keys to include
+            <includeKeys>
+              <groupId>xxx</groupId>
+            </includeKeys>
+            -->
+
+            <!-- Include dependencies with the following groupIds
+            <includeGroupIds>
+              <groupId>xxx</groupId>
+            </includeGroupIds>
+            -->
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>
