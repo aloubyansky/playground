@@ -1,67 +1,95 @@
 package io.playground.gradle;
 
-import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
+import org.gradle.tooling.BuildAction;
+import org.gradle.tooling.BuildController;
+import org.gradle.tooling.GradleConnectionException;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
+import org.gradle.tooling.ResultHandler;
 import org.gradle.tooling.model.GradleModuleVersion;
-import org.gradle.tooling.model.eclipse.EclipseExternalDependency;
-import org.gradle.tooling.model.eclipse.EclipseProject;
+import org.gradle.tooling.model.GradleProject;
+import org.gradle.tooling.model.gradle.GradlePublication;
 import org.gradle.tooling.model.gradle.ProjectPublications;
 
 public class GradleProjectReader {
 
+	public static class PublicationReader implements BuildAction<List<GradleModuleVersion>> {
+
+		@Override
+		public List<GradleModuleVersion> execute(BuildController controller) {
+			GradleProject project = controller.getModel(GradleProject.class);
+			List<GradleModuleVersion> publications = new ArrayList<>();
+			getPublications(project, controller, publications);
+			return publications;
+		}
+		
+		private void getPublications(GradleProject project, BuildController controller, List<GradleModuleVersion> publications) {
+			ProjectPublications pp = controller.getModel(project, ProjectPublications.class);
+			for (GradlePublication pub : pp.getPublications()) {
+				publications.add(pub.getId());
+			}
+			for(GradleProject child : project.getChildren()) {
+				getPublications(child, controller, publications);
+			}
+		}
+	}
+
+	public static class PublicationReaderOutcome implements ResultHandler<List<GradleModuleVersion>> {
+
+		private CompletableFuture<List<GradleModuleVersion>> publications = new CompletableFuture<>();
+		
+		public List<GradleModuleVersion> getPublications() {
+			try {
+				return publications.get();
+			} catch (Exception e) {
+				throw new RuntimeException("Failed to obtain publications", e);
+			}
+		}
+		
+		@Override
+		public void onComplete(List<GradleModuleVersion> result) {
+			publications.complete(result);
+		}
+
+		@Override
+		public void onFailure(GradleConnectionException failure) {
+			failure.printStackTrace();
+		}
+	}
+	
 	public static void main(String[] args) throws Exception {
 
 		final long startTime = System.currentTimeMillis();
+		//final String projectName = "kafka";
+		//final String projectName = "micrometer";
+		//final String projectName = "graphql-java";
+		//final String projectName = "grpc-java";
+		//final String projectName = "opentelemetry-java";
+		final String projectName = "opentelemetry-java-instrumentation";
 		final ProjectConnection connection = GradleConnector.newConnector()
-				.forProjectDirectory(Path.of(System.getProperty("user.home")).resolve("git").resolve("kafka").toFile())
+				.forProjectDirectory(Paths.get(System.getProperty("user.home")).resolve("git").resolve(projectName).toFile())
 				.connect();
 
 		try {
-			EclipseProject project = connection.getModel(EclipseProject.class);
-			log("Connected to " + project.getName());
-			logSubprojects(project);
+			final PublicationReaderOutcome outcome = new PublicationReaderOutcome();
+			connection.action(new PublicationReader())
+			.withArguments("-PskipAndroid=true")
+			.setStandardOutput(System.out)
+			.run(outcome);
 			
-			final ProjectPublications publications = connection.getModel(ProjectPublications.class);
-			logPublications(publications);
+			List<GradleModuleVersion> publications = outcome.getPublications();
+			log("PROJECT PUBLICATIONS:");
+			publications.forEach(p -> log(p.getGroup() + ":" + p.getName() + ":" + p.getVersion()));
 		} finally {
 			connection.close();
 		}
 
 		log("done in " + (System.currentTimeMillis() - startTime));
-	}
-
-	private static void logPublications(ProjectPublications publications) {
-		log("Publications: " + publications.getPublications().size());
-		publications.getPublications().forEach(p -> {
-			final GradleModuleVersion id = p.getId();
-			log("- " + id.getGroup() + ":" + id.getName() + ":" + id.getVersion());
-		});
-	}
-
-	private static void logSubprojects(EclipseProject project) {
-		logSubprojects(project, 0);
-	}
-
-	private static void logSubprojects(EclipseProject project, int depth) {
-		final StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < depth; ++i) {
-			sb.append("  ");
-		}
-		String offset = sb.toString();
-		log(sb.append(project.getName()));
-		log(offset + "  classpath: ");
-		offset += "  - ";
-		for (EclipseExternalDependency d : project.getClasspath()) {
-			final GradleModuleVersion module = d.getGradleModuleVersion();
-			if (module != null) {
-				log(offset + module.getGroup() + ":" + module.getName() + ":" + module.getVersion());
-			} else {
-				log(offset + module);
-			}
-		}
-		project.getChildren().forEach(p -> logSubprojects(p, depth + 1));
 	}
 
 	private static void log(Object s) {
