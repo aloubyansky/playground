@@ -66,16 +66,15 @@
             </excludeGroupIds>
             -->
 
-            <!-- Dependency keys to include
-            <includeKeys>
-              <groupId>xxx</groupId>
-            </includeKeys>
-            -->
+            <!-- Dependency keys to include -->
+            <includeGroupIds>
+              <groupId>io.opentelemetry</groupId>
+            </includeGroupIds>
 
             <!-- Include dependencies with the following groupIds
-            <includeGroupIds>
-              <groupId>xxx</groupId>
-            </includeGroupIds>
+            <includeKeys>
+              <key>xxx</key>
+            </includeKeys>
             -->
           </configuration>
         </plugin>

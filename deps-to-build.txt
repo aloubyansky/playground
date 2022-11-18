@@ -152,7 +152,15 @@ io.vertx:vertx-micrometer-metrics::jar:4.3.5
 io.vertx:vertx-reactive-streams::jar:4.3.5
 # repo-url https://github.com/open-telemetry/opentelemetry-java
 # tag v1.18.0
+io.opentelemetry:opentelemetry-api::jar:1.18.0
 io.opentelemetry:opentelemetry-bom::pom:1.18.0
+io.opentelemetry:opentelemetry-context::jar:1.18.0
+io.opentelemetry:opentelemetry-sdk-common::jar:1.18.0
+io.opentelemetry:opentelemetry-sdk-logs::jar:1.18.0-alpha
+io.opentelemetry:opentelemetry-sdk-metrics::jar:1.18.0
+io.opentelemetry:opentelemetry-sdk-trace::jar:1.18.0
+io.opentelemetry:opentelemetry-sdk::jar:1.18.0
+io.opentelemetry:opentelemetry-semconv::jar:1.18.0-alpha
 # repo-url https://github.com/eclipse-vertx/vertx-tracing
 # tag 4.3.5
 io.vertx:vertx-opentelemetry::jar:4.3.5
@@ -309,6 +317,6 @@ io.vertx:vertx-service-discovery::jar:4.3.5
 # tag 4.3.5
 io.vertx:vertx-sockjs-service-proxy::jar:4.3.5
 # Selecting all the managed (stopping at the first non-managed one) dependencies of supported extensions from io.vertx:vertx-dependencies:pom:4.3.5 will result in:
-# 181 artifacts from 64 code repositories to build from source
-# 96 dependency nodes skipped
-# 277 dependencies visited in total
+# 189 artifacts from 64 code repositories to build from source
+# 93 dependency nodes skipped
+# 282 dependencies visited in total
