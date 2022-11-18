@@ -9,7 +9,7 @@
   <name>Vert.X Dependencies to Build</name>
 
   <properties>
-    <vertx.version>4.3.3</vertx.version>
+    <vertx.version>4.3.5</vertx.version>
   </properties>
 
   <build>
@@ -19,7 +19,7 @@
         <plugin>
           <groupId>io.quarkus</groupId>
           <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
-          <version>0.0.64</version>
+          <version>0.0.68</version>
           <configuration>
             <!-- The main BOM to productize -->
             <bom>io.vertx:vertx-dependencies:${vertx.version}</bom>

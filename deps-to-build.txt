@@ -1,0 +1,314 @@
+# Artifacts to be built from source from io.vertx:vertx-dependencies:pom:4.3.5:
+# repo-url https://github.com/sonatype/oss-parents
+# tag oss-parent-7
+org.sonatype.oss:oss-parent::pom:7
+# repo-url https://github.com/vert-x3/vertx-parent
+# tag 19
+io.vertx:vertx-parent::pom:19
+# repo-url https://github.com/vert-x3/vertx-ext-parent
+# tag 38
+io.vertx:vertx-ext-parent::pom:38
+io.vertx:vertx-ext::pom:38
+# repo-url https://github.com/sonatype/oss-parents
+# tag oss-parent-9
+org.sonatype.oss:oss-parent::pom:9
+# repo-url https://github.com/netty/netty
+# tag netty-4.1.85.Final
+io.netty:netty-bom::pom:4.1.85.Final
+io.netty:netty-buffer::jar:4.1.85.Final
+io.netty:netty-codec-dns::jar:4.1.85.Final
+io.netty:netty-codec-http2::jar:4.1.85.Final
+io.netty:netty-codec-http::jar:4.1.85.Final
+io.netty:netty-codec-mqtt::jar:4.1.85.Final
+io.netty:netty-codec-socks::jar:4.1.85.Final
+io.netty:netty-codec::jar:4.1.85.Final
+io.netty:netty-common::jar:4.1.85.Final
+io.netty:netty-handler-proxy::jar:4.1.85.Final
+io.netty:netty-handler::jar:4.1.85.Final
+io.netty:netty-parent::pom:4.1.85.Final
+io.netty:netty-resolver-dns::jar:4.1.85.Final
+io.netty:netty-resolver::jar:4.1.85.Final
+io.netty:netty-transport-native-unix-common::jar:4.1.85.Final
+io.netty:netty-transport::jar:4.1.85.Final
+# repo-url https://github.com/FasterXML/oss-parent
+# tag oss-parent-48
+com.fasterxml:oss-parent::pom:48
+# repo-url https://github.com/FasterXML/jackson-parent
+# tag jackson-parent-2.14
+com.fasterxml.jackson:jackson-parent::pom:2.14
+# repo-url https://github.com/FasterXML/jackson-bom
+# tag jackson-bom-2.14.0
+com.fasterxml.jackson:jackson-base::pom:2.14.0
+com.fasterxml.jackson:jackson-bom::pom:2.14.0
+# repo-url https://github.com/vert-x3/vertx-dependencies
+# tag 4.3.5
+io.vertx:vertx-dependencies::pom:4.3.5
+# repo-url https://github.com/FasterXML/jackson-core
+# tag jackson-core-2.14.0
+com.fasterxml.jackson.core:jackson-core::jar:2.14.0
+# repo-url https://github.com/eclipse-vertx/vert.x
+# tag 4.3.5
+io.vertx:vertx-core::jar:4.3.5
+io.vertx:vertx-core:sources:jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-rabbitmq-client
+# tag 4.3.5
+io.vertx:vertx-rabbitmq-client::jar:4.3.5
+# repo-url https://github.com/eclipse-vertx/vertx-codegen
+# tag 4.3.5
+io.vertx:vertx-codegen::jar:4.3.5
+io.vertx:vertx-codegen:processor:jar:4.3.5
+io.vertx:vertx-codegen:sources:jar:4.3.5
+io.vertx:vertx-codegen:tck-sources:jar:4.3.5
+io.vertx:vertx-codegen:tck:jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-sync
+# tag 4.3.5
+io.vertx:vertx-sync::jar:4.3.5
+# repo-url https://github.com/FasterXML/jackson-annotations
+# tag jackson-annotations-2.14.0
+com.fasterxml.jackson.core:jackson-annotations::jar:2.14.0
+# repo-url https://github.com/FasterXML/jackson-databind
+# tag jackson-databind-2.14.0
+com.fasterxml.jackson.core:jackson-databind::jar:2.14.0
+# repo-url https://github.com/vert-x3/vertx-kafka-client
+# tag 4.3.5
+io.vertx:vertx-kafka-client::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-rx
+# tag 4.3.5
+io.vertx:vertx-rx-java2::jar:4.3.5
+io.vertx:vertx-rx-java3::jar:4.3.5
+io.vertx:vertx-rx-java::jar:4.3.5
+io.vertx:vertx-rx-junit5-providers::pom:4.3.5
+io.vertx:vertx-rx::pom:4.3.5
+# repo-url https://github.com/junit-team/junit5
+# tag r5.8.2
+org.junit:junit-bom::pom:5.8.2
+# repo-url https://github.com/vert-x3/vertx-junit5
+# tag 4.3.5
+io.vertx:vertx-junit5-rx-java2::jar:4.3.5
+io.vertx:vertx-junit5-rx-java3::jar:4.3.5
+io.vertx:vertx-junit5-rx-java::jar:4.3.5
+io.vertx:vertx-junit5::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-zookeeper
+# tag 4.3.5
+io.vertx:vertx-zookeeper::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-service-factory
+# tag 4.3.5
+io.vertx:vertx-service-factory::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-maven-service-factory
+# tag 4.3.5
+io.vertx:vertx-maven-service-factory::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-docgen
+# tag 0.9.4
+io.vertx:vertx-docgen::jar:0.9.4
+# repo-url https://github.com/eclipse-vertx/vertx-sql-client
+# tag 4.3.5
+io.vertx:vertx-db2-client::jar:4.3.5
+io.vertx:vertx-mssql-client::jar:4.3.5
+io.vertx:vertx-mysql-client::jar:4.3.5
+io.vertx:vertx-oracle-client::jar:4.3.5
+io.vertx:vertx-pg-client::jar:4.3.5
+io.vertx:vertx-sql-client-parent::pom:4.3.5
+io.vertx:vertx-sql-client-templates::jar:4.3.5
+io.vertx:vertx-sql-client::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-jdbc-client
+# tag 4.3.5
+io.vertx:vertx-jdbc-client::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-mongo-client
+# tag 4.3.5
+io.vertx:vertx-mongo-client::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-auth
+# tag 4.3.5
+io.vertx:vertx-auth-common::jar:4.3.5
+io.vertx:vertx-auth-htdigest::jar:4.3.5
+io.vertx:vertx-auth-htpasswd::jar:4.3.5
+io.vertx:vertx-auth-jdbc::jar:4.3.5
+io.vertx:vertx-auth-jwt::jar:4.3.5
+io.vertx:vertx-auth-ldap::jar:4.3.5
+io.vertx:vertx-auth-mongo::jar:4.3.5
+io.vertx:vertx-auth-oauth2::jar:4.3.5
+io.vertx:vertx-auth-otp::jar:4.3.5
+io.vertx:vertx-auth-properties::jar:4.3.5
+io.vertx:vertx-auth-shiro::jar:4.3.5
+io.vertx:vertx-auth-sql-client::jar:4.3.5
+io.vertx:vertx-auth-webauthn::jar:4.3.5
+io.vertx:vertx-auth::pom:4.3.5
+# repo-url https://github.com/vert-x3/vertx-mail-client
+# tag 4.3.5
+io.vertx:vertx-mail-client::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-http-service-factory
+# tag 4.3.5
+io.vertx:vertx-http-service-factory::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-bridge-common
+# tag 4.3.5
+io.vertx:vertx-bridge-common::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-tcp-eventbus-bridge
+# tag 4.3.5
+io.vertx:vertx-tcp-eventbus-bridge::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-micrometer-metrics
+# tag 4.3.5
+io.vertx:vertx-micrometer-metrics::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-reactive-streams
+# tag 4.3.5
+io.vertx:vertx-reactive-streams::jar:4.3.5
+# repo-url https://github.com/open-telemetry/opentelemetry-java
+# tag v1.18.0
+io.opentelemetry:opentelemetry-bom::pom:1.18.0
+# repo-url https://github.com/eclipse-vertx/vertx-tracing
+# tag 4.3.5
+io.vertx:vertx-opentelemetry::jar:4.3.5
+io.vertx:vertx-opentracing::jar:4.3.5
+io.vertx:vertx-tracing-parent::jar:4.3.5
+io.vertx:vertx-tracing-parent::pom:4.3.5
+io.vertx:vertx-zipkin::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-json-schema
+# tag 4.3.5
+io.vertx:vertx-json-schema::jar:4.3.5
+# repo-url https://github.com/FasterXML/jackson-dataformats-text
+# tag jackson-dataformats-text-2.14.0
+com.fasterxml.jackson.dataformat:jackson-dataformat-yaml::jar:2.14.0
+com.fasterxml.jackson.dataformat:jackson-dataformats-text::pom:2.14.0
+# repo-url https://github.com/eclipse-vertx/vertx-http-proxy
+# tag 4.3.5
+io.vertx:vertx-http-proxy::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-redis-client
+# tag 4.3.5
+io.vertx:vertx-redis-client::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-service-proxy
+# tag 4.3.5
+io.vertx:vertx-service-proxy::jar:4.3.5
+io.vertx:vertx-service-proxy:processor:jar:4.3.5
+# repo-url https://github.com/eclipse-vertx/vertx-uri-template
+# tag 4.3.5
+io.vertx:vertx-uri-template::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-web
+# tag 4.3.5
+io.vertx:vertx-template-engines::pom:4.3.5
+io.vertx:vertx-web-api-contract::jar:4.3.5
+io.vertx:vertx-web-api-service::jar:4.3.5
+io.vertx:vertx-web-client::jar:4.3.5
+io.vertx:vertx-web-common::jar:4.3.5
+io.vertx:vertx-web-graphql::jar:4.3.5
+io.vertx:vertx-web-openapi::jar:4.3.5
+io.vertx:vertx-web-parent::pom:4.3.5
+io.vertx:vertx-web-proxy::jar:4.3.5
+io.vertx:vertx-web-session-stores::pom:4.3.5
+io.vertx:vertx-web-sstore-cookie::jar:4.3.5
+io.vertx:vertx-web-sstore-redis::jar:4.3.5
+io.vertx:vertx-web-templ-freemarker::jar:4.3.5
+io.vertx:vertx-web-templ-freemarker:shaded:jar:4.3.5
+io.vertx:vertx-web-templ-handlebars::jar:4.3.5
+io.vertx:vertx-web-templ-handlebars:shaded:jar:4.3.5
+io.vertx:vertx-web-templ-httl::jar:4.3.5
+io.vertx:vertx-web-templ-httl:shaded:jar:4.3.5
+io.vertx:vertx-web-templ-jade::jar:4.3.5
+io.vertx:vertx-web-templ-jade:shaded:jar:4.3.5
+io.vertx:vertx-web-templ-jte::jar:4.3.5
+io.vertx:vertx-web-templ-jte:shaded:jar:4.3.5
+io.vertx:vertx-web-templ-mvel::jar:4.3.5
+io.vertx:vertx-web-templ-mvel:shaded:jar:4.3.5
+io.vertx:vertx-web-templ-pebble::jar:4.3.5
+io.vertx:vertx-web-templ-pebble:shaded:jar:4.3.5
+io.vertx:vertx-web-templ-rocker::jar:4.3.5
+io.vertx:vertx-web-templ-rocker:shaded:jar:4.3.5
+io.vertx:vertx-web-templ-rythm::jar:4.3.5
+io.vertx:vertx-web-templ-rythm:shaded:jar:4.3.5
+io.vertx:vertx-web-templ-thymeleaf::jar:4.3.5
+io.vertx:vertx-web-templ-thymeleaf:shaded:jar:4.3.5
+io.vertx:vertx-web-validation::jar:4.3.5
+io.vertx:vertx-web::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-health-check
+# tag 4.3.5
+io.vertx:vertx-health-check::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-proton
+# tag 4.3.5
+io.vertx:vertx-proton::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-amqp-client
+# tag 4.3.5
+io.vertx:vertx-amqp-client::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-shell
+# tag 4.3.5
+io.vertx:vertx-shell::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-lang-groovy
+# tag 4.3.5
+io.vertx:vertx-lang-groovy::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-hazelcast
+# tag 4.3.5
+io.vertx:vertx-hazelcast::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-circuit-breaker
+# tag 4.3.5
+io.vertx:vertx-circuit-breaker::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-lang-kotlin
+# tag 4.3.5
+io.vertx:vertx-lang-kotlin-coroutines::jar:4.3.5
+io.vertx:vertx-lang-kotlin-parent::jar:4.3.5
+io.vertx:vertx-lang-kotlin-parent::pom:4.3.5
+io.vertx:vertx-lang-kotlin::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-unit
+# tag 4.3.5
+io.vertx:vertx-unit::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-camel-bridge
+# tag 4.3.5
+io.vertx:vertx-camel-bridge::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-infinispan
+# tag 4.3.5
+io.vertx:vertx-infinispan-parent::pom:4.3.5
+io.vertx:vertx-infinispan::jar:4.3.5
+io.vertx:vertx-web-sstore-infinispan::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-consul-client
+# tag 4.3.5
+io.vertx:vertx-consul-client::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-config
+# tag 4.3.5
+io.vertx:vertx-config-consul::jar:4.3.5
+io.vertx:vertx-config-git::jar:4.3.5
+io.vertx:vertx-config-hocon::jar:4.3.5
+io.vertx:vertx-config-kubernetes-configmap::jar:4.3.5
+io.vertx:vertx-config-parent::pom:4.3.5
+io.vertx:vertx-config-redis::jar:4.3.5
+io.vertx:vertx-config-spring-config-server::jar:4.3.5
+io.vertx:vertx-config-vault::jar:4.3.5
+io.vertx:vertx-config-yaml::jar:4.3.5
+io.vertx:vertx-config-zookeeper::jar:4.3.5
+io.vertx:vertx-config::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-mqtt
+# tag 4.3.5
+io.vertx:vertx-mqtt::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-dropwizard-metrics
+# tag 4.3.5
+io.vertx:vertx-dropwizard-metrics::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-cassandra-client
+# tag 4.3.5
+io.vertx:vertx-cassandra-client::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-ignite
+# tag 4.3.5
+io.vertx:vertx-ignite::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-grpc
+# tag 4.3.5
+io.vertx:vertx-grpc-aggregator::pom:4.3.5
+io.vertx:vertx-grpc-client::jar:4.3.5
+io.vertx:vertx-grpc-common::jar:4.3.5
+io.vertx:vertx-grpc-parent::pom:4.3.5
+io.vertx:vertx-grpc-server::jar:4.3.5
+io.vertx:vertx-grpc::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-stomp
+# tag 4.3.5
+io.vertx:vertx-stomp::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-service-discovery
+# tag 4.3.5
+io.vertx:vertx-service-discovery-backend-consul::jar:4.3.5
+io.vertx:vertx-service-discovery-backend-redis::jar:4.3.5
+io.vertx:vertx-service-discovery-backend-zookeeper::jar:4.3.5
+io.vertx:vertx-service-discovery-bridge-consul::jar:4.3.5
+io.vertx:vertx-service-discovery-bridge-docker-links::jar:4.3.5
+io.vertx:vertx-service-discovery-bridge-docker::jar:4.3.5
+io.vertx:vertx-service-discovery-bridge-kubernetes::jar:4.3.5
+io.vertx:vertx-service-discovery-bridge-zookeeper::jar:4.3.5
+io.vertx:vertx-service-discovery-parent::pom:4.3.5
+io.vertx:vertx-service-discovery::jar:4.3.5
+# repo-url https://github.com/vert-x3/vertx-sockjs-service-proxy
+# tag 4.3.5
+io.vertx:vertx-sockjs-service-proxy::jar:4.3.5
+# Selecting all the managed (stopping at the first non-managed one) dependencies of supported extensions from io.vertx:vertx-dependencies:pom:4.3.5 will result in:
+# 181 artifacts from 64 code repositories to build from source
+# 96 dependency nodes skipped
+# 277 dependencies visited in total
