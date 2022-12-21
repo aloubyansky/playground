@@ -19,7 +19,7 @@
         <plugin>
           <groupId>io.quarkus</groupId>
           <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
-          <version>0.0.68</version>
+          <version>0.0.70</version>
           <configuration>
             <!-- The main BOM to productize -->
             <bom>io.vertx:vertx-dependencies:${vertx.version}</bom>
@@ -46,6 +46,8 @@
             <logTrees>true</logTrees>
             -->
 
+            <includeNonManaged>true</includeNonManaged>
+
             <!-- Dependency keys to exclude -->
             <excludeKeys>
               <key>io.vertx:vertx-jgroups</key>
@@ -66,10 +68,11 @@
             </excludeGroupIds>
             -->
 
-            <!-- Dependency keys to include -->
+            <!-- Dependency keys to include
             <includeGroupIds>
               <groupId>io.opentelemetry</groupId>
             </includeGroupIds>
+            -->
 
             <!-- Include dependencies with the following groupIds
             <includeKeys>
