@@ -9,6 +9,14 @@ In this project the Cyclone DX plugin is invoked twice:
 
 To generate the SBOMs run `mvn -Pcdx` from the `product-a` directory.
 
+### CycloneDX 2.7.9
+
+`bom-build-time.json` records a dependency tree identical to what `mvn dependency:tree` logs, which is correct.
+
+`bom-runtime.json` however, recorded `acme-lib-c:2.0.0-SNAPSOT` as a dependency of `acme-lib-b:1.0.0-SNAPSHOT`, which is wrong
+given that `acme-lib-b:1.0.0-SNAPSHOT` dependends on `acme-lib-c:1.0.0-SNAPSHOT`. Basically, the `provided` dependency on
+`acme-lib-d` was excluded but its transitive dependency still appears in the SBOM.
+
 ### CycloneDX 2.7.4
 
 `bom-build-time.json` does include `acme-lib-d` since the `provided` scope was included in the configuration. It also includes `acme-lib-c:2.0.0-SNAPSHOT` as a dependency of `acme-lib-d`.
@@ -16,7 +24,7 @@ To generate the SBOMs run `mvn -Pcdx` from the `product-a` directory.
 `bom-runtime.json` does not include `acme-lib-d` since the `provided` scope was excluded in the configuration. However
 
 1. `acme-lib-c:2.0.0-SNAPSHOT` appears among the components, although nothing else than the excluded `acme-lib-d` depends on it;
-2. `acme-lib-b` missing a dependency on `acme-lib-c:1.0.0-SNAPSHOT` that is also missing amonth the components.
+2. `acme-lib-b` is missing a dependency on `acme-lib-c:1.0.0-SNAPSHOT` that is also missing among the components.
 
 ### CycloneDX 2.7.5
 
