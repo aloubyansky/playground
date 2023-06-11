@@ -9,6 +9,8 @@ In this project the Cyclone DX plugin is invoked twice:
 
 To generate the SBOMs run `mvn -Pcdx` from the `product-a` directory.
 
+To try different CycloneDX plugin versions simply add `-Dcyclonedx.version=xxx` to the command line.
+
 ### CycloneDX 2.7.9
 
 `bom-build-time.json` records a dependency tree identical to what `mvn dependency:tree` logs, which is correct.
