@@ -1,33 +1,43 @@
-.DS_Store
-target
-*.iml
-.idea
-.settings
+#Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
+.flattened-pom.xml
+
+# Eclipse
 .project
 .classpath
-.vscode/
-*~
-local-test
-out
-lib
-bin
-dependency-reduced-pom.xml
-hotspot.log
-.directory
-.java-version
-.graal-install
-hs_err_pid*.log
-dumps
-*.orig
-*.rej
+.settings/
+bin/
+
+# IntelliJ
+.idea
+*.ipr
+*.iml
+*.iws
+
+# NetBeans
+nb-configuration.xml
+
+# Visual Studio Code
+.vscode
 .factorypath
-graph-output.dot
+
+# OSX
+.DS_Store
+
+# Vim
 *.swp
 *.swo
-ObjectStore
-.gradle
-build
-docker/distroless/bazel-*
-/.apt_generated_tests/
-quarkus.log
-replay_*.log
+
+# patch
+*.orig
+*.rej
+
+# Local environment
+.env
+
+# Plugin directory
+/.quarkus/cli/plugins/
