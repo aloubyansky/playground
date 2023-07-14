@@ -5,11 +5,12 @@
   <parent>
     <groupId>com.redhat.quarkus.platform</groupId>
     <artifactId>quarkus-universe-parent</artifactId>
-    <version>2.13.5.Final-redhat-00002</version>
+    <version>${revision}</version>
     <relativePath>..</relativePath>
   </parent>
   <groupId>com.redhat.quarkus</groupId>
   <artifactId>quarkus-universe-bom-quarkus-platform-properties</artifactId>
+  <version>2.13.5.Final-redhat-00002</version>
   <packaging>pom</packaging>
   <name>Quarkus Platform - Quarkus Universe - Quarkus Platform Properties</name>
   <properties>

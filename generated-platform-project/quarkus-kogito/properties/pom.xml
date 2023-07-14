@@ -5,10 +5,11 @@
   <parent>
     <groupId>com.redhat.quarkus.platform</groupId>
     <artifactId>quarkus-kogito-parent</artifactId>
-    <version>2.13.5.Final-redhat-00002</version>
+    <version>${revision}</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>quarkus-kogito-bom-quarkus-platform-properties</artifactId>
+  <version>2.13.5.Final-redhat-00002</version>
   <packaging>pom</packaging>
   <name>Quarkus Platform - Kogito - Quarkus Platform Properties</name>
   <properties>
