@@ -1,0 +1,64 @@
+2.13.5.Final-redhat=00002
+- RHBQ initial release
+mvn -PfakeRelease -Drevision=2.13.5.Final-redhat-00002 \
+    -Dquarkus.version=2.13.5.Final-redhat-00003
+
+2.13.5.SP1-redhat-00002
+- adds CEQ
+mvn -PfakeRelease -Drevision=2.13.5.SP1-redhat-00002 \
+    -Dquarkus.version=2.13.5.Final-redhat-00003 \
+    -Dquarkus-camel.hide=false -Dcamel-quarkus.version=2.13.2.redhat-00004
+
+2.13.7.Final-redhat-00003
+- upgrades RHBQ
+- adds AMQ Qpid JMS
+- forces CEQ SP1
+mvn -PfakeRelease -Drevision=2.13.5.Final-redhat-00002 \
+    -Dquarkus.version=2.13.7.Final-redhat-00003 \
+    -Dquarkus-camel.hide=false -Dcamel-quarkus.version=2.13.2.redhat-00004 \
+    -Dquarkus-qpid-jms.hide=false -Dquarkus-qpid-jms.version=0.38.0.redhat-00010
+
+2.13.7.SP1-redhat-00001
+- adds OptaPlanner
+- forces CEQ SP2
+mvn -PfakeRelease -Drevision=2.13.7.SP1-redhat-00001 \
+    -Dquarkus.version=2.13.7.Final-redhat-00003 \
+    -Dquarkus-camel.hide=false -Dcamel-quarkus.version=2.13.2.redhat-00004 \
+    -Dquarkus-qpid-jms.hide=false -Dquarkus-qpid-jms.version=0.38.0.redhat-00010 \
+    -Dquarkus-optaplanner.hide=false -Doptaplanner-quarkus.version=8.33.0.Final-redhat-00004
+
+2.13.7.SP2-redhat-00002
+- CEQ SP3 fixes https://issues.redhat.com/browse/QUARKUS-3056 in the platform config
+mvn -PfakeRelease -Drevision=2.13.7.SP2-redhat-00002 \
+    -Dquarkus.version=2.13.7.Final-redhat-00003 \
+    -Dquarkus-camel.hide=false -Dcamel-quarkus.version=2.13.2.redhat-00004 \
+    -Dquarkus-qpid-jms.hide=false -Dquarkus-qpid-jms.version=0.38.0.redhat-00010 \
+    -Dquarkus-optaplanner.hide=false -Doptaplanner-quarkus.version=8.33.0.Final-redhat-00004
+
+2.13.7.SP3-redhat-00003
+- CEQ updates to 2.13.3.redhat-00008
+mvn -PfakeRelease -Drevision=2.13.7.SP3-redhat-00003 \
+    -Dquarkus.version=2.13.7.Final-redhat-00003 \
+    -Dquarkus-camel.hide=false -Dcamel-quarkus.version=2.13.3.redhat-00008 \
+    -Dquarkus-qpid-jms.hide=false -Dquarkus-qpid-jms.version=0.38.0.redhat-00010 \
+    -Dquarkus-optaplanner.hide=false -Doptaplanner-quarkus.version=8.33.0.Final-redhat-00004
+
+2.13.8.Final-redhat-00004
+- upgrades RHBQ to 2.13.8.Final-redhat-00004
+- forces CEP SP1
+- forced OptaPlanner SP1
+mvn -PfakeRelease -Drevision=2.13.8.Final-redhat-00004 \
+    -Dquarkus.version=2.13.8.Final-redhat-00004 \
+    -Dquarkus-camel.hide=false -Dcamel-quarkus.version=2.13.3.redhat-00008 \
+    -Dquarkus-qpid-jms.hide=false -Dquarkus-qpid-jms.version=0.38.0.redhat-00010 \
+    -Dquarkus-optaplanner.hide=false -Doptaplanner-quarkus.version=8.33.0.Final-redhat-00004
+
+2.13.8.SP1-redhat-00004
+- upgrades OptaPlanner to 8.38.0.Final-redhat-00004
+- forces CEP SP2
+mvn -PfakeRelease -Drevision=2.13.8.Final-redhat-00004 \
+    -Dquarkus.version=2.13.8.Final-redhat-00004 \
+    -Dquarkus-camel.hide=false -Dcamel-quarkus.version=2.13.3.redhat-00008 \
+    -Dquarkus-qpid-jms.hide=false -Dquarkus-qpid-jms.version=0.38.0.redhat-00010 \
+    -Dquarkus-optaplanner.hide=false -Doptaplanner-quarkus.version=8.38.0.Final-redhat-00004
+

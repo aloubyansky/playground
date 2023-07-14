@@ -65,7 +65,7 @@
               </universal>
               <core>
                 <name>Core</name>
-                <release>
+                <release combine.self="override">
                   <next>${platform.groupId}:quarkus-bom:${quarkus.version}</next>
                 </release>
                 <metadataOverrideFiles>
@@ -117,7 +117,7 @@
                 <member>
                   <name>OptaPlanner</name>
                   <hidden>${quarkus-optaplanner.hide}</hidden>
-                  <release>
+                  <release combine.self="override">
                     <next>${platform.groupId}:quarkus-optaplanner-bom:${optaplanner-quarkus.version}</next>
                   </release>
                 </member>
@@ -128,7 +128,7 @@
                 <member>
                   <name>QpidJMS</name>
                   <hidden>${quarkus-qpid-jms.hide}</hidden>
-                  <release>
+                  <release combine.self="override">
                     <next>${platform.groupId}:quarkus-qpid-jms-bom:${quarkus-qpid-jms.version}</next>
                   </release>
                   <metadataOverrideFiles>
@@ -146,7 +146,7 @@
                 <member>
                   <name>Camel</name>
                   <hidden>${quarkus-camel.hide}</hidden>
-                  <release>
+                  <release combine.self="override">
                     <next>${platform.groupId}:quarkus-camel-bom:${camel-quarkus.version}</next>
                   </release>
                   <metadataOverrideArtifacts>
