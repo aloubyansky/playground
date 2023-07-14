@@ -339,6 +339,7 @@
       </activation>
       <properties>
         <skipTests>true</skipTests>
+        <enforcer.skip>true</enforcer.skip>
         <recordUpdatedBoms>true</recordUpdatedBoms>
       </properties>
       <build>
