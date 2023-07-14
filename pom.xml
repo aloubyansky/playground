@@ -20,8 +20,12 @@
     <camel-quarkus-test-list.version>2.7.1</camel-quarkus-test-list.version>
     -->
     <camel-quarkus-support-overrides.version>2.7.1.redhat-00016</camel-quarkus-support-overrides.version> <!-- for now we are using the 2.7.1 support overrides list, as the latest available for Camel -->
+    <quarkus-camel.hide>true</quarkus-camel.hide>
 
     <quarkus-qpid-jms.version>0.38.0</quarkus-qpid-jms.version>
+    <quarkus-qpid-jms.hide>true</quarkus-qpid-jms.hide>
+
+    <quarkus-optaplanner.hide>true</quarkus-optaplanner.hide>
 
     <opentelemetry.version>1.17.0.redhat-00001</opentelemetry.version>
   </properties>
@@ -110,7 +114,7 @@
               <members>
                 <member>
                   <name>OptaPlanner</name>
-                  <hidden>true</hidden>
+                  <hidden>${quarkus-optaplanner.hide}</hidden>
                   <release>
                     <next>${platform.groupId}:quarkus-optaplanner-bom:${optaplanner-quarkus.version}</next>
                   </release>
@@ -121,7 +125,7 @@
                 </member>
                 <member>
                   <name>QpidJMS</name>
-                  <hidden>true</hidden>
+                  <hidden>${quarkus-qpid-jms.hide}</hidden>
                   <release>
                     <next>${platform.groupId}:quarkus-qpid-jms-bom:${quarkus-qpid-jms.version}</next>
                   </release>
@@ -139,7 +143,7 @@
                 </member>
                 <member>
                   <name>Camel</name>
-                  <hidden>true</hidden>
+                  <hidden>${quarkus-camel.hide}</hidden>
                   <release>
                     <next>${platform.groupId}:quarkus-camel-bom:${camel-quarkus.version}</next>
                   </release>
