@@ -17,9 +17,9 @@
     <quarkus.upstream.version>2.13.5.Final</quarkus.upstream.version> <!-- the upstream Quarkus core version that will be recorded in the product platform metadata -->
     <!--
     <camel-quarkus.version>2.7.1.redhat-00016</camel-quarkus.version>
-    <camel-quarkus-test-list.version>2.7.1</camel-quarkus-test-list.version>
     -->
-    <camel-quarkus-support-overrides.version>2.7.1.redhat-00016</camel-quarkus-support-overrides.version> <!-- for now we are using the 2.7.1 support overrides list, as the latest available for Camel -->
+    <camel-quarkus-test-list.version>2.13.2</camel-quarkus-test-list.version>
+    <camel-quarkus-support-overrides.version>2.13.2.redhat-00004</camel-quarkus-support-overrides.version> <!-- for now we are using the 2.7.1 support overrides list, as the latest available for Camel -->
     <quarkus-camel.hide>true</quarkus-camel.hide>
 
     <quarkus-qpid-jms.version>0.38.0</quarkus-qpid-jms.version>

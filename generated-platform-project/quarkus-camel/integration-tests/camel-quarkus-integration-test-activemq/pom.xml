@@ -12,12 +12,12 @@
     <dependency>
       <groupId>org.apache.camel.quarkus</groupId>
       <artifactId>camel-quarkus-integration-test-activemq</artifactId>
-      <version>2.13.1</version>
+      <version>${camel-quarkus-test-list.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel.quarkus</groupId>
       <artifactId>camel-quarkus-integration-test-activemq</artifactId>
-      <version>2.13.1</version>
+      <version>${camel-quarkus-test-list.version}</version>
       <type>test-jar</type>
       <classifier>tests</classifier>
       <scope>test</scope>
@@ -73,14 +73,14 @@
     <dependency>
       <groupId>org.apache.camel.quarkus</groupId>
       <artifactId>camel-quarkus-integration-test-messaging-common</artifactId>
-      <version>2.13.1</version>
+      <version>${camel-quarkus-test-list.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.camel.quarkus</groupId>
       <artifactId>camel-quarkus-integration-test-messaging-jms</artifactId>
-      <version>2.13.1</version>
+      <version>${camel-quarkus-test-list.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
@@ -190,7 +190,7 @@
                   <goal>build</goal>
                 </goals>
                 <configuration>
-                  <appArtifact>org.apache.camel.quarkus:camel-quarkus-integration-test-activemq:2.13.1</appArtifact>
+                  <appArtifact>org.apache.camel.quarkus:camel-quarkus-integration-test-activemq:${camel-quarkus-test-list.version}</appArtifact>
                 </configuration>
               </execution>
             </executions>

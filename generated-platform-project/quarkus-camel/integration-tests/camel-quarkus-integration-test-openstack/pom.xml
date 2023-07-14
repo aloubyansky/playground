@@ -12,12 +12,12 @@
     <dependency>
       <groupId>org.apache.camel.quarkus</groupId>
       <artifactId>camel-quarkus-integration-test-openstack</artifactId>
-      <version>2.13.1</version>
+      <version>${camel-quarkus-test-list.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.camel.quarkus</groupId>
       <artifactId>camel-quarkus-integration-test-openstack</artifactId>
-      <version>2.13.1</version>
+      <version>${camel-quarkus-test-list.version}</version>
       <type>test-jar</type>
       <classifier>tests</classifier>
       <scope>test</scope>
@@ -57,7 +57,7 @@
     <dependency>
       <groupId>org.apache.camel.quarkus</groupId>
       <artifactId>camel-quarkus-integration-wiremock-support</artifactId>
-      <version>2.13.1</version>
+      <version>${camel-quarkus-test-list.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -166,7 +166,7 @@
                   <goal>build</goal>
                 </goals>
                 <configuration>
-                  <appArtifact>org.apache.camel.quarkus:camel-quarkus-integration-test-openstack:2.13.1</appArtifact>
+                  <appArtifact>org.apache.camel.quarkus:camel-quarkus-integration-test-openstack:${camel-quarkus-test-list.version}</appArtifact>
                 </configuration>
               </execution>
             </executions>
