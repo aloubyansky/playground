@@ -8,9 +8,9 @@
     <version>2.13.5.Final-redhat-00002</version>
     <relativePath>..</relativePath>
   </parent>
-  <artifactId>quarkus-dependencies-to-build</artifactId>
+  <artifactId>quarkus-extension-changes</artifactId>
   <packaging>pom</packaging>
-  <name>Quarkus Platform - Quarkus Dependencies To Build</name>
+  <name>Quarkus Platform - Quarkus Extension Changes</name>
   <properties>
     <gpg.skip>true</gpg.skip>
   </properties>
@@ -46,14 +46,14 @@
   </build>
   <profiles>
     <profile>
-      <id>depsToBuild</id>
+      <id>extensionChanges</id>
       <activation>
         <property>
-          <name>depsToBuild</name>
+          <name>extensionChanges</name>
         </property>
       </activation>
       <build>
-        <defaultGoal>quarkus-platform-bom:dependencies-to-build@quarkus-bom </defaultGoal>
+        <defaultGoal>quarkus-platform-bom:extension-changes@quarkus-bom </defaultGoal>
         <pluginManagement>
           <plugins>
             <plugin>
@@ -64,36 +64,11 @@
                   <id>quarkus-bom</id>
                   <phase>process-resources</phase>
                   <goals>
-                    <goal>dependencies-to-build</goal>
+                    <goal>extension-changes</goal>
                   </goals>
                   <configuration>
                     <bom>com.redhat.quarkus.platform:quarkus-bom:${project.version}</bom>
-                    <outputFile>../../target/dependencies-to-build/quarkus-bom-deps-to-build.txt</outputFile>
-                    <dependenciesToBuild combine.self="append">
-                      <excludeGroupIds combine.children="append">
-                        <groupId>com.github.docker-java</groupId>
-                      </excludeGroupIds>
-                      <excludeKeys combine.children="append">
-                        <key>software.amazon.awssdk:aws-sdk-java-pom::pom</key>
-                        <key>software.amazon.awssdk:bom::pom</key>
-                      </excludeKeys>
-                      <includeArtifacts>
-                        <artifact>io.quarkus:quarkus-bom-quarkus-platform-descriptor:2.13.5.Final-redhat-00003:json:2.13.5.Final-redhat-00003</artifact>
-                        <artifact>io.quarkus:quarkus-bom-quarkus-platform-properties::properties:2.13.5.Final-redhat-00003</artifact>
-                        <artifact>io.quarkus:quarkus-extension-maven-plugin::jar:2.13.5.Final-redhat-00003</artifact>
-                        <artifact>io.quarkus:quarkus-extension-processor::jar:2.13.5.Final-redhat-00003</artifact>
-                        <artifact>io.quarkus:quarkus-maven-plugin::jar:2.13.5.Final-redhat-00003</artifact>
-                      </includeArtifacts>
-                      <includeGroupIds>
-                        <groupId>org.hibernate.common</groupId>
-                      </includeGroupIds>
-                      <includeKeys>
-                        <key>io.quarkus:quarkus-devtools-base-codestarts::jar</key>
-                        <key>io.quarkus:quarkus-devtools-codestarts::jar</key>
-                        <key>io.quarkus:quarkus-devtools-message-writer::jar</key>
-                        <key>org.bitbucket.b_c:jose4j::jar</key>
-                      </includeKeys>
-                    </dependenciesToBuild>
+                    <outputFile>../../target/extension-changes/quarkus-bom-extension-changes.json</outputFile>
                   </configuration>
                 </execution>
               </executions>

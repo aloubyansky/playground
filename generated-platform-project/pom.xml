@@ -26,6 +26,8 @@
     <module>quarkus-google-cloud-services</module>
     <module>quarkus-maven-plugin</module>
     <module>quarkus-dependencies-to-build</module>
+    <module>quarkus-sbom</module>
+    <module>quarkus-extension-changes</module>
   </modules>
   <properties>
     <platform.key>com.redhat.quarkus.platform</platform.key>
@@ -38,7 +40,7 @@
         <plugin>
           <groupId>io.quarkus</groupId>
           <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
-          <version>0.0.69</version>
+          <version>0.0.93-SNAPSHOT</version>
           <extensions>true</extensions>
         </plugin>
       </plugins>

@@ -8,9 +8,9 @@
     <version>2.13.5.Final-redhat-00002</version>
     <relativePath>..</relativePath>
   </parent>
-  <artifactId>quarkus-dependencies-to-build</artifactId>
+  <artifactId>quarkus-sbom</artifactId>
   <packaging>pom</packaging>
-  <name>Quarkus Platform - Quarkus Dependencies To Build</name>
+  <name>Quarkus Platform - Quarkus Sbom</name>
   <properties>
     <gpg.skip>true</gpg.skip>
   </properties>
@@ -46,10 +46,10 @@
   </build>
   <profiles>
     <profile>
-      <id>depsToBuild</id>
+      <id>sbom</id>
       <activation>
         <property>
-          <name>depsToBuild</name>
+          <name>sbom</name>
         </property>
       </activation>
       <build>
@@ -68,15 +68,8 @@
                   </goals>
                   <configuration>
                     <bom>com.redhat.quarkus.platform:quarkus-bom:${project.version}</bom>
-                    <outputFile>../../target/dependencies-to-build/quarkus-bom-deps-to-build.txt</outputFile>
-                    <dependenciesToBuild combine.self="append">
-                      <excludeGroupIds combine.children="append">
-                        <groupId>com.github.docker-java</groupId>
-                      </excludeGroupIds>
-                      <excludeKeys combine.children="append">
-                        <key>software.amazon.awssdk:aws-sdk-java-pom::pom</key>
-                        <key>software.amazon.awssdk:bom::pom</key>
-                      </excludeKeys>
+                    <outputFile>../../target/sbom/quarkus-bom-sbom.json</outputFile>
+                    <dependenciesToBuild combine.self="override">
                       <includeArtifacts>
                         <artifact>io.quarkus:quarkus-bom-quarkus-platform-descriptor:2.13.5.Final-redhat-00003:json:2.13.5.Final-redhat-00003</artifact>
                         <artifact>io.quarkus:quarkus-bom-quarkus-platform-properties::properties:2.13.5.Final-redhat-00003</artifact>
