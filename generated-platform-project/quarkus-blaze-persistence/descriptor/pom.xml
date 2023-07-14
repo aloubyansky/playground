@@ -84,7 +84,7 @@
             <stream>${platform.stream}</stream>
             <version>${platform.release}</version>
             <members>
-              <member>${project.groupId}:quarkus-bom-quarkus-platform-descriptor:${project.version}:json:${project.version}</member>
+              <member>com.redhat.quarkus.platform:quarkus-bom-quarkus-platform-descriptor:2.13.5.Final-redhat-00003:json:2.13.5.Final-redhat-00003</member>
             </members>
           </platformRelease>
           <ignoredArtifacts>

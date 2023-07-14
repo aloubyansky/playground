@@ -9,6 +9,7 @@
     <relativePath>..</relativePath>
   </parent>
   <artifactId>quarkus-camel-parent</artifactId>
+  <version>2.13.1</version>
   <packaging>pom</packaging>
   <name>Quarkus Platform - Camel - Parent</name>
   <modules>

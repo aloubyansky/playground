@@ -51,10 +51,17 @@
           <configuration>
             <platformConfig>
               <upstreamQuarkusCoreVersion>${quarkus.upstream.version}</upstreamQuarkusCoreVersion>
+              <release>
+                <onlyChangedMembers>true</onlyChangedMembers>
+              </release>
               <universal>
                 <bom>com.redhat.quarkus:quarkus-universe-bom:${project.version}</bom>
               </universal>
               <core>
+                <name>Core</name>
+                <release>
+                  <next>${platform.groupId}:quarkus-bom:${quarkus.version}</next>
+                </release>
                 <metadataOverrideFiles>
                   <file>${resourcesdir}/core/extensions-support-overrides.json</file>
                 </metadataOverrideFiles>
@@ -104,6 +111,9 @@
                 <member>
                   <name>OptaPlanner</name>
                   <hidden>true</hidden>
+                  <release>
+                    <next>${platform.groupId}:quarkus-optaplanner-bom:${optaplanner-quarkus.version}</next>
+                  </release>
                 </member>
                 <member>
                   <name>Kogito</name>
@@ -112,6 +122,9 @@
                 <member>
                   <name>QpidJMS</name>
                   <hidden>true</hidden>
+                  <release>
+                    <next>${platform.groupId}:quarkus-qpid-jms-bom:${quarkus-qpid-jms.version}</next>
+                  </release>
                   <metadataOverrideFiles>
                     <file>${resourcesdir}/qpid-jms/extensions-support-overrides.json</file>
                   </metadataOverrideFiles>
@@ -127,6 +140,9 @@
                 <member>
                   <name>Camel</name>
                   <hidden>true</hidden>
+                  <release>
+                    <next>${platform.groupId}:quarkus-camel-bom:${camel-quarkus.version}</next>
+                  </release>
                   <metadataOverrideArtifacts>
                     <artifact>org.apache.camel.quarkus:camel-quarkus-product::json:${camel-quarkus-support-overrides.version}</artifact>
                   </metadataOverrideArtifacts>
@@ -308,6 +324,21 @@
             </plugin>
           </plugins>
         </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>fakeRelease</id>
+      <activation>
+        <property>
+          <name>fakeRelease</name>
+        </property>
+      </activation>
+      <properties>
+        <skipTests>true</skipTests>
+        <recordUpdatedBoms>true</recordUpdatedBoms>
+      </properties>
+      <build>
+        <defaultGoal>clean install</defaultGoal>
       </build>
     </profile>
   </profiles>

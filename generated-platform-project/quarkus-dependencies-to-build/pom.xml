@@ -67,7 +67,7 @@
                     <goal>dependencies-to-build</goal>
                   </goals>
                   <configuration>
-                    <bom>com.redhat.quarkus.platform:quarkus-bom:${project.version}</bom>
+                    <bom>com.redhat.quarkus.platform:quarkus-bom:2.13.5.Final-redhat-00003</bom>
                     <outputFile>../../target/dependencies-to-build/quarkus-bom-deps-to-build.txt</outputFile>
                     <dependenciesToBuild combine.self="append">
                       <excludeGroupIds combine.children="append">

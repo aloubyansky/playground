@@ -67,7 +67,7 @@
                     <goal>extension-changes</goal>
                   </goals>
                   <configuration>
-                    <bom>com.redhat.quarkus.platform:quarkus-bom:${project.version}</bom>
+                    <bom>com.redhat.quarkus.platform:quarkus-bom:2.13.5.Final-redhat-00003</bom>
                     <outputFile>../../target/extension-changes/quarkus-bom-extension-changes.json</outputFile>
                   </configuration>
                 </execution>

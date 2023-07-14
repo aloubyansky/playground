@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.redhat.quarkus.platform</groupId>
     <artifactId>quarkus-qpid-jms-parent</artifactId>
-    <version>2.13.5.Final-redhat-00002</version>
+    <version>0.38.0</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>quarkus-qpid-jms-bom-quarkus-platform-descriptor</artifactId>
@@ -84,7 +84,7 @@
             <stream>${platform.stream}</stream>
             <version>${platform.release}</version>
             <members>
-              <member>${project.groupId}:quarkus-bom-quarkus-platform-descriptor:${project.version}:json:${project.version}</member>
+              <member>com.redhat.quarkus.platform:quarkus-bom-quarkus-platform-descriptor:2.13.5.Final-redhat-00003:json:2.13.5.Final-redhat-00003</member>
             </members>
           </platformRelease>
           <processGroupIds>

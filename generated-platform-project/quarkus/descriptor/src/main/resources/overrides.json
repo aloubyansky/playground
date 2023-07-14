@@ -13,7 +13,7 @@
         "quarkus-core-version" : "2.13.5.Final-redhat-00003",
         "maven-plugin-groupId" : "${project.groupId}",
         "maven-plugin-artifactId" : "quarkus-maven-plugin",
-        "maven-plugin-version" : "${project.version}",
+        "maven-plugin-version" : "2.13.5.Final-redhat-00002",
         "gradle-plugin-id" : "io.quarkus",
         "gradle-plugin-version" : "2.13.5.Final",
         "supported-maven-versions" : "[3.6.2,)",

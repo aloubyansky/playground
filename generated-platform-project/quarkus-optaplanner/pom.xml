@@ -9,6 +9,7 @@
     <relativePath>..</relativePath>
   </parent>
   <artifactId>quarkus-optaplanner-parent</artifactId>
+  <version>8.29.0.Final</version>
   <packaging>pom</packaging>
   <name>Quarkus Platform - OptaPlanner - Parent</name>
   <modules>
