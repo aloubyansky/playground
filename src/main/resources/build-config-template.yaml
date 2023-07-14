@@ -1,0 +1,50 @@
+#!baseMaven=mvn -DskipTests clean deploy -B dependency:tree
+#!baseGradle=gradle --stacktrace --info publish
+#!jdk11Env=226
+#!gradleEnvironment=103
+#!productVersion=2.13.3
+#!scmRevision=2.13.3.Final-redhat
+#!milestone=ER3
+
+product:
+  name: Quarkus
+  abbreviation: qrks
+  stage: GA
+  issueTrackerUrl: https://issues.redhat.com/projects/QUARKUS
+version: "{{productVersion}}"
+milestone: "{{milestone}}"
+group: "Quarkus Platform {{productVersion}} all"
+defaultBuildParameters:
+  environmentName: "OpenJDK 11.0; Mvn 3.8.6; Gradle 7.5.1; GCC; CPP; Make"
+  buildScript: clean deploy -B -DskipTests
+builds:
+  - name: "io.quarkus-quarkus-platform-{{productVersion}}"
+    project: quarkusio/quarkus-platform
+    scmUrl: git+ssh://code.engineering.redhat.com/quarkusio/quarkus-platform.git
+    scmRevision: "{{scmRevision}}"
+    environmentName: "OpenJDK 11.0; Mvn 3.8.6; Gradle 7.5.1; GCC; CPP; Make"
+    buildScript: "git pull https://code.engineering.redhat.com/gerrit/quarkusio/quarkus-platform GERRIT_REFSPEC; {{baseMaven}} -Denforcer.skip=true -am"
+    alignmentParameters:
+      - '-Dmanipulation.disable=true'
+outputPrefixes:
+  releaseFile: rh-quarkus
+  releaseDir: rh-quarkus
+flow:
+  licensesGeneration:
+    strategy: GENERATE
+  repositoryGeneration:
+    strategy: RESOLVE_ONLY
+    sourceBuild: "io.quarkus-quarkus-platform-{{productVersion}}"
+    parameters:
+      extensionsListUrl: "https://gitlab.cee.redhat.com/middleware/build-configurations/-/raw/master/Quarkus/quarkus-platform/2.13/extensionArtifactList.txt"
+    additionalArtifacts:
+      - from: "io.quarkus-quarkus-platform-{{productVersion}}"
+        download:
+          - '^com.redhat.quarkus:quarkus-universe-bom:pom:2.13.\d.Final-(temporary-|)redhat-\d+'  #QUARKUS-2602
+          - '^com.redhat.quarkus.platform:quarkus-maven-plugin:jar:2.13.\d.Final-(temporary-|)redhat-\d+'
+          - '^com.redhat.quarkus.platform:quarkus-maven-plugin:pom:2.13.\d.Final-(temporary-|)redhat-\d+'
+  javadocGeneration:
+    strategy: IGNORE
+  sourcesGeneration:
+    strategy: GENERATE_SELECTED
+    sourceBuild: "io.quarkus-quarkus-platform-{{productVersion}}"

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.redhat.quarkus.platform</groupId>
+    <artifactId>quarkus-platform-parent</artifactId>
+    <version>2.13.5.Final-redhat-00002</version>
+    <relativePath>..</relativePath>
+  </parent>
+  <artifactId>quarkus-dependencies-to-build</artifactId>
+  <packaging>pom</packaging>
+  <name>Quarkus Platform - Quarkus Dependencies To Build</name>
+  <properties>
+    <gpg.skip>true</gpg.skip>
+  </properties>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-install-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-install</id>
+              <phase>none</phase>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-deploy</id>
+              <phase>none</phase>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>depsToBuild</id>
+      <activation>
+        <property>
+          <name>depsToBuild</name>
+        </property>
+      </activation>
+      <build>
+        <defaultGoal>quarkus-platform-bom:dependencies-to-build@quarkus-bom </defaultGoal>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>io.quarkus</groupId>
+              <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>quarkus-bom</id>
+                  <phase>process-resources</phase>
+                  <goals>
+                    <goal>dependencies-to-build</goal>
+                  </goals>
+                  <configuration>
+                    <bom>com.redhat.quarkus.platform:quarkus-bom:${project.version}</bom>
+                    <outputFile>../../target/dependencies-to-build/quarkus-bom-deps-to-build.txt</outputFile>
+                    <dependenciesToBuild combine.self="append">
+                      <excludeGroupIds combine.children="append">
+                        <groupId>com.github.docker-java</groupId>
+                      </excludeGroupIds>
+                      <excludeKeys combine.children="append">
+                        <key>software.amazon.awssdk:aws-sdk-java-pom::pom</key>
+                        <key>software.amazon.awssdk:bom::pom</key>
+                      </excludeKeys>
+                      <includeArtifacts combine.children="append">
+                        <artifact>io.quarkus:quarkus-extension-processor::jar:2.13.5.Final-redhat-00003</artifact>
+                        <artifact>io.quarkus:quarkus-maven-plugin::jar:2.13.5.Final-redhat-00003</artifact>
+                        <artifact>io.quarkus:quarkus-extension-maven-plugin::jar:2.13.5.Final-redhat-00003</artifact>
+                        <artifact>io.quarkus:quarkus-bom-quarkus-platform-properties::properties:2.13.5.Final-redhat-00003</artifact>
+                        <artifact>io.quarkus:quarkus-bom-quarkus-platform-descriptor:2.13.5.Final-redhat-00003:json:2.13.5.Final-redhat-00003</artifact>
+                      </includeArtifacts>
+                      <includeGroupIds combine.children="append">
+                        <groupId>org.hibernate.common</groupId>
+                      </includeGroupIds>
+                      <includeKeys combine.children="append">
+                        <key>io.quarkus:quarkus-devtools-message-writer::jar</key>
+                        <key>org.bitbucket.b_c:jose4j::jar</key>
+                        <key>io.quarkus:quarkus-devtools-codestarts::jar</key>
+                        <key>io.quarkus:quarkus-devtools-base-codestarts::jar</key>
+                      </includeKeys>
+                    </dependenciesToBuild>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
+</project>

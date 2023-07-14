@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.redhat.quarkus.platform</groupId>
+    <artifactId>quarkus-platform-config</artifactId>
+    <version>2.13.5.Final-redhat-00002</version>
+    <relativePath>..</relativePath>
+  </parent>
+  <artifactId>quarkus-platform-parent</artifactId>
+  <packaging>pom</packaging>
+  <name>Quarkus Platform - Parent</name>
+  <modules>
+    <module>quarkus-universe</module>
+    <module>quarkus</module>
+    <module>quarkus-optaplanner</module>
+    <module>quarkus-kogito</module>
+    <module>quarkus-qpid-jms</module>
+    <module>quarkus-cassandra</module>
+    <module>quarkus-amazon-services</module>
+    <module>quarkus-camel</module>
+    <module>quarkus-hazelcast</module>
+    <module>quarkus-debezium</module>
+    <module>quarkus-blaze-persistence</module>
+    <module>quarkus-google-cloud-services</module>
+    <module>quarkus-maven-plugin</module>
+    <module>quarkus-dependencies-to-build</module>
+  </modules>
+  <properties>
+    <platform.key>com.redhat.quarkus.platform</platform.key>
+    <platform.release>2.13.5.Final-redhat-00002</platform.release>
+    <platform.stream>2.13</platform.stream>
+  </properties>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+          <version>0.0.69</version>
+          <extensions>true</extensions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

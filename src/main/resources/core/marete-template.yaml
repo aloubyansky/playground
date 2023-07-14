@@ -1,0 +1,370 @@
+name: Quarkus
+maven-repo:
+  main-group-id: io.quarkus
+  known-classifiers:
+  - noapt
+  - linux-x86_64
+  expected-boms:
+  internal-maven-repos:
+  - http://indy.psi.redhat.com/api/content/maven/group/static
+  final-versions-exceptions:
+  - drools-alphanetwork-compiler-*.jar
+  - drools-alphanetwork-compiler-*.pom
+  - geronimo-jms_2.0_spec-1.0.0.alpha-2-redhat-2.*            # Camel, ENTESB-17937
+  unique-artifacts-exceptions:
+  redhat-versions-strict: true
+  sources-jars-exceptions:
+  - com/redhat/quarkus/platform/quarkus-maven-plugin/*/quarkus-maven-plugin-*.jar
+  redhat-versions-exceptions:
+  - activation-1.1.1.redhat-5.pom                               # Camel, QUARKUS-1507
+  - antlr-2.7.7.redhat-7.pom
+  - antlr-3.5.2.redhat-1.pom                                    # Camel + Quarkus, ENTESB-17950, QUARKUS-1459
+  - antlr-master-3.5.2.redhat-1.pom                             # Camel + Quarkus, ENTESB-17950, QUARKUS-1459
+  - antlr-runtime-3.5.2.redhat-1.pom                            # Camel + Quarkus, ENTESB-17950, QUARKUS-1459
+  - apache-13.0.0.redhat-4.pom
+  - apache-16.0.0.redhat-5.pom
+  - apache-18.0.0.redhat-1.pom
+  - automaton-1.11.8.redhat-1.pom
+  - cdi-api-2.0.0.redhat-1.pom                                  # Camel, ENTESB-17938, QUARKUS-1459
+  - com.fasterxml:oss-parent
+  - com.fasterxml.jackson:jackson-bom
+  - com.fasterxml.jackson:jackson-parent
+  - com.google.guava:guava-parent
+  - commons-collections-3.2.2.redhat-2.pom                      # Camel, ENTESB-17944, QUARKUS-1459
+  - commons-lang-2.6.0.redhat-7.pom                             # Quarkus, QUARKUS-1459, https://brewweb.engineering.redhat.com/brew/buildinfo?buildID=680969
+  - commons-logging-1.1.3.redhat-1.pom
+  - commons-logging-1.2.0.redhat-3.pom
+  - commons-logging-jboss-logging-1.0.0.Final-redhat-1.pom
+  - commons-parent-28.0.0.redhat-1.pom
+  - commons-parent-37.0.0.redhat-4.pom                          # Camel, ENTESB-17948, QUARKUS-1459
+  - commons-parent-39.0.0.redhat-2.pom                          # Camel, ENTESB-17950, QUARKUS-1459
+  - commons-pool-1.6.0.redhat-10.pom                            # Camel, ENTESB-17943, QUARKUS-1459
+  - fusesource-pom-1.11.0.redhat-1.pom
+  - generex-1.0.2.redhat-1.pom
+  - geronimo-jms_2.0_spec-1.0.0.alpha-2-redhat-2.pom            # Camel, ENTESB-17937, QUARKUS-1459
+  - io.smallrye:smallrye-build-parent
+  - io.smallrye:smallrye-parent
+  - jboss-as-parent-metadata-11.0.0.Final-redhat-1.pom
+  - jboss-connector-api_1.7_spec-1.0.0.Final-redhat-1.pom
+  - jboss-metadata-common-11.0.0.Final-redhat-1.pom
+  - jboss-metadata-web-11.0.0.Final-redhat-1.pom
+  - jboss-parent-16.0.0.redhat-1.pom
+  - jboss-parent-19.0.0.redhat-1.pom
+  - jboss-parent-19.0.0.redhat-2.pom
+  - jboss-parent-22.0.0.redhat-1.pom
+  - jboss-parent-25.0.0.redhat-1.pom                            # Quarkus, QUARKUS-1459
+  - jboss-parent-26.0.0.redhat-1.pom
+  - jboss-transaction-api_1.2_spec-1.1.1.Final-redhat-1.pom     # Quarkus, QUARKUS-1459
+  - jboss-transaction-spi-7.6.0.Final-redhat-1.pom
+  - json-simple-1.1.1.redhat-1.pom                              # Camel, ENTESB-17945, QUARKUS-1459
+  - jsr305-2.0.1.redhat-1.pom                                   # Quarkus, QUARKUS-1459
+  - org.apache:apache
+  - org.apache.commons:commons-parent
+  - org.jboss:jboss-parent
+  - org.slf4j:slf4j-parent
+  - org.sonatype.oss:oss-parent
+  - oss-parent-7.0.0.redhat-5.pom
+  - oss-parent-7.0.0.redhat-6.pom
+  - oss-parent-9.0.0.redhat-2.pom
+  - project-7.0.0.redhat-3.pom
+  - shrinkwrap-bom-1.2.6.redhat-118.pom
+  - weld-parent-36.0.0.redhat-1.pom                             # Camel, ENTESB-17938, QUARKUS-1459
+  - xjboss-parent-26.0.0.redhat-1.pom
+  - jvnet-parent-5.0.0.redhat-1.pom
+  osgi-versions-exceptions:
+  - jboss-component-version-master-6.0.1-redhat-1.pom
+  - jboss-dependency-management-all-6.0.1-redhat-1.pom
+  - jboss-dependency-management-build-6.0.1-redhat-1.pom
+  - jboss-dependency-management-eap-6.0.1-redhat-1.pom
+  - jboss-parent-9-redhat-1.pom
+  - xpp3_min-1.1.4c-redhat-2.pom
+  signed-jars-exceptions:
+  # https://issues.jboss.org/browse/JBEAP-3550
+  - bcmail-jdk15on-*.jar
+  - bcprov-jdk15on-*.jar
+  - bcpkix-jdk15on-*.jar
+  - bcutil-jdk15on-*.jar
+  unexpected-files-exceptions:
+  manifests-present-exceptions:
+  - graal-sdk-*-sources.jar
+  - svm-*-sources.jar
+  skip-manifest-versions-test-no-rpms: true
+  expected-readme-lines:
+    - "Quarkus Maven Repository"
+    - "This archive contains Maven repository artifacts for Quarkus."
+  productized-artifacts:
+    - io.smallrye:smallrye-health-api                             # QUARKUS-762
+    - io.smallrye:smallrye-health-parent                          # QUARKUS-762
+    - io.smallrye:smallrye-health-provided-checks                 # QUARKUS-762
+    - io.smallrye:smallrye-health-ui                              # QUARKUS-762
+    - io.smallrye:smallrye-health                                 # QUARKUS-762
+    - io.smallrye.reactive:smallrye-mutiny-vertx-amqp-client      # QUARKUS-763
+    - io.smallrye.reactive:smallrye-reactive-messaging-amqp       # QUARKUS-763
+    - io.smallrye.reactive:smallrye-reactive-messaging-api        # QUARKUS-763
+    - io.smallrye.reactive:smallrye-reactive-messaging-health     # QUARKUS-763
+    - io.smallrye.reactive:smallrye-reactive-messaging-kafka      # QUARKUS-763
+    - io.smallrye.reactive:smallrye-reactive-messaging-provider   # QUARKUS-763
+    - io.smallrye.reactive:smallrye-reactive-messaging            # QUARKUS-763
+    - io.quarkus:quarkus-container-image-s2i-deployment           # QUARKUS-764
+    - io.quarkus:quarkus-container-image-s2i-parent               # QUARKUS-764
+    - io.quarkus:quarkus-container-image-s2i                      # QUARKUS-764
+    - io.quarkus.gizmo:gizmo                                      # QUARKUS-765
+    - mysql:mysql-connector-java                                  # QUARKUS-761
+    - org.jboss.logmanager:jboss-logmanager-embedded              # QUARKUS-759
+    - org.jboss.threads:jboss-threads                             # QUARKUS-758
+    - io.quarkus:quarkus-bootstrap-maven-plugin                   # QUARKUS-88
+    - io.quarkus:quarkus-extension-processor                      # QUARKUS-88
+  additional-checks:
+    - class: org.jboss.qa.marete.quarkus.QuarkusPlatformCheck
+      boms:
+        - bom: com.redhat.quarkus.platform:quarkus-bom
+        - bom: io.quarkus:quarkus-bom
+        - bom: com.redhat.quarkus:quarkus-universe-bom
+          excludes:
+            - supported
+            - supported-in-jvm
+            - dev-support
+            - tech-preview
+            - deprecated
+            - unsupported
+            - bom-versions
+            - universe-bom-versions
+            - deployment-bom-versions
+      jsons:
+        # before Quarkus 1.11 JSON files were located under:
+        # com.redhat.quarkus:quarkus-product-bom
+        # com.redhat.quarkus:quarkus-universe-bom
+        # now located under respective quarkus-platform-descriptor
+        - json: com.redhat.quarkus.platform:quarkus-bom-quarkus-platform-descriptor
+          extended: true
+          strict: true
+          ignore-duplicate-description-for-deprecated: false
+      not-allowed-dependencies:
+        - org.webjars:bootstrap
+      artifacts:
+        supported:
+          - quarkus-agroal
+          - quarkus-avro
+          - quarkus-cache
+          - quarkus-config-yaml
+          - quarkus-grpc
+          - quarkus-hibernate-orm
+          - quarkus-hibernate-orm-panache
+          - quarkus-hibernate-search-orm-elasticsearch
+          - quarkus-hibernate-validator
+          - quarkus-infinispan-client
+          - quarkus-jackson
+          - quarkus-jaxb
+          - quarkus-jaxrs-client-reactive
+          - quarkus-jdbc-mariadb
+          - quarkus-jdbc-mssql
+          - quarkus-jdbc-mysql
+          - quarkus-jdbc-postgresql
+          - quarkus-jsonb
+          - quarkus-jsonp
+          - quarkus-kafka-client
+          - quarkus-keycloak-authorization
+          - quarkus-logging-json
+          - quarkus-micrometer
+          - quarkus-micrometer-registry-prometheus
+          - quarkus-mutiny
+          - quarkus-narayana-jta
+          - quarkus-oidc
+          - quarkus-oidc-client
+          - quarkus-oidc-client-filter
+          - quarkus-quartz
+          - quarkus-reactive-pg-client
+          - quarkus-reactive-mysql-client
+          - quarkus-reactive-routes
+          - quarkus-rest-client
+          - quarkus-rest-client-jackson
+          - quarkus-rest-client-jaxb
+          - quarkus-rest-client-jsonb
+          - quarkus-rest-client-reactive
+          - quarkus-rest-client-reactive-jackson
+          - quarkus-resteasy
+          - quarkus-resteasy-multipart
+          - quarkus-resteasy-jackson
+          - quarkus-resteasy-jaxb
+          - quarkus-resteasy-jsonb
+          - quarkus-resteasy-multipart
+          - quarkus-resteasy-reactive
+          - quarkus-resteasy-reactive-jackson
+          - quarkus-resteasy-reactive-jsonb
+          - quarkus-scheduler
+          - quarkus-smallrye-context-propagation
+          - quarkus-smallrye-fault-tolerance
+          - quarkus-smallrye-graphql
+          - quarkus-smallrye-graphql-client
+          - quarkus-smallrye-health
+          - quarkus-smallrye-jwt
+          - quarkus-smallrye-jwt-build
+          - quarkus-smallrye-metrics
+          - quarkus-smallrye-openapi
+          - quarkus-smallrye-opentracing
+          - quarkus-smallrye-reactive-messaging
+          - quarkus-smallrye-reactive-messaging-amqp
+          - quarkus-smallrye-reactive-messaging-kafka
+          - quarkus-spring-boot-properties
+          - quarkus-spring-cache
+          - quarkus-spring-cloud-config-client
+          - quarkus-spring-data-jpa
+          - quarkus-spring-di
+          - quarkus-spring-security
+          - quarkus-spring-scheduled
+          - quarkus-spring-web
+          - quarkus-undertow
+          - quarkus-vertx
+          - quarkus-websockets
+          - quarkus-websockets-client
+        supported-in-jvm:
+          - quarkus-jdbc-oracle
+        dev-support:
+          - quarkus-container-image-openshift
+          - quarkus-openshift
+          - quarkus-kubernetes
+          - quarkus-jacoco
+          - quarkus-jdbc-h2
+          - quarkus-jdbc-db2
+          - quarkus-jdbc-derby
+        tech-preview:
+          - quarkus-hibernate-orm-rest-data-panache
+          - quarkus-hibernate-reactive
+          - quarkus-kubernetes-config
+          - quarkus-kubernetes-service-binding
+          - quarkus-mailer
+          - quarkus-mongodb-client
+          - quarkus-oidc-client-reactive-filter
+          - quarkus-openshift-client
+          - quarkus-rest-client-mutiny
+          - quarkus-resteasy-reactive-jaxb
+          - quarkus-reactive-db2-client
+          - quarkus-reactive-messaging-http
+          - quarkus-reactive-mssql-client
+          - quarkus-resteasy-mutiny
+          - quarkus-security-jpa
+          - quarkus-smallrye-stork
+          - quarkus-spring-data-rest
+          - quarkus-vertx-graphql
+          - quarkus-qute
+          - quarkus-resteasy-qute
+          - quarkus-resteasy-reactive-qute
+          - quarkus-opentelemetry
+          - quarkus-opentelemetry-exporter-jaeger
+          - quarkus-kafka-streams
+        deprecated:
+          - quarkus-smallrye-opentracing
+        unsupported:
+          - quarkus-jacoco
+        bom-versions:
+          - smallrye-reactive-messaging-api
+        universe-bom-versions:
+          - quarkus-builder
+        deployment-bom-versions:
+          - quarkus-core-deployment
+          - quarkus-jsonp-deployment
+    - class: org.jboss.qa.marete.quarkus.CommunityArtifactsCheck
+      community-artifacts:
+        - junit
+        - junit-jupiter-api
+        - junit-platform-engine
+        - quarkus-arquillian
+        - quarkus-devmode-test-utils
+        - quarkus-junit4-mock
+        - quarkus-junit5
+        - quarkus-junit5-internal
+        - quarkus-junit5-mockito
+        - quarkus-test-common
+        - quarkus-test-ldap
+        - quarkus-test-maven
+        - quarkus-test-security
+        - quarkus-test-vault
+        - quarkus-jdbc-h2
+        - quarkus-jdbc-derby
+        - rest-assured
+        - mssql-jdbc
+        - ojdbc11
+    - class: org.jboss.qa.marete.quarkus.ComposedJarsCheck
+      known-composed-jars:
+        - protostream-4*.jar
+        - wildfly-elytron-1*.jar
+        - narayana-jta-5*.jar
+        - byte-buddy-1*.jar
+        - netty-common-4*.jar
+        - jansi-1*.jar
+        - readline-2*.jar
+        # Was done on purpose to fix some Windows issues: https://github.com/quarkusio/quarkus/pull/19760
+        - quarkus-maven-plugin*.jar
+        - third-party-jackson-dataformat-cbor-2*.jar # see https://issues.redhat.com/browse/QUARKUS-2227 for analysis
+        - third-party-jackson-core-2*.jar # see https://issues.redhat.com/browse/QUARKUS-2227 for analysis
+    - class: org.jboss.qa.marete.quarkus.MandrelArtifactsVersionCheck
+      mandrel-image: registry.access.redhat.com/quarkus/mandrel-21-rhel8:21.3
+      artifacts:
+        - org.graalvm.nativeimage:svm
+        - org.graalvm.sdk:graal-sdk
+    - class: org.jboss.qa.marete.quarkus.NotAllowedArtifactsCheck
+      not-allowed-artifacts:
+        - javax.*:.*
+licenses-xml:
+  skip-if-no-jar: true
+  duplicate-licenses-exceptions:
+  - sha256-hash: 4287b572e2a69e4b64e5f11ba0e2076c69962610d2455a9c6fca7f8bcfb4d969
+    file-names:
+    - GNU+General+Public+License+v20+only+with+Classpath+exception
+    - GNU+General+Public+License+Version+2+with+the+Classpath+Exception
+  - sha256-hash: cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30 # https://issues.redhat.com/browse/QUARKUS-2030
+    file-names:
+      - Apache+License+20
+      - Apache+License+Version+20
+src-zip:
+  empty-files-exceptions:
+  - io.quarkus-quarkus-parent-*/**/.gitkeep
+  - io.quarkus-quarkus-parent-*/**/beans.xml
+  - io.quarkus-quarkus-parent-*/**/config-empty.properties
+  - io.quarkus-quarkus-parent-*/**/empty.properties
+  - io.quarkus-quarkus-parent-*/core/runtime/build-include-jdk-misc
+  - io.quarkus-quarkus-parent-*/devtools/aesh/README.md
+  - io.quarkus-quarkus-parent-*/devtools/gradle/src/functionalTest/resources/basic-java-library-module/library/src/main/resources/META-INF/beans.xml
+  - io.quarkus-quarkus-parent-*/devtools/gradle/src/test/resources/gradle-project/settings.gradle
+  - io.quarkus-quarkus-parent-*/devtools/maven/src/main/resources/create-extension-templates/integration-test-application.properties
+  - io.quarkus-quarkus-parent-*/devtools/platform-descriptor-json/src/main/resources/bundled-codestarts/project/quarkus/base/src/main/resources/application.yml
+  - io.quarkus-quarkus-parent-*/devtools/platform-descriptor-json/src/main/resources/codestarts/quarkus/core/project/quarkus/base/src/main/resources/application.yml
+  - io.quarkus-quarkus-parent-*/extensions/logging-sentry/deployment/src/test/resources/application-sentry-logger-disabled.properties
+  - io.quarkus-quarkus-parent-*/extensions/undertow/deployment/src/test/java/io/quarkus/undertow/test/TestIdentityProvider.java
+  - io.quarkus-quarkus-parent-*/extensions/reactive-mysql-client/deployment/src/test/resources/application-default-datasource.properties
+  - io.quarkus-quarkus-parent-*/independent-projects/tools/codestarts/src/test/resources/bundled-codestarts/foo-project/base/config.yml
+  - io.quarkus-quarkus-parent-*/independent-projects/tools/codestarts/src/test/resources/bundled-codestarts/tooling-t/a/a/.tooling-t
+  - io.quarkus-quarkus-parent-*/independent-projects/tools/codestarts/src/test/resources/codestarts/conflicting-fallback-project/bar-project/base/src/main/resources/application.yml
+  - io.quarkus-quarkus-parent-*/independent-projects/tools/codestarts/src/test/resources/codestarts/core/foo-project/base/config.yml
+  - io.quarkus-quarkus-parent-*/independent-projects/tools/codestarts/src/test/resources/codestarts/examples/example-forbidden/base/README.adoc
+  - io.quarkus-quarkus-parent-*/independent-projects/tools/codestarts/src/test/resources/conflicting-codestart/bar-project/base/src/main/resources/application.yml
+  - io.quarkus-quarkus-parent-*/integration-tests/flyway/src/main/resources/db/location3/beforeMigrate.sql
+  - io.quarkus-quarkus-parent-*/integration-tests/google-cloud-functions-http/src/main/resources/application.properties
+  - io.quarkus-quarkus-parent-*/integration-tests/gradle/src/*/resources/multi-module-kotlin-project/port/build.gradle.kts
+  - io.quarkus-quarkus-parent-*/integration-tests/gradle/src/main/resources/composite-project-with-dependencies/gradle-rest/src/main/resources/application.properties
+  - io.quarkus-quarkus-parent-*/integration-tests/kubernetes/quarkus-standard-way/src/test/resources/kubernetes-with-auto-mongo-binding.properties
+  - io.quarkus-quarkus-parent-*/integration-tests/maven/src/test/resources/expected/create-extension-pom-itest/integration-tests/itest/src/main/resources/application.properties
+  - io.quarkus-quarkus-parent-*/integration-tests/maven/src/test/resources-filtered/expected/create-extension-pom-itest/integration-tests/itest/src/main/resources/application.properties
+  - io.quarkus-quarkus-parent-*/integration-tests/maven/src/test/resources-filtered/projects/classic/src/main/resources/assets/test.txt
+  - io.quarkus-quarkus-parent-*/extensions/hibernate-orm/banned-signatures.txt
+  - io.quarkus-quarkus-parent-*/extensions/hibernate-orm/runtime/banned-signatures.txt
+  - io.quarkus-quarkus-parent-*/extensions/panache/quarkus-resteasy-reactive-problem/integration-tests/src/main/resources/application.properties
+  - io.quarkus-quarkus-parent-*/independent-projects/tools/base-codestarts/src/main/resources/codestarts/quarkus-extension/code/integration-tests/java/integration-tests/src/main/resources/application.properties
+  - io.quarkus-quarkus-parent-*/independent-projects/tools/base-codestarts/src/main/resources/codestarts/quarkus/project/quarkus/base/src/main/resources/application.yml
+  - io.quarkus-quarkus-parent-*/integration-tests/gradle/src/*/resources/multi-module-with-empty-module/modB/src/main/resources/application.properties
+  empty-directories-exceptions:
+  - io.quarkus-quarkus-parent-*/extensions/kubernetes-service-binding/runtime/src/test/resources/k8s/test-k8s/.hidden-symlink-dir
+  expected-source-dirs:
+  - io.quarkus-quarkus-parent-*
+  strict-no-other-source-dirs-are-present: true
+  strict-unexpected-files: false
+  additional-checks:
+    - class: org.jboss.qa.marete.quarkus.NativeBuilderImageCheck
+      image: registry.access.redhat.com/quarkus/mandrel-21-rhel8:21.3
+      parameterName: platform.quarkus.native.builder-image
+    - class: org.jboss.qa.marete.quarkus.RESTEasyContextMapCheck
+    - class: org.jboss.qa.marete.quarkus.InstrumentationDefaultsCheck
+    - class: org.jboss.qa.marete.quarkus.MavenVersionCheck
+    - class: org.jboss.qa.marete.quarkus.GradleVersionCheck
+      expectedVersion: 7
+      versionPropertyName: distributionUrl

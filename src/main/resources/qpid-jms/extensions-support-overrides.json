@@ -1,0 +1,13 @@
+{
+  "extensions": [
+    {
+      "group-id": "org.amqphub.quarkus",
+      "artifact-id": "quarkus-qpid-jms",
+      "metadata": {
+        "redhat-support": [
+          "supported"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>io.quarkus.platform</groupId>
+    <artifactId>quarkus-platform-config</artifactId>
+    <version>2.13.4.Final</version> <!-- The base upstream platform version -->
+    <relativePath></relativePath>
+  </parent>
+  <groupId>com.redhat.quarkus.platform</groupId>
+  <artifactId>quarkus-platform-config</artifactId>
+  <version>2.13.5.Final-redhat-00002</version>
+  <packaging>pom</packaging>
+  <properties>
+    <quarkus.version>2.13.5.Final-redhat-00003</quarkus.version> <!-- the Quarkus core version, to be replaced with the productized one when it's available -->
+    <quarkus.upstream.version>2.13.5.Final</quarkus.upstream.version> <!-- the upstream Quarkus core version that will be recorded in the product platform metadata -->
+    <!--
+    <camel-quarkus.version>2.7.1.redhat-00016</camel-quarkus.version>
+    <camel-quarkus-test-list.version>2.7.1</camel-quarkus-test-list.version>
+    -->
+    <camel-quarkus-support-overrides.version>2.7.1.redhat-00016</camel-quarkus-support-overrides.version> <!-- for now we are using the 2.7.1 support overrides list, as the latest available for Camel -->
+
+    <quarkus-qpid-jms.version>0.38.0</quarkus-qpid-jms.version>
+
+    <opentelemetry.version>1.17.0.redhat-00001</opentelemetry.version>
+  </properties>
+
+  <!-- Indy Maven repo to be able to resolve the Camel Quarkus support overrides metadata -->
+  <repositories>
+    <repository>
+      <id>indy-static</id>
+      <url>https://indy.psi.redhat.com/api/content/maven/group/static/</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>indy-static</id>
+      <url>https://indy.psi.redhat.com/api/content/maven/group/static/</url>
+    </pluginRepository>
+  </pluginRepositories>
+ 
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+          <version>0.0.69</version>
+          <extensions>true</extensions>
+          <configuration>
+            <platformConfig>
+              <upstreamQuarkusCoreVersion>${quarkus.upstream.version}</upstreamQuarkusCoreVersion>
+              <universal>
+                <bom>com.redhat.quarkus:quarkus-universe-bom:${project.version}</bom>
+              </universal>
+              <core>
+                <metadataOverrideFiles>
+                  <file>${resourcesdir}/core/extensions-support-overrides.json</file>
+                </metadataOverrideFiles>
+                <dependencyManagement combine.children="append">
+                  <!-- enforced for Fireball due to the alpha qualifier been dropped during the productization -->
+                  <dependency>io.opentelemetry:opentelemetry-sdk-logs:${opentelemetry.version}</dependency>
+                  <dependency>io.opentelemetry:opentelemetry-semconv:${opentelemetry.version}</dependency>
+                  <dependency>io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:${opentelemetry.version}</dependency>
+                  <dependency>io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations-support:${opentelemetry.version}</dependency>
+                  <dependency>io.opentelemetry.instrumentation:opentelemetry-instrumentation-api:${opentelemetry.version}</dependency>
+                  <dependency>io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv:${opentelemetry.version}</dependency>
+                </dependencyManagement>
+                <dependenciesToBuild>
+                  <!-- include dependencies by groupId -->
+                  <includeGroupIds>
+                    <groupId>org.hibernate.common</groupId>
+                  </includeGroupIds>
+                  <!-- include dependencies by keys -->
+                  <includeKeys>
+                    <key>org.bitbucket.b_c:jose4j</key>
+                    <key>io.quarkus:quarkus-devtools-base-codestarts</key>
+                    <key>io.quarkus:quarkus-devtools-codestarts</key>
+                    <key>io.quarkus:quarkus-devtools-message-writer</key>
+                  </includeKeys>
+                  <!-- include specific versions of dependencies -->
+                  <includeArtifacts>
+                    <artifact>io.quarkus:quarkus-maven-plugin:${quarkus.version}</artifact>
+                    <artifact>io.quarkus:quarkus-extension-maven-plugin:${quarkus.version}</artifact>
+                    <artifact>io.quarkus:quarkus-bom-quarkus-platform-properties::properties:${quarkus.version}</artifact>
+                    <artifact>io.quarkus:quarkus-bom-quarkus-platform-descriptor:${quarkus.version}:json:${quarkus.version}</artifact>
+                    <artifact>io.quarkus:quarkus-extension-processor:${quarkus.version}</artifact>
+                    <!-- TODO
+                    * svm
+                    * hibernate-search-engine
+                    -->
+                  </includeArtifacts>
+                  <excludeGroupIds>
+                    <groupId>com.github.docker-java</groupId>
+                  </excludeGroupIds>
+                  <excludeKeys>
+                    <key>software.amazon.awssdk:aws-sdk-java-pom::pom</key>
+                    <key>software.amazon.awssdk:bom::pom</key>
+                  </excludeKeys>
+                </dependenciesToBuild>
+              </core>
+              <members>
+                <member>
+                  <name>OptaPlanner</name>
+                  <hidden>true</hidden>
+                </member>
+                <member>
+                  <name>Kogito</name>
+                  <hidden>true</hidden>
+                </member>
+                <member>
+                  <name>QpidJMS</name>
+                  <hidden>true</hidden>
+                  <metadataOverrideFiles>
+                    <file>${resourcesdir}/qpid-jms/extensions-support-overrides.json</file>
+                  </metadataOverrideFiles>
+                </member>
+                <member>
+                  <name>Cassandra</name>
+                  <hidden>true</hidden>
+                </member>
+                <member>
+                  <name>AmazonServices</name>
+                  <hidden>true</hidden>
+                </member>
+                <member>
+                  <name>Camel</name>
+                  <hidden>true</hidden>
+                  <metadataOverrideArtifacts>
+                    <artifact>org.apache.camel.quarkus:camel-quarkus-product::json:${camel-quarkus-support-overrides.version}</artifact>
+                  </metadataOverrideArtifacts>
+                </member>
+                <member>
+                  <name>Hazelcast</name>
+                  <hidden>true</hidden>
+                </member>
+                <member>
+                  <name>Debezium-Outbox</name>
+                  <hidden>true</hidden>
+                </member>
+                <member>
+                  <name>Blaze-Persistence</name>
+                  <hidden>true</hidden>
+                </member>
+                <member>
+                  <name>GoogleCloudServices</name>
+                  <hidden>true</hidden>
+                </member>
+              </members>
+              <bomGenerator>
+                <!-- Version constraint preferences during alignment -->
+                <!-- This allows to favor versions that match a certain expression even if the default Maven version comparator would do otherwise -->
+                <versionConstraintPreferences>
+                  <prefer>*redhat-*</prefer>
+                </versionConstraintPreferences>
+              </bomGenerator>
+            </platformConfig>
+
+            <!-- Config to dependencies-to-build report -->
+            <dependenciesToBuild>
+              <!-- exclude dependencies by groupId -->
+              <excludeGroupIds>
+                <groupId>org.junit</groupId>
+                <groupId>org.testcontainers</groupId>
+                <groupId>org.junit.jupiter</groupId>
+                <groupId>org.junit.platform</groupId>
+                <groupId>org.mockito</groupId>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <groupId>org.jetbrains.kotlinx</groupId>
+                <groupId>org.apache.maven</groupId>
+                <groupId>org.apache.maven.plugin-tools</groupId>
+                <groupId>org.apache.maven.resolver</groupId>
+                <groupId>org.apache.maven.shared</groupId>
+                <groupId>org.apache.maven.wagon</groupId>
+                <groupId>org.jacoco</groupId>
+                <groupId>org.bouncycastle</groupId>
+                <groupId>org.eclipse.sisu</groupId>
+                <groupId>com.h2database</groupId>
+                <groupId>org.apache.derby</groupId>
+                <!-- Oracle JDBC - https://issues.redhat.com/browse/QUARKUS-1164 -->
+                <groupId>com.oracle.database.jdbc</groupId>
+                <!-- DB2 JDBC - treat it the same way as Oracle JDBC -->
+                <groupId>com.ibm.db2</groupId>
+                <!-- MongoDB driver - https://issues.redhat.com/browse/QUARKUS-2358  -->
+                <groupId>org.mongodb</groupId>
+                <!-- shrinkwrap -->
+                <groupId>org.jboss.shrinkwrap</groupId>
+                <groupId>org.jboss.shrinkwrap.resolver</groupId>
+                <groupId>org.jboss.shrinkwrap.descriptors</groupId>
+                <!-- arquillian -->
+                <groupId>org.jboss.arquillian</groupId>
+              </excludeGroupIds>
+              <!-- exclude dependencies specifying their keys -->
+              <excludeKeys>
+                <!-- testing related -->
+                <key>io.quarkus:quarkus-junit4-mock</key>
+                <key>io.strimzi:strimzi-test-container</key>
+                <key>org.infinispan:infinispan-server-testdriver-core</key>
+                <!-- DEV mode related -->
+                <key>io.smallrye:smallrye-graphql-ui-graphiql</key>
+                <key>io.quarkus:quarkus-devservices-derby</key>
+                <key>io.quarkus:quarkus-jdbc-derby</key>
+                <key>io.quarkus:quarkus-devservices-h2</key>
+                <key>io.quarkus:quarkus-jdbc-db2</key>
+                <key>io.quarkus:quarkus-jdbc-h2</key>
+                <!-- MSSQL JDBC - https://issues.redhat.com/browse/QUARKUS-1304 -->
+                <key>com.microsoft.sqlserver:mssql-jdbc</key>
+                <key>com.microsoft.azure:adal4j</key>
+                <!-- quarkus-grpc-codegen - not used in runtime -->
+                <key>io.quarkus:quarkus-grpc-codegen</key>
+                <!-- CRaC is experimental feature -->
+                <key>io.github.crac:org-crac</key>
+                <!-- HAL is experimental feature -->
+                <key>io.quarkus:quarkus-hal</key>
+                <!-- OpenTelemetry MDC is not supported -->
+                <key>io.quarkus:quarkus-vertx-latebound-mdc-provider</key>
+                <!-- Available since 4.3 as preview feature, Quarkus does not plan to use it now -->
+                <key>io.vertx:vertx-uri-template</key>
+                <!-- already in the MRRC with a version w/o the redhat suffix -->
+                <key>org.ow2:ow2::pom</key>
+              </excludeKeys>
+              <!-- exclude specific versions of dependencies -->
+              <excludeArtifacts>
+                <!-- excluding these since it'd be too expensive to build and we enforce a different version in the quarkus-bom -->
+                <artifact>com.fasterxml.jackson:jackson-bom::pom:2.12.3</artifact>
+                <artifact>com.fasterxml.jackson:jackson-bom::pom:2.12.7</artifact>
+                <!-- Have no history of productization in PNC, excluding for Fireball -->
+                <artifact>org.codehaus.plexus:plexus-utils:3.3.0</artifact>
+                <!-- The following POM shouldn't be used at all (not supported by Vert.X prod) this POM is used as a BOM in SmallRye -->
+                <artifact>io.vertx:vertx-stack-depchain::pom:4.3.4</artifact>
+                <!-- the following artifacts cannot be built -->
+                <artifact>org.jboss:jboss-parent:12</artifact>
+                <artifact>org.jboss:jboss-parent:18</artifact>
+                <!-- exclusion only for ER3 as graal sdk bug is fixed in Quarkus 2.13.4.Final -->
+                <artifact>org.graalvm.sdk:graal-sdk:22.2.0</artifact>
+                <!-- excluding problematic parent POMs -->
+                <artifact>com.google.errorprone:error_prone_parent::pom:2.15.0</artifact>
+                <artifact>org.codehaus.plexus:plexus::pom:5.1</artifact>
+              </excludeArtifacts>
+            </dependenciesToBuild>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+        <inherited>false</inherited>
+        <executions>
+          <execution>
+            <id>generate-platform-project</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>generate-platform-project</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>build-platform-project</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>invoke-platform-project</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>depsToBuild</id>
+      <activation>
+        <property>
+          <name>depsToBuild</name>
+        </property>
+      </activation>
+      <build>
+        <defaultGoal>clean process-resources</defaultGoal>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>io.quarkus</groupId>
+              <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+              <configuration>
+                <logCodeRepos>true</logCodeRepos>
+                <logModulesToBuild>true</logModulesToBuild> <!-- log dependencies in GAV format instead of GACTV -->
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>mavenRepoZip</id>
+      <activation>
+        <property>
+          <name>mavenRepoZip</name>
+        </property>
+      </activation>
+      <build>
+        <defaultGoal>clean process-resources</defaultGoal>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>io.quarkus</groupId>
+              <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
+</project>
