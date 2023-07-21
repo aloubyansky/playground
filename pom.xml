@@ -59,6 +59,7 @@
               <upstreamQuarkusCoreVersion>${quarkus.upstream.version}</upstreamQuarkusCoreVersion>
               <release>
                 <onlyChangedMembers>true</onlyChangedMembers>
+                <versionIncrementor>pnc</versionIncrementor>
               </release>
               <universal>
                 <bom>com.redhat.quarkus:quarkus-universe-bom:${project.version}</bom>
