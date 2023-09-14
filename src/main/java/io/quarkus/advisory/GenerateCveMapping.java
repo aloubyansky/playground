@@ -2,7 +2,10 @@ package io.quarkus.advisory;
 
 import static io.quarkus.advisory.MessageWriter.info;
 
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.packageurl.MalformedPackageURLException;
 import com.github.packageurl.PackageURL;
 import io.quarkus.maven.dependency.ArtifactCoords;
@@ -104,7 +107,7 @@ public class GenerateCveMapping implements Runnable {
         }
 
         try (Writer writer = getResultWriter()) {
-            SbomerResponse.getMapper().writeValue(writer, root);
+            prettyPrint(writer, root);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -137,7 +140,7 @@ public class GenerateCveMapping implements Runnable {
 
         var sw = new StringWriter();
         try (Writer writer = sw) {
-            SbomerResponse.getMapper().writeValue(writer, root);
+            prettyPrint(writer, root);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -172,6 +175,12 @@ public class GenerateCveMapping implements Runnable {
                 }
             }
         };
+    }
+
+    private static void prettyPrint(Writer writer, ObjectNode o) throws IOException {
+        var prettyPrinter = new DefaultPrettyPrinter();
+        prettyPrinter.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
+        SbomerResponse.getMapper().writer(prettyPrinter).writeValue(writer, o);
     }
 
     private static PackageURL toPurl(ArtifactKey key, String version) {
