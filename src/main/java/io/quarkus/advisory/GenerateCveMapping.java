@@ -7,11 +7,12 @@ import com.github.packageurl.MalformedPackageURLException;
 import com.github.packageurl.PackageURL;
 import io.quarkus.maven.dependency.ArtifactCoords;
 import io.quarkus.maven.dependency.ArtifactKey;
-import java.io.File;
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +41,10 @@ public class GenerateCveMapping implements Runnable {
 
     @CommandLine.Option(names = {
             "--output-file" }, description = "If specified, this parameter will cause the output to be written to the path specified, instead of writing to the console.")
-    public File outputFile;
+    public Path outputFile;
+
+    @CommandLine.Option(names = { "--advisory-note" }, description = "Generate a JSON snippet to be added in an advisory")
+    public boolean advisoryNote;
 
     @Override
     public void run() {
@@ -104,21 +108,70 @@ public class GenerateCveMapping implements Runnable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        if (advisoryNote) {
+            generateAdvisoryNode();
+        }
+    }
+
+    private void generateAdvisoryNode() {
+        var root = JsonNodeFactory.instance.objectNode();
+
+        var bomCoords = ArtifactCoords.fromString(bom);
+        var manifest = root.putObject("manifest");
+        var refs = manifest.putArray("refs");
+        var ref = refs.addObject();
+        ref.put("type", "purl");
+        ref.put("uri", "pkg:maven/"
+                + bomCoords.getGroupId() + "/"
+                + bomCoords.getArtifactId() + "@"
+                + bomCoords.getVersion()
+                + "?type=pom");
+
+        var simpleMapper = root.putObject("simple-mapper");
+        refs = simpleMapper.putArray("refs");
+        ref = refs.addObject();
+        ref.put("type", "cve-component-mapping");
+        ref.put("version", "0.0.1");
+        ref.put("uri", "https://gitlab.cee.redhat.com/fix-mappings/rhbq/-/raw/main/" + jiraVersion + "/cve-mappings.json");
+
+        var sw = new StringWriter();
+        try (Writer writer = sw) {
+            SbomerResponse.getMapper().writeValue(writer, root);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        info("ADVISORY NOTE:");
+        info(sw.getBuffer().toString());
     }
 
     private Writer getResultWriter() throws IOException {
         if (outputFile != null) {
-            if (outputFile.isDirectory()) {
+            if (Files.isDirectory(outputFile)) {
                 throw new IllegalArgumentException(outputFile + " appears to be a directory");
             }
-            var parentDir = outputFile.getAbsoluteFile().getParentFile();
+            var absolutePath = outputFile.normalize().toAbsolutePath();
+            var parentDir = absolutePath.getParent();
             if (parentDir != null) {
-                parentDir.mkdirs();
+                Files.createDirectories(parentDir);
             }
-            info("Saving result in " + outputFile.getAbsolutePath());
-            return Files.newBufferedWriter(outputFile.toPath());
+            info("Saving result in " + absolutePath);
+            return Files.newBufferedWriter(outputFile);
         }
-        return new OutputStreamWriter(System.out);
+        final StringWriter sw = new StringWriter();
+        return new BufferedWriter(sw) {
+            boolean close;
+
+            @Override
+            public void close() throws IOException {
+                if (!close) {
+                    close = true;
+                    super.close();
+                    info("CVE MAPPINGS:");
+                    info(sw.getBuffer().toString());
+                }
+            }
+        };
     }
 
     private static PackageURL toPurl(ArtifactKey key, String version) {

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,8 @@ public class JiraReader {
 
     private static final String VULNERABLE_MAVEN_ARTIFACTS = "Vulnerable Maven artifacts:";
     private static final String VULNERABLE_MAVEN_ARTIFACT_PREFIX = "- ";
+
+    private static final Set<String> DONE_RESOLUTIONS = Set.of("Done", "Done-Errata");
 
     public static Map<String, List<ArtifactCoords>> readVulnerableArtifacts(
             String jiraServer, String token, String project, String fixVersion) {
@@ -49,7 +52,7 @@ public class JiraReader {
                 }
                 MessageWriter.info("  CVEs: " + sj);
                 var resolution = (issue.getResolution() != null ? issue.getResolution().getName() : "n/a");
-                if (!"Done".equals(resolution)) {
+                if (!DONE_RESOLUTIONS.contains(resolution)) {
                     MessageWriter.info("  Skipping since the issue is resolved as '" + resolution + "'");
                     continue;
                 }
