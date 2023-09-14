@@ -17,18 +17,10 @@ import java.util.Map;
 
 public class ManifestProvider {
 
-    public static void main(String[] args) throws Exception {
-        var components = getManifestComponents("com.redhat.quarkus.platform", "quarkus-bom", "2.13.8.Final-redhat-00004");
-        for (Map.Entry<ArtifactKey, ManifestComponent> e : components.entrySet()) {
-            System.out.println(e.getValue());
-        }
-        MessageWriter.info("Total: " + components.size());
-    }
-
     public static Map<ArtifactKey, ManifestComponent> getManifestComponents(String namespace, String name, String version) {
         final URL url;
         try {
-            url = new URL("https", "sbomer.apps.ocp-c1.prod.psi.redhat.com", 443,
+            url = new URL("https", "sbomer.pnc.engineering.redhat.com", 443,
                     "/api/v1alpha1/sboms?query=rootPurl=eq=%22pkg:maven/"
                             + namespace + "/"
                             + name + "@"
