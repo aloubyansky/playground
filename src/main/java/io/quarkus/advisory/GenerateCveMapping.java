@@ -1,6 +1,7 @@
 package io.quarkus.advisory;
 
 import static io.quarkus.advisory.MessageWriter.info;
+import static io.quarkus.advisory.MessageWriter.warn;
 
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -18,8 +19,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -67,33 +70,40 @@ public class GenerateCveMapping implements Runnable {
 
         final Map<String, List<String>> cveMapping = new TreeMap<>();
         for (Map.Entry<String, List<ArtifactCoords>> vulnerableArtifacts : vulnerableMapping.entrySet()) {
-            if (vulnerableArtifacts.getValue().isEmpty()) {
+            var vulnerableCoords = vulnerableArtifacts.getValue();
+            if (vulnerableCoords.isEmpty()) {
                 continue;
             }
             final String cveId = vulnerableArtifacts.getKey();
-            final List<String> purls = new ArrayList<>(vulnerableArtifacts.getValue().size());
-            for (ArtifactCoords vulnerableArtifact : vulnerableArtifacts.getValue()) {
+            final Set<String> purls = new HashSet<>(vulnerableCoords.size());
+            for (ArtifactCoords vulnerableArtifact : vulnerableCoords) {
                 var fixedComponent = components.get(vulnerableArtifact.getKey());
-                List<String> fixedVersions = List.of();
-                if (fixedComponent != null) {
-                    fixedVersions = new ArrayList<>(fixedComponent.getVersions());
-                    for (var va : vulnerableArtifacts.getValue()) {
-                        fixedVersions.remove(va.getVersion());
-                    }
-                }
-                if (!fixedVersions.isEmpty()) {
-                    info("  Component " + vulnerableArtifact + " was replaced with " + fixedComponent.getKey() + ":"
-                            + fixedVersions);
-                    for (String v : fixedVersions) {
-                        purls.add(toPurl(fixedComponent.getKey(), v).toString());
-                    }
-                } else if (fixedComponent == null) {
+                if (fixedComponent == null) {
                     info("  Component " + vulnerableArtifact.toCompactCoords() + " was removed");
+                } else {
+                    var fixedVersions = new ArrayList<>(fixedComponent.getVersions());
+                    if (fixedVersions.remove(vulnerableArtifact.getVersion())) {
+                        warn("  Component " + vulnerableArtifact + " is still present in " + jiraVersion);
+                        continue;
+                    }
+                    for (var c : vulnerableCoords) {
+                        fixedVersions.remove(c.getVersion());
+                    }
+                    if (!fixedVersions.isEmpty()) {
+                        info("  Component " + vulnerableArtifact + " was replaced with " + fixedComponent.getKey() + ":"
+                                + fixedVersions);
+                        for (String v : fixedVersions) {
+                            purls.add(toPurl(fixedComponent.getKey(), v).toString());
+                        }
+                    } else {
+                        info("  Component " + vulnerableArtifact.toCompactCoords() + " was removed");
+                    }
                 }
             }
             if (!purls.isEmpty()) {
-                Collections.sort(purls);
-                cveMapping.put(cveId, purls);
+                var purlList = new ArrayList<>(purls);
+                Collections.sort(purlList);
+                cveMapping.put(cveId, purlList);
             }
         }
 
