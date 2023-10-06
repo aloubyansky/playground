@@ -12,6 +12,8 @@
     <module>lib-c-1.0</module>
     <module>lib-c-2.0</module>
     <module>lib-d</module>
+    <module>lib-e-1.0</module>
+    <module>lib-e-2.0</module>
     <module>app</module>
   </modules>
 </project>
