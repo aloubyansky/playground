@@ -39,6 +39,10 @@ public class ManifestProvider {
             return null;
         }
 
+        var sboms = response.getContent();
+        if (sboms == null || sboms.isEmpty()) {
+            throw new IllegalArgumentException("No manifest was returned for " + namespace + ":" + name + ":" + version);
+        }
         var sbom = response.getContent().get(0).getSbom();
         final Map<ArtifactKey, Collection<String>> components;
         ArrayNode arr = (ArrayNode) sbom.get("components");
