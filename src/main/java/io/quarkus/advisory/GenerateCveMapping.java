@@ -49,9 +49,6 @@ public class GenerateCveMapping implements Runnable {
             "--output-file" }, description = "If specified, this parameter will cause the output to be written to the path specified, instead of writing to the console.")
     public Path outputFile;
 
-    @CommandLine.Option(names = { "--advisory-note" }, description = "Generate a JSON snippet to be added in an advisory")
-    public boolean advisoryNote;
-
     @Override
     public void run() {
 
@@ -107,27 +104,13 @@ public class GenerateCveMapping implements Runnable {
             }
         }
 
-        var root = JsonNodeFactory.instance.objectNode();
-        for (Map.Entry<String, List<String>> e : cveMapping.entrySet()) {
-            var arr = JsonNodeFactory.instance.arrayNode();
-            root.put(e.getKey(), arr);
-            for (String purl : e.getValue()) {
-                arr.add(purl);
-            }
-        }
-
-        try (Writer writer = getResultWriter()) {
-            prettyPrint(writer, root);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        if (advisoryNote) {
-            generateAdvisoryNode();
-        }
+        generateAdvisoryNodeV2(cveMapping);
     }
 
-    private void generateAdvisoryNode() {
+    /**
+     * Embeds CVE mappings in the advisory notes
+     */
+    private void generateAdvisoryNodeV2(Map<String, List<String>> cveMapping) {
         var root = JsonNodeFactory.instance.objectNode();
 
         var bomCoords = ArtifactCoords.fromString(bom);
@@ -141,21 +124,27 @@ public class GenerateCveMapping implements Runnable {
                 + bomCoords.getVersion()
                 + "?type=pom");
 
-        var simpleMapper = root.putObject("simple-mapper");
-        refs = simpleMapper.putArray("refs");
-        ref = refs.addObject();
-        ref.put("type", "cve-component-mapping");
-        ref.put("version", "0.0.1");
-        ref.put("uri", "https://gitlab.cee.redhat.com/fix-mappings/rhbq/-/raw/main/" + jiraVersion + "/cve-mappings.json");
+        if (!cveMapping.isEmpty()) {
+            var simpleMapper = root.putObject("simple-mapper");
+            refs = simpleMapper.putArray("refs");
+            ref = refs.addObject();
+            ref.put("type", "cve-component-mapping");
+            ref.put("version", "0.0.2");
+            var fix = ref.putObject("fix");
 
-        var sw = new StringWriter();
-        try (Writer writer = sw) {
+            for (Map.Entry<String, List<String>> e : cveMapping.entrySet()) {
+                var arr = fix.putArray(e.getKey());
+                for (String purl : e.getValue()) {
+                    arr.add(purl);
+                }
+            }
+        }
+
+        try (Writer writer = getResultWriter()) {
             prettyPrint(writer, root);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        info("ADVISORY NOTE:");
-        info(sw.getBuffer().toString());
     }
 
     private Writer getResultWriter() throws IOException {
@@ -180,7 +169,7 @@ public class GenerateCveMapping implements Runnable {
                 if (!close) {
                     close = true;
                     super.close();
-                    info("CVE MAPPINGS:");
+                    info("ADVISORY NOTE:");
                     info(sw.getBuffer().toString());
                 }
             }
