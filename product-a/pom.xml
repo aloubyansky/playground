@@ -13,7 +13,7 @@
       <groupId>org.acme</groupId>
       <artifactId>acme-lib-d</artifactId>
       <version>1.0.0-SNAPSHOT</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.acme</groupId>
