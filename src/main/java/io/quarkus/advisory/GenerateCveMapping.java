@@ -118,11 +118,8 @@ public class GenerateCveMapping implements Runnable {
         var refs = manifest.putArray("refs");
         var ref = refs.addObject();
         ref.put("type", "purl");
-        ref.put("uri", "pkg:maven/"
-                + bomCoords.getGroupId() + "/"
-                + bomCoords.getArtifactId() + "@"
-                + bomCoords.getVersion()
-                + "?type=pom");
+        ref.put("uri", toPurl(ArtifactKey.of(bomCoords.getGroupId(), bomCoords.getArtifactId(),
+                ArtifactCoords.DEFAULT_CLASSIFIER, ArtifactCoords.TYPE_POM), bomCoords.getVersion()).toString());
 
         if (!cveMapping.isEmpty()) {
             var simpleMapper = root.putObject("simple-mapper");
@@ -187,6 +184,9 @@ public class GenerateCveMapping implements Runnable {
         qualifiers.put("type", key.getType());
         if (!key.getClassifier().isEmpty()) {
             qualifiers.put("classifier", key.getClassifier());
+        }
+        if (version.contains("redhat")) {
+            qualifiers.put("repository_url", "https://maven.repository.redhat.com/ga/");
         }
         try {
             return new PackageURL(PackageURL.StandardTypes.MAVEN,
