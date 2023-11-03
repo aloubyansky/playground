@@ -1,5 +1,7 @@
 package io.quarkus.advisory;
 
+import static io.quarkus.advisory.ManifestJsonMapper.deserialize;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.github.packageurl.MalformedPackageURLException;
@@ -9,7 +11,8 @@ import io.quarkus.maven.dependency.ArtifactKey;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,29 +24,22 @@ public class ManifestProvider {
         final URL url;
         try {
             url = new URL("https", "sbomer.pnc.engineering.redhat.com", 443,
-                    "/api/v1alpha1/sboms?query=rootPurl=eq=%22pkg:maven/"
-                            + namespace + "/"
-                            + name + "@"
-                            + version
-                            + "?type=pom%22&sort=creationTime=desc=&pageIndex=0&pageSize=1");
+                    "/api/v1alpha2/sboms/purl/"
+                            + URLEncoder.encode("pkg:maven/" + namespace + "/" + name + "@" + version + "?type=pom",
+                                    StandardCharsets.UTF_8)
+                            + "/bom");
             MessageWriter.info("Requesting manifest " + url);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Failed to parse URL", e);
         }
-        final SbomerResponse response;
+        final JsonNode sbom;
         try {
-            final URLConnection connection = url.openConnection();
-            response = SbomerResponse.deserialize(connection.getInputStream());
+            sbom = deserialize(url);
         } catch (IOException e) {
             MessageWriter.info("Failed to connect to " + url + ": " + e.getLocalizedMessage());
             return null;
         }
 
-        var sboms = response.getContent();
-        if (sboms == null || sboms.isEmpty()) {
-            throw new IllegalArgumentException("No manifest was returned for " + namespace + ":" + name + ":" + version);
-        }
-        var sbom = response.getContent().get(0).getSbom();
         final Map<ArtifactKey, Collection<String>> components;
         ArrayNode arr = (ArrayNode) sbom.get("components");
         if (arr != null && !arr.isEmpty()) {

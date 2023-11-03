@@ -1,5 +1,6 @@
 package io.quarkus.advisory;
 
+import static io.quarkus.advisory.ManifestJsonMapper.getMapper;
 import static io.quarkus.advisory.MessageWriter.info;
 import static io.quarkus.advisory.MessageWriter.warn;
 
@@ -176,7 +177,7 @@ public class GenerateCveMapping implements Runnable {
     private static void prettyPrint(Writer writer, ObjectNode o) throws IOException {
         var prettyPrinter = new DefaultPrettyPrinter();
         prettyPrinter.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
-        SbomerResponse.getMapper().writer(prettyPrinter).writeValue(writer, o);
+        getMapper().writer(prettyPrinter).writeValue(writer, o);
     }
 
     private static PackageURL toPurl(ArtifactKey key, String version) {
