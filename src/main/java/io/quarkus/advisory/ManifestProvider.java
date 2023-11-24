@@ -9,6 +9,7 @@ import com.github.packageurl.PackageURL;
 import io.quarkus.maven.dependency.ArtifactCoords;
 import io.quarkus.maven.dependency.ArtifactKey;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -36,8 +37,7 @@ public class ManifestProvider {
         try {
             sbom = deserialize(url);
         } catch (IOException e) {
-            MessageWriter.info("Failed to connect to " + url + ": " + e.getLocalizedMessage());
-            return null;
+            throw new UncheckedIOException("Failed to connect to " + url + ": " + e.getLocalizedMessage(), e);
         }
 
         final Map<ArtifactKey, Collection<String>> components;
