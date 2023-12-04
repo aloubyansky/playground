@@ -51,11 +51,8 @@ public class JiraReader {
                     sj.add(cveId);
                 }
                 MessageWriter.info("  CVEs: " + sj);
-                var resolution = (issue.getResolution() != null ? issue.getResolution().getName() : "n/a");
-                if (!DONE_RESOLUTIONS.contains(resolution)) {
-                    MessageWriter.info("  Skipping since the issue is resolved as '" + resolution + "'");
-                    continue;
-                }
+                var resolution = (issue.getResolution() != null ? issue.getResolution().getName() : "Unresolved");
+                final boolean resolved = DONE_RESOLUTIONS.contains(resolution);
                 if (issue.getDescription() == null) {
                     MessageWriter.info("  Description is missing");
                     continue;
@@ -95,7 +92,9 @@ public class JiraReader {
                     throw new UncheckedIOException("Failed to read description of " + issue.getKey(), e);
                 }
 
-                if (vulnerableArtifacts.isEmpty()) {
+                if (!resolved) {
+                    MessageWriter.info("  Skipping since the issue is resolved as '" + resolution + "'");
+                } else if (vulnerableArtifacts.isEmpty()) {
                     MessageWriter.info("  Skipping since the issue description is missing vulnerable Maven artifacts");
                 } else {
                     for (String cveId : cveIds) {
