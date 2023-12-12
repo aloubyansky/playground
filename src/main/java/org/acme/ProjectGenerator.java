@@ -40,6 +40,7 @@ public class ProjectGenerator {
     private List<ClassBuilder> classBuidlers = new ArrayList<>();
     private String quarkusVersion;
     private List<ArtifactCoords> quarkusExtensions = new ArrayList<>();
+    private Properties applicationProps;
 
     private ProjectGenerator() {
     }
@@ -65,6 +66,14 @@ public class ProjectGenerator {
         return this;
     }
 
+    public ProjectGenerator setApplicationProperty(String name, String value) {
+        if(applicationProps == null) {
+            applicationProps = new Properties();
+        }
+        applicationProps.setProperty(name, value);
+        return this;
+    }
+
     public void generate(ClassGenerator clsGen) throws Exception {
         ensureNotUsed();
         used = true;
@@ -78,6 +87,14 @@ public class ProjectGenerator {
         Files.createDirectories(srcDir);
         for(var cb : classBuidlers) {
             cb.generate(srcDir);
+        }
+
+        if(applicationProps != null) {
+            var resourcesDir = projectDir.resolve("src").resolve("main").resolve("resources");
+            Files.createDirectories(resourcesDir);
+            try(BufferedWriter writer = Files.newBufferedWriter(resourcesDir.resolve("application.properties"))) {
+                applicationProps.store(writer, "Application configuration");
+            }
         }
 
         generatePom();
@@ -174,21 +191,25 @@ public class ProjectGenerator {
                 throw new IllegalArgumentException(projectDir + " is not a directory");
             }
             if(regenerate) {
-                Files.walkFileTree(projectDir, new SimpleFileVisitor<>(){
-                    @Override
-                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                            throws IOException {
-                        Files.delete(file);
-                        return FileVisitResult.CONTINUE;
-                    }
+                try(DirectoryStream<Path> stream = Files.newDirectoryStream(projectDir)) {
+                    for(Path p : stream) {
+                        Files.walkFileTree(p, new SimpleFileVisitor<>() {
+                            @Override
+                            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                                    throws IOException {
+                                Files.delete(file);
+                                return FileVisitResult.CONTINUE;
+                            }
 
-                    @Override
-                    public FileVisitResult postVisitDirectory(Path file, IOException e)
-                            throws IOException {
-                        Files.delete(file);
-                        return FileVisitResult.CONTINUE;
+                            @Override
+                            public FileVisitResult postVisitDirectory(Path file, IOException e)
+                                    throws IOException {
+                                Files.delete(file);
+                                return FileVisitResult.CONTINUE;
+                            }
+                        });
                     }
-                });
+                }
             } else {
                 try (DirectoryStream<Path> stream = Files.newDirectoryStream(projectDir)) {
                     if (stream.iterator().hasNext()) {

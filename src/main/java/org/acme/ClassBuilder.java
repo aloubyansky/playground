@@ -12,6 +12,7 @@ public class ClassBuilder {
     private String packageName;
     private String simpleName;
     private List<String> classAnnotations = List.of();
+    private String parentClass;
 
     public String getPackageName() {
         return packageName;
@@ -38,6 +39,23 @@ public class ClassBuilder {
         return this;
     }
 
+    public ClassBuilder setApplicationScoped() {
+        return addClassAnnotation("jakarta.enterprise.context.ApplicationScoped");
+    }
+
+    public ClassBuilder setEntity() {
+        return addClassAnnotation("jakarta.persistence.Entity");
+    }
+
+    public ClassBuilder setParentClass(String parentClass) {
+        this.parentClass = parentClass;
+        return this;
+    }
+
+    public ClassBuilder setPanacheEntity() {
+        return setEntity().setParentClass("io.quarkus.hibernate.orm.panache.PanacheEntity");
+    }
+
     void generate(Path srcDir) throws IOException {
         if(this.getSimpleName() == null || this.getSimpleName().isEmpty()) {
             throw new IllegalArgumentException("Class name has not been initialized");
@@ -54,6 +72,8 @@ public class ClassBuilder {
             writer.append("package ").append(this.getPackageName()).append(";");
             writer.newLine();
             writer.newLine();
+
+            // imports
             if(!classAnnotations.isEmpty()) {
                 for(var a : classAnnotations) {
                     writer.append("import ").append(a).append(';');
@@ -61,17 +81,26 @@ public class ClassBuilder {
                 }
                 writer.newLine();
             }
+            if(parentClass != null && !parentClass.isEmpty()) {
+                writer.append("import ").append(parentClass).append(';');
+                writer.newLine();
+                writer.newLine();
+            }
 
             if(!classAnnotations.isEmpty()) {
                 for(var a : classAnnotations) {
                     writer.append('@');
                     var i = a.lastIndexOf('.');
-                    var name = i < 0 ? a : a.substring(i + 1);
-                    writer.append(name);
+                    writer.append(i < 0 ? a : a.substring(i + 1));
                     writer.newLine();
                 }
             }
-            writer.append("public class ").append(this.getSimpleName()).append(" {");
+            writer.append("public class ").append(this.getSimpleName());
+            if(parentClass != null && !parentClass.isEmpty()) {
+                var i = parentClass.lastIndexOf('.');
+                writer.append(" extends ").append(i < 0 ? parentClass : parentClass.substring(i + 1));
+            }
+            writer.append(" {");
             writer.newLine();
             writer.append("}");
         }
