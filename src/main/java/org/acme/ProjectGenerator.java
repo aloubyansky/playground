@@ -38,6 +38,7 @@ public class ProjectGenerator {
     private boolean regenerate;
     private String defaultPackage = DEFAULT_PACKAGE;
     private List<ClassBuilder> classBuidlers = new ArrayList<>();
+    private String platformGroupId = PLATFORM_GROUP_ID;
     private String quarkusVersion;
     private List<ArtifactCoords> quarkusExtensions = new ArrayList<>();
     private Properties applicationProps;
@@ -56,7 +57,12 @@ public class ProjectGenerator {
         return this;
     }
 
-    public ProjectGenerator setQuarkusVersion(String quarkusVersion) {
+    public ProjectGenerator setQuarkusPlatformGroupId(String platformGroupId) {
+        this.platformGroupId = platformGroupId;
+        return this;
+    }
+
+    public ProjectGenerator setQuarkusPlatformVersion(String quarkusVersion) {
         this.quarkusVersion = quarkusVersion;
         return this;
     }
@@ -134,7 +140,7 @@ public class ProjectGenerator {
         pluginManagement.addPlugin(plugin);
 
         plugin = new Plugin();
-        plugin.setGroupId(PLATFORM_GROUP_ID);
+        plugin.setGroupId(platformGroupId);
         plugin.setArtifactId("quarkus-maven-plugin");
         plugin.setVersion(quarkusVersion);
         plugin.setExtensions(true);
@@ -148,7 +154,7 @@ public class ProjectGenerator {
         var depMan = new DependencyManagement();
         model.setDependencyManagement(depMan);
         var dep = new Dependency();
-        dep.setGroupId(PLATFORM_GROUP_ID);
+        dep.setGroupId(platformGroupId);
         dep.setArtifactId("quarkus-bom");
         dep.setVersion(quarkusVersion);
         dep.setScope("import");
