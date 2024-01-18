@@ -13,9 +13,9 @@ public class ProjectGeneratorRunner {
                 // remove and re-generate the project
                 .setRegenerate(true)
                 // Quarkus version
-                //.setQuarkusPlatformGroupId("io.quarkus")
-                //.setQuarkusPlatformVersion("999-SNAPSHOT")
-                .setQuarkusPlatformVersion("3.6.1")
+                .setQuarkusPlatformGroupId("io.quarkus")
+                .setQuarkusPlatformVersion("999-SNAPSHOT")
+                //.setQuarkusPlatformVersion("3.6.1")
                 // Dependencies
                 .addQuarkusExtension("quarkus-resteasy-reactive")
                 .addQuarkusExtension("quarkus-hibernate-orm-panache")
