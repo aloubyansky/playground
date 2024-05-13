@@ -32,6 +32,7 @@ public class ProjectGeneratorRunner {
 
                     for(int i = 0; i < 1600; ++i) {
                         project.newClassBuilder("Entity" + (i + 1))
+                                .addField("firstname", "String", "@jakarta.persistence.Basic")
                                 .setPanacheEntity();
                     }
                 });

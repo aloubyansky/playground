@@ -13,6 +13,7 @@ public class ClassBuilder {
     private String simpleName;
     private List<String> classAnnotations = List.of();
     private String parentClass;
+    private List<Field> fieldList = new ArrayList<>();
 
     public String getPackageName() {
         return packageName;
@@ -102,7 +103,20 @@ public class ClassBuilder {
             }
             writer.append(" {");
             writer.newLine();
+            writer.newLine();
+            for (Field field : fieldList) {
+                field.render(writer);
+            }
+            writer.newLine();
             writer.append("}");
+            writer.newLine();
         }
     }
+
+    public ClassBuilder addField(String name, String type, String... annotations) {
+        Field newfield = new Field(name, type, annotations);
+        fieldList.add(newfield);
+        return this;
+    }
+
 }
