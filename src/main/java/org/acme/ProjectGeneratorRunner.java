@@ -21,7 +21,8 @@ public class ProjectGeneratorRunner {
                 .addQuarkusExtension("quarkus-hibernate-orm-panache")
                 .addQuarkusExtension("quarkus-jdbc-postgresql")
                 // Configuration
-                .setApplicationProperty("quarkus.hibernate-orm.database.generation", "drop-and-create")
+                .setApplicationProperty("quarkus.hibernate-orm.database.generation", "none")
+                .setApplicationProperty("quarkus.hibernate-orm.validate-in-dev-mode", "false")
                 // Classes
                 .generate(project -> {
 
