@@ -17,11 +17,12 @@ public class ProjectGeneratorRunner {
                 .setQuarkusPlatformVersion("999-SNAPSHOT")
                 //.setQuarkusPlatformVersion("3.6.1")
                 // Dependencies
-                .addQuarkusExtension("quarkus-resteasy-reactive")
+                .addQuarkusExtension("quarkus-rest")
                 .addQuarkusExtension("quarkus-hibernate-orm-panache")
                 .addQuarkusExtension("quarkus-jdbc-postgresql")
                 // Configuration
-                .setApplicationProperty("quarkus.hibernate-orm.database.generation", "drop-and-create")
+                .setApplicationProperty("quarkus.hibernate-orm.database.generation", "none")
+                .setApplicationProperty("quarkus.hibernate-orm.validate-in-dev-mode", "false")
                 // Classes
                 .generate(project -> {
 
@@ -32,6 +33,7 @@ public class ProjectGeneratorRunner {
 
                     for(int i = 0; i < 1600; ++i) {
                         project.newClassBuilder("Entity" + (i + 1))
+                                .addField("firstname", "String", "@jakarta.persistence.Basic")
                                 .setPanacheEntity();
                     }
                 });
