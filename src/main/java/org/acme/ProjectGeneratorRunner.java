@@ -17,7 +17,7 @@ public class ProjectGeneratorRunner {
                 .setQuarkusPlatformVersion("999-SNAPSHOT")
                 //.setQuarkusPlatformVersion("3.6.1")
                 // Dependencies
-                .addQuarkusExtension("quarkus-resteasy-reactive")
+                .addQuarkusExtension("quarkus-rest")
                 .addQuarkusExtension("quarkus-hibernate-orm-panache")
                 .addQuarkusExtension("quarkus-jdbc-postgresql")
                 // Configuration
