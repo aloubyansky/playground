@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.acme.quarkus</groupId>
+    <artifactId>acme-quarkus-platform-parent</artifactId>
+    <version>1.2.3-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Acme - Quarkus Platform - Parent</name>
+
+    <modules>
+        <module>bom</module>
+        <module>build-parent</module>
+        <module>extensions</module>
+        <module>platform-descriptor</module>
+    </modules>
+
+    <scm>
+        <connection>scm:git:git@github.com:quarkiverse/quarkus-magic.git</connection>
+        <developerConnection>scm:git:git@github.com:quarkiverse/quarkus-magic.git</developerConnection>
+        <url>https://github.com/quarkiverse/quarkus-magic</url>
+    </scm>
+
+    <properties>
+        <compiler-plugin.version>3.13.0</compiler-plugin.version>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <quarkus.version>3.12.1</quarkus.version>
+        <quarkus-platform-bom-generator.version>0.0.108</quarkus-platform-bom-generator.version>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-maven-plugin</artifactId>
+                    <version>${quarkus.version}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${compiler-plugin.version}</version>
+                    <configuration>
+                        <parameters>true</parameters>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-config-doc-maven-plugin</artifactId>
+                    <version>${quarkus.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+                    <version>${quarkus-platform-bom-generator.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>

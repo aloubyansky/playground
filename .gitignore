@@ -1,33 +1,64 @@
-.DS_Store
-target
-*.iml
-.idea
-.settings
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see https://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+# Eclipse
 .project
 .classpath
-.vscode/
-*~
-local-test
-out
-lib
-bin
-dependency-reduced-pom.xml
-hotspot.log
-.directory
-.java-version
-.graal-install
-hs_err_pid*.log
-dumps
-*.orig
-*.rej
+.settings/
+bin/
+
+# IntelliJ
+.idea
+*.ipr
+*.iml
+*.iws
+
+# NetBeans
+nb-configuration.xml
+
+# Visual Studio Code
+.vscode
 .factorypath
-graph-output.dot
+
+# OSX
+.DS_Store
+
+# Vim
 *.swp
 *.swo
-ObjectStore
-.gradle
-build
-docker/distroless/bazel-*
-/.apt_generated_tests/
-quarkus.log
-replay_*.log
+
+# patch
+*.orig
+*.rej
+
+# Gradle
+.gradle/
+build/
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties

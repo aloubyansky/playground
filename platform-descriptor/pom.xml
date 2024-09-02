@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>io.acme.quarkus</groupId>
+        <artifactId>acme-quarkus-platform-parent</artifactId>
+        <version>1.2.3-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>acme-quarkus-bom-quarkus-platform-descriptor</artifactId>
+    <packaging>pom</packaging>
+    <name>Acme - Quarkus Platform - Descriptor JSON</name>
+
+    <properties>
+        <pluginPhase>process-resources</pluginPhase>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/resources</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-platform-bom-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>${pluginPhase}</phase>
+                        <goals>
+                            <goal>generate-platform-descriptor</goal>
+                        </goals>
+                        <configuration>
+                            <processGroupIds>
+                                <groupId>io.acme.quarkus</groupId>
+                            </processGroupIds>
+                            <bomArtifactId>acme-quarkus-bom</bomArtifactId>
+                            <resolveDependencyManagement>true</resolveDependencyManagement>
+                            <quarkusCoreVersion>${quarkus.version}</quarkusCoreVersion>
+                            <generateReleaseInfo>true</generateReleaseInfo>
+                            <!-- overridesFile>${basedir}/target/resources/catalog-overrides.json</overridesFile -->
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

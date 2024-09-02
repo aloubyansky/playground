@@ -1,0 +1,9 @@
+---
+maven-repository:
+- file:///home/aloubyansky/.m2/repository/
+group-id: "io.acme.quarkus"
+artifact-id: "acme-quarkus-bom-quarkus-platform-descriptor"
+classifier-as-version: true
+platform-key: "io.acme.quarkus"
+versions:
+- "1.2.3-SNAPSHOT"

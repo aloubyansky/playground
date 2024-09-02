@@ -1,0 +1,10 @@
+{
+  "metadata" : {
+    "platform-release" : {
+      "platform-key" : "io.acme.quarkus",
+      "stream" : "1.2",
+      "version" : "1.2.3-SNAPSHOT",
+      "members" : [ "io.acme.quarkus:acme-quarkus-bom-quarkus-platform-descriptor:1.2.3-SNAPSHOT:json:1.2.3-SNAPSHOT" ]
+    }
+  }
+}
