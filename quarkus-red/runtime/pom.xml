@@ -32,13 +32,13 @@
                         <configuration>
                             <deployment>${project.groupId}:${project.artifactId}-deployment:${project.version}</deployment>
                             <devMode>
-                                <jvmArgs>
+                                <jvmOptions>
                                     <add-modules>jdk.incubator.vector</add-modules>
                                     <add-opens>java.base/java.util=ALL-UNNAMED</add-opens>
                                     <add-opens>java.base/java.io=ALL-UNNAMED</add-opens>
                                     <add-opens>java.base/java.nio=ALL-UNNAMED</add-opens>
                                     <enable-preview/>
-                                </jvmArgs>
+                                </jvmOptions>
                             </devMode>
                         </configuration>
                     </execution>

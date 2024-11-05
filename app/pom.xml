@@ -56,14 +56,14 @@
                     <modules>
                         <module>java.management</module>
                     </modules>
-                    <extensionJvmArgs>
+                    <extensionJvmOptions>
                         <disableAll>false</disableAll>
                         <!--
                         <disableFor>
                             <extension>org.acme:quarkus-red</extension>
                         </disableFor>
                         -->
-                    </extensionJvmArgs>
+                    </extensionJvmOptions>
                 </configuration>
             </plugin>
             <plugin>

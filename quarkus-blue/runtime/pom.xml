@@ -32,10 +32,10 @@
                         <configuration>
                             <deployment>${project.groupId}:${project.artifactId}-deployment:${project.version}</deployment>
                             <devMode>
-                                <jvmArgs>
+                                <jvmOptions>
                                     <add-modules>jdk.incubator.vector</add-modules>
                                     <enable-preview/>
-                                </jvmArgs>
+                                </jvmOptions>
                             </devMode>
                         </configuration>
                     </execution>
