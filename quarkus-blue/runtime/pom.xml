@@ -36,6 +36,11 @@
                                     <add-modules>jdk.incubator.vector</add-modules>
                                     <enable-preview/>
                                 </jvmOptions>
+                                <xxJvmOptions>
+                                    <UseThreadPriorities>false</UseThreadPriorities>
+                                    <UseLargePages>true</UseLargePages>
+                                    <AllocatePrefetchStyle>1</AllocatePrefetchStyle>
+                                </xxJvmOptions>
                             </devMode>
                         </configuration>
                     </execution>
