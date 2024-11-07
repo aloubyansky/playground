@@ -4,13 +4,42 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.acme</groupId>
   <artifactId>aggregate</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0</version>
   <packaging>pom</packaging>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <cyclonedx.version>2.9.0</cyclonedx.version>
+  </properties>
   <modules>
-    <module>product-a</module>
+    <module>lib-z/1.0</module>
+    <module>lib-z/2.0</module>
+    <module>lib-z/3.0</module>
+    <module>lib-a</module>
     <module>lib-b</module>
-    <module>lib-c-1.0</module>
-    <module>lib-c-2.0</module>
-    <module>lib-d</module>
+    <module>lib-c</module>
+    <module>product-x</module>
+    <module>product-y</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <id>cdx</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.cyclonedx</groupId>
+              <artifactId>cyclonedx-maven-plugin</artifactId>
+              <version>${cyclonedx.version}</version>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+        <defaultGoal>package cyclonedx:makeBom</defaultGoal>
+      </build>
+    </profile>
+  </profiles>
 </project>

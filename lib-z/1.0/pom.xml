@@ -2,22 +2,14 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.b</groupId>
-  <artifactId>lib-b</artifactId>
+  <groupId>org.z</groupId>
+  <artifactId>lib-z</artifactId>
   <version>1.0</version>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <cyclonedx.version>2.9.0</cyclonedx.version>
   </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.z</groupId>
-      <artifactId>lib-z</artifactId>
-      <version>2.0</version>
-    </dependency>
-  </dependencies>
 
   <build>
     <pluginManagement>

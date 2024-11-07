@@ -1,27 +1,53 @@
-This is a simple reproducer that demonstrates `test` (or `provided`) scope dependencies may override (or "leak into") compile classpath.
+This repo contains a couple of examples demonstrating the challenge of manifesting embedded/bundled (shaded) vs linked dependencies.
 
-1. Run `mvn install -f aggregate-pom.xml` from the root project directory to install all the sample projects into the local Maven repository
-2. Run `mvn -f product-a dependency:tree` from the root project directory
-
-The following outcome should be logged to the terminal:
+Run
 ```
-[aloubyansky@localhost playground]$ mvn -f product-a dependency:tree
-[INFO] Scanning for projects...
-[INFO] 
-[INFO] ----------------------< org.acme:acme-product-a >-----------------------
-[INFO] Building acme-product-a 1.0.0-SNAPSHOT
-[INFO]   from pom.xml
-[INFO] --------------------------------[ jar ]---------------------------------
-[INFO] 
-[INFO] --- dependency:3.6.0:tree (default-cli) @ acme-product-a ---
-[INFO] org.acme:acme-product-a:jar:1.0.0-SNAPSHOT
-[INFO] +- org.acme:acme-lib-d:jar:1.0.0-SNAPSHOT:test
-[INFO] |  \- org.acme:acme-lib-c:jar:2.0.0-SNAPSHOT:compile
-[INFO] \- org.acme:acme-lib-b:jar:1.0.0-SNAPSHOT:compile
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
+./mvnw -f aggregate-pom.xml
 ```
+to generate the CycloneDX SBOMs.
 
-Here you can see that `org.acme:acme-lib-c:2.0.0-SNAPSHOT` (which is actually on a `test` dependency branch) was selected during the conflict resolution and its scope was promoted to `compile,` while a `compile` dependency `org.acme:acme-lib-b:1.0.0-SNAPSHOT` depends on `org.acme:acme-lib-c:1.0.0-SNAPSHOT`.
+## product-x
 
-NOTE: the same issue can be demonstrated for `provided` dependencies by replacing `test` scope with `provided` for dependency `acme-lib-d`.
+In this example, `product-x` depends on `lib-a`, `lib-a` depends on `lib-z` but `product-x` excludes `lib-z` as a dependency in its project configuration. And so
+```
+less product-x/target/bom.json
+```
+shows that `product-x` depends on `lib-a` which does not have dependencies on its own, although
+```
+less lib-a/target/bom.json
+```
+shows that it does depend on `lib-z`.
+
+So if there are tools that, based on SBOM analysis, conclude that `lib-z` is a dependency of `product-x`, that will be wrong in this case.
+
+## product-y
+
+In this example, `product-y` depends on three libraries:
+
+* `lib-a` that depends on `lib-z:1.0`;
+* `lib-b` that depends on `lib-z:2.0`;
+* `lib-c` that depends on `lib-z:3.0`.
+
+```
+less product-y/target/bom.json
+```
+manifests dependencies on `lib-a`, `lib-b` and `lib-c`, and that all of them depend on `lib-z:1.0` (meaning in the context of `product-y` all the other libs will use `lib-z:1.0`).
+
+So if SBOM dependency analysis tools conclude that
+* `product-y` transitively depends on `lib-z:1.0` - correct;
+* `product-y` transitively depends on `lib-z:2.0` - wrong, since `lib-b` does not bundle `lib-z:2.0`;
+* `product-z` transitively depends on `lib-z:3.0` - correct, since `lib-c` bundles `lib-z:3.0`.
+
+This can be seen by running
+```
+vim lib-c/target/lib-c-1.0.jar
+```
+that will display the following content included in the `lib-c-1.0.jar`:
+```
+lib-z-3.0.txt
+META-INF/maven/org.z/
+META-INF/maven/org.z/lib-z/
+META-INF/maven/org.z/lib-z/pom.xml
+META-INF/maven/org.z/lib-z/pom.properties
+```
+which comes from `lib-z/3.0/target/lib-z-3.0.jar`.
