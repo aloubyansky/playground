@@ -53,6 +53,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <!-- forceC2>false</forceC2 -->
                     <modules>
                         <module>java.management</module>
                     </modules>

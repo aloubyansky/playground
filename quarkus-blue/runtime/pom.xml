@@ -40,7 +40,9 @@
                                     <UseThreadPriorities>false</UseThreadPriorities>
                                     <UseLargePages>true</UseLargePages>
                                     <AllocatePrefetchStyle>1</AllocatePrefetchStyle>
+                                    <!-- TieredStopAtLevel>2</TieredStopAtLevel -->
                                 </xxJvmOptions>
+                                <!-- lockDefaultXxJvmOptions>TieredStopAtLevel</lockDefaultXxJvmOptions -->
                             </devMode>
                         </configuration>
                     </execution>
