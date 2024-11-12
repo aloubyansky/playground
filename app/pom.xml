@@ -11,10 +11,12 @@
     <name>Acme - Application</name>
 
     <dependencies>
+    <!--
         <dependency>
             <groupId>org.acme</groupId>
             <artifactId>quarkus-red</artifactId>
         </dependency>
+        -->
         <dependency>
             <groupId>org.acme</groupId>
             <artifactId>quarkus-blue</artifactId>
@@ -54,9 +56,11 @@
                 </executions>
                 <configuration>
                     <!-- forceC2>false</forceC2 -->
+                    <!--
                     <modules>
                         <module>java.management</module>
                     </modules>
+                    -->
                     <extensionJvmOptions>
                         <disableAll>false</disableAll>
                         <!--
