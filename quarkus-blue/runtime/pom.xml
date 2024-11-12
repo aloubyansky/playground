@@ -42,7 +42,8 @@
                                     <AllocatePrefetchStyle>1</AllocatePrefetchStyle>
                                     <!-- TieredStopAtLevel>2</TieredStopAtLevel -->
                                 </xxJvmOptions>
-                                <!-- lockDefaultXxJvmOptions>TieredStopAtLevel</lockDefaultXxJvmOptions -->
+                                <lockDefaultJvmOptions>agentlib:jdwp</lockDefaultJvmOptions>
+                                <lockDefaultXxJvmOptions>TieredStopAtLevel</lockDefaultXxJvmOptions>
                             </devMode>
                         </configuration>
                     </execution>
