@@ -16,10 +16,6 @@
             <artifactId>quarkus-red</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.acme</groupId>
-            <artifactId>quarkus-blue</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest</artifactId>
         </dependency>
@@ -53,18 +49,6 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <!-- forceC2>false</forceC2 -->
-                    <modules>
-                        <module>java.management</module>
-                    </modules>
-                    <extensionJvmOptions>
-                        <disableAll>false</disableAll>
-                        <!--
-                        <disableFor>
-                            <extension>org.acme:quarkus-red</extension>
-                        </disableFor>
-                        -->
-                    </extensionJvmOptions>
                 </configuration>
             </plugin>
             <plugin>

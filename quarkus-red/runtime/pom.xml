@@ -31,15 +31,9 @@
                         </goals>
                         <configuration>
                             <deployment>${project.groupId}:${project.artifactId}-deployment:${project.version}</deployment>
-                            <devMode>
-                                <jvmOptions>
-                                    <add-modules>jdk.incubator.vector</add-modules>
-                                    <add-opens>java.base/java.util=ALL-UNNAMED</add-opens>
-                                    <add-opens>java.base/java.io=ALL-UNNAMED</add-opens>
-                                    <add-opens>java.base/java.nio=ALL-UNNAMED</add-opens>
-                                    <enable-preview/>
-                                </jvmOptions>
-                            </devMode>
+                            <conditionalDevDependencies>
+                                <extension>${project.groupId}:quarkus-blue:${project.version}</extension>
+                            </conditionalDevDependencies>
                         </configuration>
                     </execution>
                 </executions>

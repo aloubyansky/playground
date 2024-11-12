@@ -31,19 +31,6 @@
                         </goals>
                         <configuration>
                             <deployment>${project.groupId}:${project.artifactId}-deployment:${project.version}</deployment>
-                            <devMode>
-                                <jvmOptions>
-                                    <add-modules>jdk.incubator.vector</add-modules>
-                                    <enable-preview/>
-                                </jvmOptions>
-                                <xxJvmOptions>
-                                    <UseThreadPriorities>false</UseThreadPriorities>
-                                    <UseLargePages>true</UseLargePages>
-                                    <AllocatePrefetchStyle>1</AllocatePrefetchStyle>
-                                    <!-- TieredStopAtLevel>2</TieredStopAtLevel -->
-                                </xxJvmOptions>
-                                <!-- lockDefaultXxJvmOptions>TieredStopAtLevel</lockDefaultXxJvmOptions -->
-                            </devMode>
                         </configuration>
                     </execution>
                 </executions>
