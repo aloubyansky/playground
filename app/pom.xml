@@ -69,6 +69,14 @@
                         </disableFor>
                         -->
                     </extensionJvmOptions>
+                    <!--
+                    <compilerOptions>
+                      <compilerOption>
+                        <name>java</name>
+                        <args> - - enable-preview</args>
+                      </compilerOption>
+                    </compilerOptions>
+                    -->
                 </configuration>
             </plugin>
             <plugin>

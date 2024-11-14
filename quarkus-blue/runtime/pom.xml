@@ -43,8 +43,8 @@
                                     <AllocatePrefetchStyle>1</AllocatePrefetchStyle>
                                     < ! - - TieredStopAtLevel>2</TieredStopAtLevel - - >
                                 </xxJvmOptions>
-                                <lockDefaultJvmOptions>agentlib:jdwp</lockDefaultJvmOptions>
-                                <lockDefaultXxJvmOptions>TieredStopAtLevel</lockDefaultXxJvmOptions>
+                                <lockJvmOptions>agentlib:jdwp</lockJvmOptions>
+                                <lockXxJvmOptions>TieredStopAtLevel</lockXxJvmOptions>
                             </devMode>
                             -->
                             <devMode>
@@ -53,8 +53,8 @@
                                     <enable-preview/>
                                     <enable-native-access>ALL-UNNAMED</enable-native-access>
                                 </jvmOptions>
-                                <lockDefaultJvmOptions>agentlib:jdwp</lockDefaultJvmOptions>
-                                <lockDefaultXxJvmOptions>TieredStopAtLevel</lockDefaultXxJvmOptions>
+                                <lockJvmOptions>agentlib:jdwp</lockJvmOptions>
+                                <lockXxJvmOptions>TieredStopAtLevel</lockXxJvmOptions>
                             </devMode>
                         </configuration>
                     </execution>
