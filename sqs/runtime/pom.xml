@@ -4,31 +4,46 @@
 
     <parent>
         <groupId>org.acme</groupId>
-        <artifactId>quarkus-red-parent</artifactId>
+        <artifactId>sqs-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-red-deployment</artifactId>
-    <name>Acme - Quarkus Red - Deployment</name>
+    <artifactId>sqs</artifactId>
+    <name>Acme - sqs - Runtime</name>
 
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-arc-deployment</artifactId>
+            <artifactId>quarkus-arc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.acme</groupId>
-            <artifactId>quarkus-red</artifactId>
-            <version>${project.version}</version>
+            <artifactId>common</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-junit5-internal</artifactId>
-            <scope>test</scope>
+            <groupId>org.acme</groupId>
+            <artifactId>netty-nio-client</artifactId>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-extension-maven-plugin</artifactId>
+                <version>${quarkus.version}</version>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>extension-descriptor</goal>
+                        </goals>
+                        <configuration>
+                            <deployment>${project.groupId}:${project.artifactId}-deployment:${project.version}</deployment>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <executions>

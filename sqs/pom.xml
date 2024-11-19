@@ -7,9 +7,9 @@
         <artifactId>acme-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-red-parent</artifactId>
+    <artifactId>sqs-parent</artifactId>
     <packaging>pom</packaging>
-    <name>Acme - Quarkus Red - Parent</name>
+    <name>Acme - sqs - Parent</name>
 
     <modules>
         <module>deployment</module>

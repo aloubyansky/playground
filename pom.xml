@@ -9,8 +9,11 @@
     <name>Acme - Parent</name>
 
     <modules>
-        <module>quarkus-red</module>
-        <module>quarkus-blue</module>
+        <module>netty-nio-client</module>
+        <module>netty-client-internal</module>
+        <module>common</module>
+        <module>sqs</module>
+        <module>messaging-sqs</module>
         <module>app</module>
     </modules>
 
@@ -33,22 +36,47 @@
             </dependency>
             <dependency>
                 <groupId>org.acme</groupId>
-                <artifactId>quarkus-red</artifactId>
+                <artifactId>netty-nio-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.acme</groupId>
-                <artifactId>quarkus-red-deployment</artifactId>
+                <artifactId>netty-client-internal</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.acme</groupId>
-                <artifactId>quarkus-blue</artifactId>
+                <artifactId>netty-client-internal-deployment</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.acme</groupId>
-                <artifactId>quarkus-blue-deployment</artifactId>
+                <artifactId>common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.acme</groupId>
+                <artifactId>common-deployment</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.acme</groupId>
+                <artifactId>sqs</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.acme</groupId>
+                <artifactId>sqs-deployment</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.acme</groupId>
+                <artifactId>messaging-sqs</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.acme</groupId>
+                <artifactId>messaging-sqs-deployment</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

@@ -13,7 +13,11 @@
     <dependencies>
         <dependency>
             <groupId>org.acme</groupId>
-            <artifactId>quarkus-red</artifactId>
+            <artifactId>messaging-sqs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.acme</groupId>
+            <artifactId>netty-nio-client</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>

@@ -4,16 +4,20 @@
 
     <parent>
         <groupId>org.acme</groupId>
-        <artifactId>quarkus-red-parent</artifactId>
+        <artifactId>messaging-sqs-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-red</artifactId>
-    <name>Acme - Quarkus Red - Runtime</name>
+    <artifactId>messaging-sqs</artifactId>
+    <name>Acme - messaging-sqs - Runtime</name>
 
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-arc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.acme</groupId>
+            <artifactId>sqs</artifactId>
         </dependency>
     </dependencies>
 
@@ -31,9 +35,6 @@
                         </goals>
                         <configuration>
                             <deployment>${project.groupId}:${project.artifactId}-deployment:${project.version}</deployment>
-                            <conditionalDevDependencies>
-                                <extension>${project.groupId}:quarkus-blue:${project.version}</extension>
-                            </conditionalDevDependencies>
                         </configuration>
                     </execution>
                 </executions>

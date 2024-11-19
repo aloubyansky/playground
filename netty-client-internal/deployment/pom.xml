@@ -4,11 +4,11 @@
 
     <parent>
         <groupId>org.acme</groupId>
-        <artifactId>quarkus-blue-parent</artifactId>
+        <artifactId>netty-client-internal-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-blue-deployment</artifactId>
-    <name>Acme - Quarkus Blue - Deployment</name>
+    <artifactId>netty-client-internal-deployment</artifactId>
+    <name>Acme - netty-client-internal - Deployment</name>
 
     <dependencies>
         <dependency>
@@ -17,7 +17,7 @@
         </dependency>
         <dependency>
             <groupId>org.acme</groupId>
-            <artifactId>quarkus-blue</artifactId>
+            <artifactId>netty-client-internal</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
