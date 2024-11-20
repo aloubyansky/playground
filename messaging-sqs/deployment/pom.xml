@@ -12,8 +12,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-arc-deployment</artifactId>
+            <groupId>org.acme</groupId>
+            <artifactId>messaging-sqs</artifactId>
         </dependency>
         <dependency>
             <groupId>org.acme</groupId>
@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>org.acme</groupId>
-            <artifactId>messaging-sqs</artifactId>
+            <artifactId>common-deployment</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>

@@ -13,17 +13,17 @@
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-arc-deployment</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.acme</groupId>
-            <artifactId>netty-client-internal-deployment</artifactId>
-            <optional>true</optional>
+            <artifactId>quarkus-core-deployment</artifactId>
         </dependency>
         <dependency>
             <groupId>org.acme</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.acme</groupId>
+            <artifactId>netty-client-internal-deployment</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
