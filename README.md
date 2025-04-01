@@ -1,13 +1,25 @@
 # Playground
 
-1) `cd gradle-bom` and install it `mvn install`
-2) `cd gradle-plugin` and install it `./gradlew publishToMavenLocal`
-3) `cd gradle-app` and list its dependencies `./gradlew dependencies --configuration compileClasspath`
+A reproducer to figure out why a dependency provider is called more than once during a configuration action.
 
-You should see
+Running `./gradlew :app:dependencies --configuration greetingClasspath` produces output such as
+````
+$ ./gradlew :app:dependencies --configuration greetingClasspath
 
+> Task :app:dependencies
+
+------------------------------------------------------------
+Project ':app'
+------------------------------------------------------------
+
+greetingClasspath
+Dependency provider call counter: 1
+Dependency provider call counter: 2
+\--- xom:xom:1.3.9
+
+A web-based, searchable dependency report is available by adding the --scan option.
 ````
-compileClasspath - Compile classpath for source set 'main'.
-+--- io.playground:playground-bom:999-SNAPSHOT
-\--- commons-lang:commons-lang FAILED
-````
+
+The producer consists of two modules:
+* `plugin` - a simple Gradle plugin that registers `greetingClasspath` configuration and uses the Provider API to add dependencies to it.
+* `app` - an "application" project that applies the example plugin.
