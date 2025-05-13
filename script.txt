@@ -1,0 +1,45 @@
+= Demo Script
+
+== Create a project
+
+mvn archetype:generate \
+       -DarchetypeGroupId=io.quarkus \
+       -DarchetypeArtifactId=quarkus-amazon-lambda-archetype \
+       -DarchetypeVersion=3.22.2
+
+== Test Lambda in Dev mode
+
+curl -d '{"greeting":"Hey", "name":"AWS Community"}' -X POST http://localhost:8080
+
+== Create the function
+
+(LAMBDA_ROLE_ARN env var has to be set)
+
+./target/manage.sh create
+
+== Invoke the Lambda
+
+./target/manage.sh invoke
+
+== Create the native function
+
+./target/manage.sh native create
+
+== Invoke the native fucntion
+
+./target/manage.sh native invoke
+
+== SnapStart
+
+aws lambda update-function-configuration \
+  --function-name QuarkusAwsDemo \
+  --snap-start ApplyOn=PublishedVersions
+
+aws lambda publish-version --function-name QuarkusAwsDemo
+
+aws lambda invoke \
+  --cli-binary-format raw-in-base64-out \
+  --function-name QuarkusAwsDemo:1 \
+  --payload '{"greeting":"Hi", "name":"SnapStart friends"}' \
+  response.json
+
