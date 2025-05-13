@@ -6,6 +6,7 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>playground-app</artifactId>
+  <packaging>jar</packaging>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
@@ -23,31 +24,4 @@
       <version>3.6.3</version>
     </dependency>
   </dependencies>
-   <build>
-   <!-- 
-     <extensions>
-       <extension>
-         <groupId>io.playground</groupId>
-         <artifactId>playground-mvn-ext</artifactId>
-         <version>0.0.1-SNAPSHOT</version>
-       </extension>
-     </extensions>
-      -->
-     <plugins>
-       <plugin>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>playground-mvn-ext</artifactId>
-         <version>${project.version}</version>
-         <extensions>true</extensions>
-         <executions>
-           <execution>
-             <goals>
-               <goal>playground</goal>
-             </goals>
-             <phase>package</phase>
-           </execution>
-         </executions>
-       </plugin>
-     </plugins>
-   </build>
 </project>

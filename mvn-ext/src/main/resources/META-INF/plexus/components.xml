@@ -1,0 +1,14 @@
+<component-set>
+    <components>
+        <component>
+            <role>org.apache.maven.eventspy.EventSpy</role>
+            <role-hint>my-event-spy</role-hint>
+            <implementation>io.playground.mvn.ext.PlaygroundEventSpy</implementation>
+        </component>
+        <component>
+            <role>org.apache.maven.AbstractMavenLifecycleParticipant</role>
+            <role-hint>playground-lifecycle-participant</role-hint>
+            <implementation>io.playground.mvn.ext.PlaygroundLifecycleParticipant</implementation>
+        </component>
+    </components>
+</component-set>

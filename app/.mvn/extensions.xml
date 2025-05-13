@@ -1,0 +1,7 @@
+<extensions>
+    <extension>
+        <groupId>io.playground</groupId>
+        <artifactId>playground-mvn-ext</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </extension>
+</extensions>
