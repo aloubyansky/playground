@@ -8,5 +8,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation(testFixtures(project(":module-testfixtures")))
+    testImplementation(testFixtures(project(":module-testfixtures"))) {
+        exclude module: 'module-testfixtures' // exclude the dependency on the main artifact
+    }
 }
