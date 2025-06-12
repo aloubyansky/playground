@@ -1,0 +1,123 @@
+== Top Project Build Request
+
+Top project build request is a request submitted by a user to build a specific project along with its dependencies, depending on the configuration options provided.
+
+Top project build request is processed by the Top Project Build Request Handler, that will process the initial user request, analyze the project configuration and dependencies, and submit a Project Build Request.
+
+=== Top Project Build Request Structure
+
+* SCM
+** repository
+** revision
+* rebuild (OFF | UNFIT | FORCE)
+* perfect-modules [?]
+* exclude-modules [?]
+* exclude-dependencies [?]
+* fail-on-dependency-build-errors (?)
+* rebuild-unfit-dependencies (?)
+* build-extraneous-dependencies (?)
+* fail-on-extraneous-dependency-build-errors (?)
+
+[%autowidth]
+|===
+|Name |Required |Type |Default Value |Description
+
+|repository
+|true
+|string
+|n/a
+|Source code repository URI
+
+|revision
+|true
+|string
+|n/a
+|Tag, branch or commit to build
+
+|rebuild
+|false
+|string
+|OFF
+|Whether to rebuild a given revision of the project in case a build of the requested revision is already available and could be re-used. Allowed options are:
+
+* OFF - the default, do not rebuild an existing build;
+
+* UNFIT - rebuild if the existing build does not satisfy the configuration provided in the build request (for example, certain required dependencies appear to be not rebuild in the existing build).
+
+* FORCE - force rebuild of an existing build.
+
+|perfect-modules
+|false
+|array of strings
+|empty array
+|Modules that must be built along with all their dependencies, unless some of those dependencies are explicitly excluded. If a module is not present in this array and is not excluded, such a module would still be built along with all its dependencies, unless, if the configuration allows, some or all of its dependencies may end up being used w/o a rebuild, if they could not be rebuilt successfully.
+
+|exclude-modules
+|false
+|array of strings
+|empty array
+|Modules that should be excluded from the build and analysis.
+
+|exclude-dependencies
+|false
+|array of strings
+|empty array
+|Patterns of artifacts that should be excluded when analyzing project dependencies.
+
+|fail-on-dependency-build-errors
+|false
+|boolean
+|false
+|Whether to fail the top project build in case one of its dependencies could not be built. This option is applied only for regular (non-perfect) modules.
+
+If this option is enabled and a dependency failed to build, the top project may end up depending on the original (not rebuilt) version of the dependency.
+
+|rebuild-unfit-dependencies
+|false
+|boolean
+|true
+|Whether to rebuild existing builds of dependencies that link to not rebuilt versions of their dependencies that are relevant for the top project. This option is applied only for regular (non-perfect) modules.
+
+If this option is disabled and an existing build of a dependency links to a not rebuilt version of another dependency, the top project may end up depending on that not rebuilt version of that other dependency.
+
+|build-extraneous-dependencies
+|false
+|boolean
+|false
+|Whether to build dependencies that are outside the top project dependency graph. This option is applied to both regular and perfect modules.
+
+It may happen that a top project depends on an artifact that comes from a multimodule project. This option indicates whether dependencies of the modules of that multimodule dependency project that aren't relevant for the top project being built should also be rebuilt.
+
+|fail-on-extraneous-dependency-build-errors
+|false
+|boolean
+|false
+|Whether to fail a top project build in case one of its extraneous dependencies could not be built. This option is applied to both regular and perfect modules.
+|===
+
+== Top Project Build Request Handler
+
+The Top Project Build Request Handler receives a Top Project Build Request and performs the following operations:
+
+* analyze the configuration of the requested project revision;
+* collect information about the project's dependencies;
+* check whether the request project revision has already been built and, if so, could it be re-used or a rebuild is required;
+* if, following the analysis, the requested revision has to be (re)built, submit a Project Build Request with more detailed build instructions.
+
+Project revision configuration analysis includes the following steps:
+
+* check out the project revision from git (or another source code management) repository;
+* determine build tool versions (e.g. Maven, Gradle, etc);
+* determine Java compiler source and target versions;
+* determine configured project dependencies (direct dependencies and configured dependency version constraints);
+* collect all project dependencies to determine the artifacts relevant for the build of the top-level project.
+
+== Project Build Request
+
+=== Structure
+---
+
+- Project Build Analysis Request
+- Analyzed Project Build Request
+- Project Dependency Source Code Info Build Request
+- Project Build Request
