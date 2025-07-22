@@ -7,6 +7,8 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.gradle.api.artifacts.ComponentMetadataDetails;
 import org.gradle.api.attributes.Attribute;
+import org.gradle.api.attributes.AttributeDisambiguationRule;
+import org.gradle.api.attributes.MultipleCandidatesDetails;
 import org.gradle.api.plugins.JavaPlugin;
 
 
@@ -19,13 +21,40 @@ public class PlaygroundPlugin implements Plugin<Project> {
     private static final String ARTIFACT_ID = "commons-lang";
     private static final String VERSION = "2.6";
 
+    public static class OtherDisambiguationRule implements AttributeDisambiguationRule<String> {
+        @Override
+        public void execute(MultipleCandidatesDetails<String> candidatesDetails) {
+            System.out.println(getClass().getSimpleName() + " " + candidatesDetails.getCandidateValues() + " " + candidatesDetails.getConsumerValue());
+            if(candidatesDetails.getConsumerValue() == null) {
+                candidatesDetails.closestMatch("Off");
+            }
+        }
+    }
+
     public void apply(Project project) {
+
+        Attribute<String> otherAttr = Attribute.of("other-attr", String.class);
+        project.getDependencies().getAttributesSchema().attribute(otherAttr)
+                .getDisambiguationRules().add(OtherDisambiguationRule.class);
+
+        Attribute<String> anotherAttr = Attribute.of("another-attr", String.class);
+        project.getDependencies().getAttributesSchema().attribute(anotherAttr)
+                .getDisambiguationRules().add(OtherDisambiguationRule.class);
+
+        Attribute<String> fooAttr = Attribute.of("foo-attr", String.class);
+        project.getDependencies().getAttributesSchema().attribute(fooAttr)
+                .getDisambiguationRules().add(OtherDisambiguationRule.class);
 
         // add a variant
         project.getDependencies().getComponents().withModule("xom:xom", this::addOtherVariant);
 
         project.getConfigurations().register("greetingClasspath", config -> {
             config.extendsFrom(project.getConfigurations().getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME));
+            config.attributes(attrs -> {
+                //attrs.attribute(anotherAttr, "On");
+                //attrs.attribute(otherAttr, "On");
+                attrs.attribute(fooAttr, "On");
+            });
         });
 
         project.getTasks().register("greeting", GreetingTask.class, project.getConfigurations().getByName("greetingClasspath"));
@@ -37,23 +66,46 @@ public class PlaygroundPlugin implements Plugin<Project> {
     }
 
     private void addOtherVariant(ComponentMetadataDetails compDetails, String baseVariant) {
+        addOtherVariantOn("other", compDetails, baseVariant, "On");
+        addOtherVariantOn("other", compDetails, baseVariant, "Off");
+        addOtherVariantOn("another", compDetails, baseVariant, "On");
+        addOtherVariantOn("another", compDetails, baseVariant, "Off");
+    }
+
+    private static void addOtherVariantOn(String prefix, ComponentMetadataDetails compDetails, String baseVariant, String value) {
+        String groupId;
+        String artifactId;
+        String version;
+        if(prefix.equals("other")) {
+            groupId = GROUP_ID;
+            artifactId = ARTIFACT_ID;
+            version = VERSION;
+        } else {
+            groupId = "io.quarkus";
+            artifactId = "quarkus-fs-util";
+            version = "1.1.0";
+        }
         compDetails.maybeAddVariant(
-                "otherVariant",
+                prefix + "Variant" + value,
                 baseVariant,
                 variant -> {
-                    variant.attributes(attrs -> attrs.attribute(Attribute.of("other-attr", String.class), "on"));
-                    variant.withDependencies(directDeps -> {
-                        boolean alreadyAdded = false;
-                        for (var directDep : directDeps) {
-                            if (directDep.getName().equals(ARTIFACT_ID) && directDep.getGroup().equals(GROUP_ID)) {
-                                alreadyAdded = true;
-                                break;
-                            }
-                        }
-                        if (!alreadyAdded) {
-                            directDeps.add(GROUP_ID + ":" + ARTIFACT_ID + ":" + VERSION);
-                        }
+                    variant.attributes(attrs -> {
+                        attrs.attribute(Attribute.of(prefix + "-attr", String.class), value);
                     });
+                    if(value.equals("On")) {
+                        variant.withDependencies(directDeps -> {
+                            boolean alreadyAdded = false;
+                            for (var directDep : directDeps) {
+                                if (directDep.getName().equals(artifactId) && directDep.getGroup().equals(groupId)) {
+                                    alreadyAdded = true;
+                                    break;
+                                }
+                            }
+                            if (!alreadyAdded) {
+                                directDeps.add(groupId + ":" + artifactId + ":" + version);
+                            }
+                        });
+                    }
                 });
     }
 }
