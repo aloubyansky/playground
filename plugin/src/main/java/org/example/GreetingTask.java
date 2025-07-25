@@ -18,6 +18,8 @@ public class GreetingTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-        config.resolve();
+        for(var a : config.getResolvedConfiguration().getResolvedArtifacts()) {
+            System.out.println("resolved: " + a);
+        };
     }
 }

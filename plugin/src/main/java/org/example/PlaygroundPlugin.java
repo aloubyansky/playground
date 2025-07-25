@@ -7,6 +7,12 @@ import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.gradle.api.artifacts.ComponentMetadataDetails;
 import org.gradle.api.attributes.Attribute;
+import org.gradle.api.attributes.Bundling;
+import org.gradle.api.attributes.Category;
+import org.gradle.api.attributes.LibraryElements;
+import org.gradle.api.attributes.Usage;
+import org.gradle.api.attributes.java.TargetJvmEnvironment;
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.plugins.JavaPlugin;
 
 
@@ -26,6 +32,16 @@ public class PlaygroundPlugin implements Plugin<Project> {
 
         project.getConfigurations().register("greetingClasspath", config -> {
             config.extendsFrom(project.getConfigurations().getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME));
+            config.attributes(attrs -> {
+                final ObjectFactory objectFactory = project.getObjects();
+                attrs.attribute(Category.CATEGORY_ATTRIBUTE, objectFactory.named(Category.class, Category.LIBRARY));
+                attrs.attribute(Usage.USAGE_ATTRIBUTE, objectFactory.named(Usage.class, Usage.JAVA_RUNTIME));
+                attrs.attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
+                        objectFactory.named(LibraryElements.class, LibraryElements.JAR));
+                attrs.attribute(Bundling.BUNDLING_ATTRIBUTE, objectFactory.named(Bundling.class, Bundling.EXTERNAL));
+                attrs.attribute(TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE,
+                        objectFactory.named(TargetJvmEnvironment.class, TargetJvmEnvironment.STANDARD_JVM));
+            });
         });
 
         project.getTasks().register("greeting", GreetingTask.class, project.getConfigurations().getByName("greetingClasspath"));
