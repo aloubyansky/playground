@@ -18,7 +18,9 @@ public class GreetingTask extends DefaultTask {
 
     @TaskAction
     public void run() {
-        var config = this.config.copyRecursive();
+        //var config = this.config.copyRecursive();
+        var config = getProject().getConfigurations().resolvable("anotherConfig").get();
+        config.setExtendsFrom(this.config.getExtendsFrom());
         for(var a : config.getResolvedConfiguration().getResolvedArtifacts()) {
             System.out.println("- " + a);
         }
