@@ -16,4 +16,4 @@ fi
 echo Building "$projectDir" with "$mavenGoals"
 
 # build the project
-./"$projectDir"/mvnw "$mavenGoals" -f "$projectDir" -Dquarkus.platform.group-id=com.redhat.quarkus.platform -Dquarkus.platform.version=3.27.1.redhat-00003 -s settings.xml -Dmaven.repo.local=local-maven-repo -Pibm
+./"$projectDir"/mvnw $mavenGoals -f "$projectDir" -Dquarkus.platform.group-id=com.redhat.quarkus.platform -Dquarkus.platform.version=3.27.1.redhat-00003 -s settings.xml -Dmaven.repo.local=local-maven-repo -Pibm
