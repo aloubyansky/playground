@@ -289,6 +289,19 @@
                             <autoPublish>true</autoPublish>
                         </configuration>
                     </plugin>
+                    <plugin>
+                        <groupId>io.github.aloubyansky.pqc.maven</groupId>
+                        <artifactId>pqc-sign-maven-plugin</artifactId>
+                        <version>0.0.1</version>
+                        <executions>
+                            <execution>
+                                <goals><goal>sign</goal></goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <pqcFingerprint>${env.PQC_FINGERPRINT}</pqcFingerprint>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
