@@ -31,3 +31,6 @@ docker/distroless/bazel-*
 /.apt_generated_tests/
 quarkus.log
 replay_*.log
+.claude
+native-images/
+node_modules/
