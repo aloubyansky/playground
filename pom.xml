@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.acme</groupId>
+    <artifactId>wildfly-galleon-test</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <wildfly.version>42.0.0.Beta1-SNAPSHOT</wildfly.version>
+        <wildfly-maven-plugin.version>6.0.1.Final</wildfly-maven-plugin.version>
+        <jboss-maven-dist>false</jboss-maven-dist>
+        <jboss-cyclonedx>true</jboss-cyclonedx>
+        <jboss-cyclonedx-only>false</jboss-cyclonedx-only>
+        <jboss-cyclonedx-output/>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.wildfly.plugins</groupId>
+                <artifactId>wildfly-maven-plugin</artifactId>
+                <version>${wildfly-maven-plugin.version}</version>
+                <configuration>
+                    <feature-packs>
+                        <feature-pack>
+                            <groupId>org.wildfly</groupId>
+                            <artifactId>wildfly-galleon-pack</artifactId>
+                            <version>${wildfly.version}</version>
+                        </feature-pack>
+                    </feature-packs>
+                    <galleonOptions>
+                        <jboss-cyclonedx>${jboss-cyclonedx}</jboss-cyclonedx>
+                        <jboss-maven-dist>${jboss-maven-dist}</jboss-maven-dist>
+                        <jboss-cyclonedx-only>${jboss-cyclonedx-only}</jboss-cyclonedx-only>
+                        <jboss-cyclonedx-output>${jboss-cyclonedx-output}</jboss-cyclonedx-output>
+                    </galleonOptions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install-wildfly</id>
+                        <goals>
+                            <goal>provision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
