@@ -7,8 +7,8 @@
     <packaging>pom</packaging>
 
     <properties>
-        <wildfly.version>42.0.0.Beta1-SNAPSHOT</wildfly.version>
-        <wildfly-maven-plugin.version>6.0.1.Final</wildfly-maven-plugin.version>
+        <wildfly.version>40.0.0.Final</wildfly.version>
+        <galleon-maven-plugin.version>7.0.11.Final-SNAPSHOT</galleon-maven-plugin.version>
         <jboss-maven-dist>false</jboss-maven-dist>
         <jboss-cyclonedx>true</jboss-cyclonedx>
         <jboss-cyclonedx-only>false</jboss-cyclonedx-only>
@@ -16,13 +16,30 @@
         <jboss-cyclonedx-output/>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>jboss-public-repository-group</id>
+            <name>JBoss Public Repository Group</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jboss-public-repository-group</id>
+            <name>JBoss Public Repository Group</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
     <build>
         <plugins>
             <plugin>
-                <groupId>org.wildfly.plugins</groupId>
-                <artifactId>wildfly-maven-plugin</artifactId>
-                <version>${wildfly-maven-plugin.version}</version>
+                <groupId>org.jboss.galleon</groupId>
+                <artifactId>galleon-maven-plugin</artifactId>
+                <version>${galleon-maven-plugin.version}</version>
                 <configuration>
+                    <install-dir>${project.build.directory}/wildfly</install-dir>
                     <feature-packs>
                         <feature-pack>
                             <groupId>org.wildfly</groupId>
@@ -30,13 +47,16 @@
                             <version>${wildfly.version}</version>
                         </feature-pack>
                     </feature-packs>
-                    <galleonOptions>
+                    <plugin-versions>
+                        <plugin-version>org.wildfly.galleon-plugins:wildfly-galleon-plugins:jar:8.2.0.Final-SNAPSHOT</plugin-version>
+                    </plugin-versions>
+                    <plugin-options>
                         <jboss-cyclonedx>${jboss-cyclonedx}</jboss-cyclonedx>
                         <jboss-maven-dist>${jboss-maven-dist}</jboss-maven-dist>
                         <jboss-cyclonedx-only>${jboss-cyclonedx-only}</jboss-cyclonedx-only>
                         <jboss-cyclonedx-licenses>${jboss-cyclonedx-licenses}</jboss-cyclonedx-licenses>
                         <jboss-cyclonedx-output>${jboss-cyclonedx-output}</jboss-cyclonedx-output>
-                    </galleonOptions>
+                    </plugin-options>
                 </configuration>
                 <executions>
                     <execution>
