@@ -13,7 +13,19 @@
         <jboss-cyclonedx>true</jboss-cyclonedx>
         <jboss-cyclonedx-only>false</jboss-cyclonedx-only>
         <jboss-cyclonedx-licenses>false</jboss-cyclonedx-licenses>
+        <jboss-cyclonedx-pretty-print>true</jboss-cyclonedx-pretty-print>
         <jboss-cyclonedx-output/>
+        <!--
+            Cosmetic-only: override the product-conf artifact to the EAP 8.1 Update 6.0 GA so the
+            provisioned server's version.txt and runtime banner report "Update 6.0", matching the
+            channel-driven EAP plugin build. NOTE: this only relabels the product info; all other
+            library artifacts remain at the feature-pack-pinned 8.1.1 (Update 1.0) versions. For a
+            genuine, fully-upgraded Update 6.0 build, provision through the eap-8.1 channel (e.g. via
+            org.wildfly.plugins:wildfly-maven-plugin, which supports <channels>).
+            Two coordinates are overridden: the plain jar (product module manifest -> runtime banner)
+            and the version:txt variant (copy-artifact task -> dist-root version.txt).
+        -->
+        <jboss-overridden-artifacts>org.jboss.eap:wildfly-ee-feature-pack-product-conf:801.6.0.GA-redhat-00001::jar|org.jboss.eap:wildfly-ee-feature-pack-product-conf:801.6.0.GA-redhat-00001:version:txt</jboss-overridden-artifacts>
     </properties>
 
     <repositories>
@@ -33,6 +45,7 @@
     </pluginRepositories>
 
     <build>
+        <defaultGoal>clean galleon:provision</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.jboss.galleon</groupId>
@@ -41,10 +54,17 @@
                 <configuration>
                     <install-dir>${project.build.directory}/wildfly</install-dir>
                     <feature-packs>
+                        <!--
                         <feature-pack>
                             <groupId>org.wildfly</groupId>
                             <artifactId>wildfly-galleon-pack</artifactId>
                             <version>${wildfly.version}</version>
+                        </feature-pack>
+                        -->
+                        <feature-pack>
+                            <groupId>org.jboss.eap</groupId>
+                            <artifactId>wildfly-ee-galleon-pack</artifactId>
+                            <version>8.1.1.GA-redhat-00017</version>
                         </feature-pack>
                     </feature-packs>
                     <plugin-versions>
@@ -56,6 +76,8 @@
                         <jboss-cyclonedx-only>${jboss-cyclonedx-only}</jboss-cyclonedx-only>
                         <jboss-cyclonedx-licenses>${jboss-cyclonedx-licenses}</jboss-cyclonedx-licenses>
                         <jboss-cyclonedx-output>${jboss-cyclonedx-output}</jboss-cyclonedx-output>
+                        <jboss-cyclonedx-pretty-print>${jboss-cyclonedx-pretty-print}</jboss-cyclonedx-pretty-print>
+                        <jboss-overridden-artifacts>${jboss-overridden-artifacts}</jboss-overridden-artifacts>
                     </plugin-options>
                 </configuration>
                 <executions>

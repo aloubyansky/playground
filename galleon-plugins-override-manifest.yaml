@@ -1,0 +1,15 @@
+schemaVersion: "1.0.0"
+name: "Local galleon-plugins override"
+description: >-
+  Layered on top of the eap-8.1 channel to force the locally-built
+  wildfly-galleon-plugins snapshot (with SBOM support). Channel resolution
+  takes the highest version across channels, and 8.2.0.Final-SNAPSHOT
+  outranks eap-8.1's 7.3.2.Final-redhat, so this stream wins for this GA
+  only. Everything else remains governed by eap-8.1 (EAP Update 6.0).
+streams:
+  - groupId: "org.wildfly.galleon-plugins"
+    artifactId: "wildfly-galleon-plugins"
+    version: "8.2.0.Final-SNAPSHOT"
+  - groupId: "org.wildfly.galleon-plugins"
+    artifactId: "wildfly-config-gen"
+    version: "8.2.0.Final-SNAPSHOT"

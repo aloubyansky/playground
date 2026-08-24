@@ -7,8 +7,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <wildfly.version>42.0.0.Beta1-SNAPSHOT</wildfly.version>
-        <wildfly-maven-plugin.version>6.0.1.Final</wildfly-maven-plugin.version>
+        <wildfly-maven-plugin.version>6.0.2.Final-SNAPSHOT</wildfly-maven-plugin.version>
         <jboss-maven-dist>false</jboss-maven-dist>
         <jboss-cyclonedx>true</jboss-cyclonedx>
         <jboss-cyclonedx-only>false</jboss-cyclonedx-only>
@@ -17,17 +16,56 @@
     </properties>
 
     <build>
+        <defaultGoal>clean wildfly:provision</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.wildfly.plugins</groupId>
                 <artifactId>wildfly-maven-plugin</artifactId>
                 <version>${wildfly-maven-plugin.version}</version>
                 <configuration>
+                    <channels>
+                        <channel>
+                            <manifest>
+                                <groupId>org.jboss.eap.channels</groupId>
+                                <artifactId>eap-8.1</artifactId>
+                            </manifest>
+                        </channel>
+                        <!--
+                            Layered override channel: forces the locally-built wildfly-galleon-plugins
+                            snapshot (with SBOM support) over the eap-8.1-pinned 7.3.2.Final-redhat.
+                            Channel resolution takes the highest version across channels, so this wins
+                            for this GA only; everything else stays governed by eap-8.1 (EAP Update 6.0).
+                        -->
+                        <channel>
+                            <manifest>
+                                <url>file:galleon-plugins-override-manifest.yaml</url>
+                            </manifest>
+                        </channel>
+                    </channels>
                     <feature-packs>
                         <feature-pack>
-                            <groupId>org.wildfly</groupId>
-                            <artifactId>wildfly-galleon-pack</artifactId>
-                            <version>${wildfly.version}</version>
+                            <groupId>org.jboss.eap</groupId>
+                            <artifactId>wildfly-ee-galleon-pack</artifactId>
+                        </feature-pack>
+                        <feature-pack>
+                            <groupId>org.jboss.eap</groupId>
+                            <artifactId>eap-datasources-galleon-pack</artifactId>
+                        </feature-pack>
+                        <feature-pack>
+                            <groupId>org.jboss.eap.cloud</groupId>
+                            <artifactId>eap-cloud-galleon-pack</artifactId>
+                        </feature-pack>
+                        <feature-pack>
+                            <groupId>org.keycloak</groupId>
+                            <artifactId>keycloak-saml-adapter-galleon-pack</artifactId>
+                        </feature-pack>
+                        <feature-pack>
+                            <groupId>org.jboss.eap</groupId>
+                            <artifactId>eap-myfaces-feature-pack</artifactId>
+                        </feature-pack>
+                        <feature-pack>
+                            <groupId>org.wildfly.prospero</groupId>
+                            <artifactId>prospero-wildfly-galleon-pack</artifactId>
                         </feature-pack>
                     </feature-packs>
                     <galleonOptions>
@@ -36,6 +74,7 @@
                         <jboss-cyclonedx-only>${jboss-cyclonedx-only}</jboss-cyclonedx-only>
                         <jboss-cyclonedx-licenses>${jboss-cyclonedx-licenses}</jboss-cyclonedx-licenses>
                         <jboss-cyclonedx-output>${jboss-cyclonedx-output}</jboss-cyclonedx-output>
+                        <jboss-cyclonedx-pretty-print>false</jboss-cyclonedx-pretty-print>
                     </galleonOptions>
                 </configuration>
                 <executions>
