@@ -404,6 +404,7 @@ The exact mechanism for component-to-product attribution is under active researc
 - **Custom properties** — using CycloneDX `properties` on components to declare product affiliation (e.g., `sbom:redhat:cpe` for the product CPE and a corresponding property for the specific release version). Clear intent, but requires registering a custom property namespace and defining the full set of required properties.
 - **`evidence.identity`** — using the existing `evidence.identity` field with a CPE. Reuses spec fields, but semantically `evidence.identity` describes how a component itself was identified, not which product it belongs to.
 - **`compositions`** — using CycloneDX's `compositions` element to group components under a product-level assembly with a CPE.
+- **Dependency-graph `provides` edges** — modeling each product as its own `framework` component that carries the product CPE, and expressing component membership through the CycloneDX `dependencies` graph. This follows Red Hat's published product SBOM pattern (`RedHatProductSecurity/security-data-guidelines`, e.g. `sbom/examples/product/rhel-9.2-main+eus.cdx.json`), reuses native spec fields, and cleanly handles shared and multi-product components. It is the leading candidate for the Quarkus platform case — see [Candidate: dependency-graph `provides` edges](#candidate-dependency-graph-provides-edges-quarkus-platform-members) below.
 
 Each approach has trade-offs around semantic correctness, scanner complexity, and alignment with the CycloneDX specification's intended usage. The following example illustrates the custom properties approach as one candidate:
 
@@ -427,6 +428,74 @@ Each approach has trade-offs around semantic correctness, scanner complexity, an
 }
 ```
 
+#### Candidate: dependency-graph `provides` edges (Quarkus platform members)
+
+This candidate is being prototyped for the Quarkus platform, where the runtime mixes the customer's application with several Red Hat products (the platform members: Quarkus core, Camel Quarkus, etc.). It adapts [Red Hat's published product SBOM pattern](https://github.com/RedHatProductSecurity/security-data-guidelines/tree/main/sbom/examples/product) to the *application* SBOM context.
+
+**Product taxonomy.** Three distinct "product" notions must not be conflated:
+
+1. **The application** — a product in its own right (the customer's), and the SBOM subject: it is the `metadata.component` / root. It typically carries no Red Hat CPE (it is *not* Quarkus and *not* a platform member).
+2. **Quarkus** (the framework/core) — not the application; a consumed product. If the core member declares a CPE it is simply another member product, never the root.
+3. **The platform members** — Red Hat products, each with a CPE, whose artifacts are attributed to them.
+
+**Structure.** Unlike Red Hat's standalone *product* SBOM (where the single product is the root and provides everything), here the root is the application and each member product is an additional, non-root `framework` component:
+
+- Red Hat CPEs attach only to the member product components — never to the app root, and never to individual `pkg:maven` artifacts.
+- The app relates to its dependencies via `dependsOn` (installation requirements — the normal Maven graph).
+- The app also `dependsOn` each member product component, marked `scope: excluded` so the member node is graph-reachable (not orphan inventory) but flagged as a build-time/tooling construct, not a runtime deliverable. Runtime-closure computation is unaffected because the attributed artifacts remain reachable via the direct `app → dependsOn → artifact` edges.
+- Each member product `provides` the subset of `pkg:maven` artifacts attributed to it. A shared artifact simply appears in multiple members' `provides` lists — one canonical component/bom-ref, no duplication.
+
+```
+app (root, metadata.component — the customer's product)
+ ├─ dependsOn ─▶ pkg:maven artifacts            (scope: required — runtime graph)
+ └─ dependsOn ─▶ member product (CPE, framework, scope: excluded)
+                     └─ provides ─▶ the attributed subset of those pkg:maven artifacts
+```
+
+```json
+{
+  "components": [
+    {
+      "type": "framework",
+      "bom-ref": "pkg:maven/com.redhat.quarkus.platform/quarkus-camel-bom@3.15.1.redhat-00001?type=pom",
+      "group": "com.redhat.quarkus.platform",
+      "name": "quarkus-camel-bom",
+      "version": "3.15.1.redhat-00001",
+      "purl": "pkg:maven/com.redhat.quarkus.platform/quarkus-camel-bom@3.15.1.redhat-00001?type=pom",
+      "cpe": "cpe:2.3:a:redhat:camel_quarkus:3.15.1:*:*:*:*:*:*:*",
+      "scope": "excluded",
+      "evidence": {
+        "identity": [
+          { "field": "cpe", "concludedValue": "cpe:2.3:a:redhat:camel_quarkus:3.15.1:*:*:*:*:*:*:*" }
+        ]
+      }
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:maven/com.example/my-quarkus-app@1.0.0",
+      "dependsOn": [
+        "pkg:maven/org.apache.camel.quarkus/camel-quarkus-atom@3.15.1?type=jar",
+        "pkg:maven/com.redhat.quarkus.platform/quarkus-camel-bom@3.15.1.redhat-00001?type=pom"
+      ]
+    },
+    {
+      "ref": "pkg:maven/com.redhat.quarkus.platform/quarkus-camel-bom@3.15.1.redhat-00001?type=pom",
+      "provides": [
+        "pkg:maven/org.apache.camel.quarkus/camel-quarkus-atom@3.15.1?type=jar"
+      ]
+    }
+  ]
+}
+```
+
+**Member product component identity.** Unlike Red Hat's RHEL products (which have no purl, hence CPE-as-`bom-ref` out of necessity), Quarkus platform members have a natural purl — their Maven BOM coordinates. Decisions:
+
+- **`purl` retained** — the member BOM coordinates (`pkg:maven/<groupId>/<bom-artifactId>@<version>?type=pom`).
+- **CPE placement** — canonical CPE in native `component.cpe` (so single-CPE scanners match); all CPEs in `evidence.identity[]` (`field: cpe`) to support multi-CPE members.
+- **`type: framework`, `scope: excluded`.**
+- **`bom-ref` — leaning toward the purl rather than the CPE (RH convention), pending consumer confirmation.** `bom-ref` is an opaque, document-local handle; the RH CPE-as-`bom-ref` choice is driven by their lack of a purl, not a semantic requirement. Purl-as-`bom-ref` keeps edges uniform with the rest of a Maven-generated SBOM, is unambiguous for multi-CPE members, and guarantees uniqueness. **Confirm** whether the downstream consumer (Trustify / SBOMer) keys attribution off `component.cpe` / `evidence.identity` (correct) or relies on the RH CPE-as-`bom-ref` convention.
+
 #### Role Obligations (Future)
 
 - **Product Team** would declare which product(s) their components belong to via generator configuration
@@ -440,6 +509,9 @@ This area requires further design work and community input, particularly around:
 - Property namespace and naming conventions
 - Handling components that belong to multiple products
 - Interaction with CycloneDX's own evolving metadata capabilities
+- For the `provides`-edge candidate: `bom-ref` convention (purl vs. CPE) and whether consumers key attribution off `component.cpe`/`evidence.identity` rather than `bom-ref`
+- For the `provides`-edge candidate: whether the member BOM could independently appear as its own `pkg:maven` component elsewhere in the SBOM (a `bom-ref`/purl collision to reconcile), and confirming consumers honor `scope: excluded` on the member product node rather than dropping it from views
+- Semantic fit of `provides`: its canonical CycloneDX meaning is "implements a specification/standard" (CBOM origin); the product-membership reading follows Red Hat's usage but is broader than the field's documented intent
 
 ## 6. Reference Implementations
 
