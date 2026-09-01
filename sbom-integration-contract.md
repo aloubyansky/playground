@@ -33,10 +33,11 @@ This proposal is grounded in working implementations:
 - [Quarkus CycloneDX extension](https://quarkus.io/guides/cyclonedx) — SBOM embedded in application JARs and native executables
 - [WildFly/EAP Galleon plugin](https://github.com/aloubyansky/galleon-plugins/tree/sbom-cdx) — SBOM generated during server provisioning
 
-Example product integrations:
+Example project integrations:
 
 - [Apache Artemis distribution](https://github.com/apache/artemis/pull/6600)
 - [Keycloak distribution](https://github.com/keycloak/keycloak/pull/51743)
+- [WildFly Galleon plugins](https://github.com/wildfly/galleon-plugins/pull/372)
 
 ## 2. Why Prefer SBOMs Over Filesystem Scanning
 
@@ -127,7 +128,7 @@ SBOMs can be embedded inside JARs or native executables, allowing them to travel
 
 **Generator** MUST place embedded SBOMs under the `META-INF/` directory using the `*.cdx.json` naming convention.
 
-**Generator** MAY GZip-compress embedded SBOMs to reduce size. If compressed, the file MUST use the `*.cdx.json.gz` extension. Quarkus compresses embedded SBOMs by default.
+**Generator** MAY GZip-compress embedded SBOMs. If compressed, the file MUST use the `*.cdx.json.gz` extension. Quarkus compresses embedded SBOMs by default.
 
 **Scanner** MUST open JARs as ZIP archives and check `META-INF/` for `*.cdx.json` files. **Scanner** SHOULD also check for `*.cdx.json.gz` and decompress as needed.
 
@@ -142,7 +143,7 @@ myapp-1.0-runner.jar
 
 #### GraalVM Native Images
 
-GraalVM embeds a gzip-compressed CycloneDX 1.6 SBOM in native images by default (via `--enable-sbom`). The compressed payload is typically less than 1/10,000 of the overall image size.
+GraalVM embeds a gzip-compressed CycloneDX SBOM in native images by default (via `--enable-sbom`).
 
 The binary exports two symbols:
 
@@ -216,6 +217,8 @@ The `components` array lists every identifiable component in the distribution. E
 
 **Scanner** MUST extract component purls. **Scanner** SHOULD match both the product CPE and component purls against VEX and CVE data sources.
 
+Occurrence locations use the same archive URI syntax as external references: a path relative to the distribution root, with `!` separating each archive boundary from the entry path within it (e.g., `web/console.war!/WEB-INF/lib/resources.jar`).
+
 ```json
 {
   "components": [
@@ -244,7 +247,7 @@ The `components` array lists every identifiable component in the distribution. E
       "purl": "pkg:npm/lodash@4.17.21",
       "evidence": {
         "occurrences": [
-          { "location": "web/console.war/WEB-INF/lib/resources.jar" }
+          { "location": "web/console.war!/WEB-INF/lib/resources.jar" }
         ]
       }
     }
@@ -258,11 +261,33 @@ SBOMs are typically self-contained — all product and component information is 
 
 However, in some cases a component within the SBOM may reference a separate, external SBOM. This is done using a CycloneDX `externalReference` of type `bom` on the component, with the URL pointing to the location of the referenced SBOM file.
 
+In this contract, external references are **local filesystem references** — either relative paths within the distribution, or paths into embedded archives. Remote URLs (e.g., `https://...`) are out of scope: scanners typically operate without network access to external repositories, and remote references cannot be reliably resolved at scan time.
+
+#### Archive URI syntax
+
+Both `externalReference` URLs and `evidence/occurrences` locations use the same archive URI syntax:
+
+```
+<path-relative-to-distribution-root>[!/<entry-path-inside-archive>]*
+```
+
+The `!` character separates each archive from the entry path within it. This nesting can repeat for archives within archives:
+
+```
+web/console.war!/WEB-INF/lib/nested.jar!/META-INF/bom.cdx.json
+```
+
+This means: open `web/console.war` as a ZIP, then open the `WEB-INF/lib/nested.jar` entry within it as a ZIP, then read `META-INF/bom.cdx.json` from that inner archive.
+
 **Generator** MAY add `externalReference` entries of type `bom` to components that carry their own SBOM (e.g., a WAR or JAR inside the distribution that has an embedded SBOM).
 
-**Generator** MUST use paths relative to the distribution root in external reference URLs. When the referenced SBOM is inside an archive (JAR, WAR, etc.), the path MUST use `!` to separate the archive path from the entry path within it (e.g., `web/admin-console.war!/META-INF/bom.cdx.json`).
+**Generator** MUST use the archive URI syntax described above for all local references. The path MUST be relative to the distribution root.
 
-**Scanner** SHOULD be prepared to follow these references. When an `externalReference` of type `bom` is found on a component, the scanner should locate and parse the referenced SBOM. When the path contains `!`, the scanner should treat the portion before `!` as the path to an archive and the portion after as the entry path within it. The components in the referenced SBOM belong to the parent component that carries the reference.
+**Generator** MUST NOT use remote URLs (e.g., `https://...`) as external reference URLs. Remote references cannot be reliably resolved by scanners operating without network access.
+
+**Scanner** SHOULD be prepared to follow local references. When an `externalReference` of type `bom` is found on a component, the scanner should resolve it using the archive URI syntax: split on `!`, treat each segment as an archive to open, and read the final entry from the innermost archive. The components in the referenced SBOM belong to the parent component that carries the reference.
+
+**Scanner** MAY skip or log a warning for any `externalReference` of type `bom` whose URL is a remote URL, since these cannot be resolved in a typical scan environment.
 
 ```json
 {
@@ -344,7 +369,7 @@ This is the straightforward case. Scanners can match the product CPE against VEX
 
 ### 5.2 Multi-Product Runtimes
 
-Some runtimes combine components from multiple products. A Quarkus application, for example, bundles Quarkus framework components (which have their own CPE and VEX stream), the customer's application code, and possibly third-party libraries. Similarly, an EAP server may include customer-deployed applications alongside the platform components.
+Some runtimes combine components from multiple products. A Quarkus application, for example, bundles Quarkus framework components (which have their own CPE and VEX stream), the customer's application code, and possibly third-party libraries.
 
 In these cases, the top-level `metadata.component` typically identifies the deployed application or the overall runtime. However, a scanner needs to know which components belong to which product in order to match them against the correct VEX/CVE sources.
 
@@ -389,60 +414,28 @@ In these cases, the top-level `metadata.component` typically identifies the depl
 
 In this example, `quarkus-core` belongs to the Quarkus product (which has its own CPE), `my-service` belongs to the customer's application, and `jackson-databind` is a third-party library that may be covered by multiple VEX streams. Without attribution, a scanner cannot route these components to the correct vulnerability data sources.
 
-### 5.3 Component-to-Product Attribution (Proposed)
+### 5.3 Component-to-Product Attribution
 
-> **This section is a draft proposal.** No SBOM generators implement this feature yet. Implementation is planned, but the exact mechanism may change. Finalization depends on feedback from scanner teams and product portfolio stakeholders. Scanner teams can plan their architecture around the concept but should not hardcode against specific property names.
+> **This section describes a feature in active implementation.** The [Quarkus CycloneDX extension](https://quarkus.io/guides/cyclonedx) implements this mechanism. Scanner teams can plan their architecture around this design.
 
 #### Problem
 
 In multi-product runtimes ([5.2](#52-multi-product-runtimes)), a scanner needs to associate each component with the product(s) it belongs to. Without this association, the scanner cannot determine which VEX stream or CPE applies to a given component.
 
-#### Proposed Mechanism
+#### Mechanism: dependency-graph `provides` edges
 
-The exact mechanism for component-to-product attribution is under active research. Approaches being evaluated include:
+Component-to-product attribution uses the CycloneDX dependency graph. Each attributed product is modeled as a `framework` component carrying its CPE, and component membership is expressed through `provides` edges in the `dependencies` array. This adapts [Red Hat's published product SBOM pattern](https://github.com/RedHatProductSecurity/security-data-guidelines/tree/main/sbom/examples/product) to the application SBOM context, reuses native CycloneDX fields, and cleanly handles components shared across multiple products.
 
-- **Custom properties** — using CycloneDX `properties` on components to declare product affiliation (e.g., `sbom:redhat:cpe` for the product CPE and a corresponding property for the specific release version). Clear intent, but requires registering a custom property namespace and defining the full set of required properties.
-- **`evidence.identity`** — using the existing `evidence.identity` field with a CPE. Reuses spec fields, but semantically `evidence.identity` describes how a component itself was identified, not which product it belongs to.
-- **`compositions`** — using CycloneDX's `compositions` element to group components under a product-level assembly with a CPE.
-- **Dependency-graph `provides` edges** — modeling each product as its own `framework` component that carries the product CPE, and expressing component membership through the CycloneDX `dependencies` graph. This follows Red Hat's published product SBOM pattern (`RedHatProductSecurity/security-data-guidelines`, e.g. `sbom/examples/product/rhel-9.2-main+eus.cdx.json`), reuses native spec fields, and cleanly handles shared and multi-product components. It is the leading candidate for the Quarkus platform case — see [Candidate: dependency-graph `provides` edges](#candidate-dependency-graph-provides-edges-quarkus-platform-members) below.
+**Product taxonomy.** Two distinct "product" notions must not be conflated:
 
-Each approach has trade-offs around semantic correctness, scanner complexity, and alignment with the CycloneDX specification's intended usage. The following example illustrates the custom properties approach as one candidate:
-
-```json
-{
-  "type": "library",
-  "group": "io.quarkus",
-  "name": "quarkus-core",
-  "version": "3.15.1",
-  "purl": "pkg:maven/io.quarkus/quarkus-core@3.15.1?type=jar",
-  "properties": [
-    {
-      "name": "sbom:redhat:cpe",
-      "value": "cpe:2.3:a:redhat:quarkus:3.15.1:*:*:*:*:*:*:*"
-    },
-    {
-      "name": "sbom:redhat:release-version",
-      "value": "3.15.1.redhat-00001"
-    }
-  ]
-}
-```
-
-#### Candidate: dependency-graph `provides` edges (Quarkus platform members)
-
-This candidate is being prototyped for the Quarkus platform, where the runtime mixes the customer's application with several Red Hat products (the platform members: Quarkus core, Camel Quarkus, etc.). It adapts [Red Hat's published product SBOM pattern](https://github.com/RedHatProductSecurity/security-data-guidelines/tree/main/sbom/examples/product) to the *application* SBOM context.
-
-**Product taxonomy.** Three distinct "product" notions must not be conflated:
-
-1. **The application** — a product in its own right (the customer's), and the SBOM subject: it is the `metadata.component` / root. It typically carries no Red Hat CPE (it is *not* Quarkus and *not* a platform member).
-2. **Quarkus** (the framework/core) — not the application; a consumed product. If the core member declares a CPE it is simply another member product, never the root.
-3. **The platform members** — Red Hat products, each with a CPE, whose artifacts are attributed to them.
+1. **The application** — a product in its own right (the customer's), and the SBOM subject: it is the `metadata.component` / root. It carries no upstream product CPE.
+2. **Upstream products** — Red Hat products consumed by the application (e.g., Quarkus, Camel Quarkus), each with a CPE, whose artifacts are attributed to them. These are never the SBOM root.
 
 **Structure.** Unlike Red Hat's standalone *product* SBOM (where the single product is the root and provides everything), here the root is the application and each member product is an additional, non-root `framework` component:
 
 - Red Hat CPEs attach only to the member product components — never to the app root, and never to individual `pkg:maven` artifacts.
-- The app relates to its dependencies via `dependsOn` (installation requirements — the normal Maven graph).
-- The app also `dependsOn` each member product component, marked `scope: excluded` so the member node is graph-reachable (not orphan inventory) but flagged as a build-time/tooling construct, not a runtime deliverable. Runtime-closure computation is unaffected because the attributed artifacts remain reachable via the direct `app → dependsOn → artifact` edges.
+- The app relates to its dependencies via `dependsOn` (the normal Maven dependency graph).
+- The app also `dependsOn` each member product component, marked `scope: excluded` so the member node is graph-reachable but flagged as a build-time/tooling construct, not a runtime deliverable. Runtime-closure computation is unaffected because the attributed artifacts remain reachable via the direct `app → dependsOn → artifact` edges.
 - Each member product `provides` the subset of `pkg:maven` artifacts attributed to it. A shared artifact simply appears in multiple members' `provides` lists — one canonical component/bom-ref, no duplication.
 
 ```
@@ -489,29 +482,33 @@ app (root, metadata.component — the customer's product)
 }
 ```
 
-**Member product component identity.** Unlike Red Hat's RHEL products (which have no purl, hence CPE-as-`bom-ref` out of necessity), Quarkus platform members have a natural purl — their Maven BOM coordinates. Decisions:
+**Member product component identity.** Unlike Red Hat's RHEL products (which have no purl, hence CPE-as-`bom-ref` out of necessity), Quarkus platform members have a natural purl — their Maven BOM coordinates:
 
-- **`purl` retained** — the member BOM coordinates (`pkg:maven/<groupId>/<bom-artifactId>@<version>?type=pom`).
-- **CPE placement** — canonical CPE in native `component.cpe` (so single-CPE scanners match); all CPEs in `evidence.identity[]` (`field: cpe`) to support multi-CPE members.
+- **`purl`** — the member BOM coordinates (`pkg:maven/<groupId>/<bom-artifactId>@<version>?type=pom`).
+- **`bom-ref`** — the purl (not the CPE). `bom-ref` is a document-local handle; purl-as-`bom-ref` keeps edges uniform with the rest of a Maven-generated SBOM and is unambiguous for multi-CPE members.
+- **CPE placement** — canonical CPE in `component.cpe` (so single-CPE scanners match); all CPEs in `evidence.identity[]` (`field: cpe`) to support multi-CPE members.
 - **`type: framework`, `scope: excluded`.**
-- **`bom-ref` — leaning toward the purl rather than the CPE (RH convention), pending consumer confirmation.** `bom-ref` is an opaque, document-local handle; the RH CPE-as-`bom-ref` choice is driven by their lack of a purl, not a semantic requirement. Purl-as-`bom-ref` keeps edges uniform with the rest of a Maven-generated SBOM, is unambiguous for multi-CPE members, and guarantees uniqueness. **Confirm** whether the downstream consumer (Trustify / SBOMer) keys attribution off `component.cpe` / `evidence.identity` (correct) or relies on the RH CPE-as-`bom-ref` convention.
 
-#### Role Obligations (Future)
+#### Role Obligations
 
-- **Product Team** would declare which product(s) their components belong to via generator configuration
-- **Generator** would annotate each component with the configured product metadata as CycloneDX properties
-- **Scanner** would read these properties to route components to the correct VEX/CVE streams
+**Product Team** MUST declare which products their components are attributed to via generator configuration.
 
-Every component in the SBOM belongs to the top-level product or application identified in `metadata.component`. Component-level product attribution serves a different purpose: it identifies which upstream product team is responsible for providing a patch for that component. A component without attribution properties is still part of the top-level application — the application owner simply has no upstream product stream to look to for a fix and must address vulnerabilities directly.
+**Generator** MUST model each attributed product as a `framework` component with `scope: excluded` and a CPE.
 
-This area requires further design work and community input, particularly around:
+**Generator** MUST add `provides` edges in the `dependencies` array linking each member product component to the `pkg:maven` artifacts attributed to it.
 
-- Property namespace and naming conventions
-- Handling components that belong to multiple products
-- Interaction with CycloneDX's own evolving metadata capabilities
-- For the `provides`-edge candidate: `bom-ref` convention (purl vs. CPE) and whether consumers key attribution off `component.cpe`/`evidence.identity` rather than `bom-ref`
-- For the `provides`-edge candidate: whether the member BOM could independently appear as its own `pkg:maven` component elsewhere in the SBOM (a `bom-ref`/purl collision to reconcile), and confirming consumers honor `scope: excluded` on the member product node rather than dropping it from views
-- Semantic fit of `provides`: its canonical CycloneDX meaning is "implements a specification/standard" (CBOM origin); the product-membership reading follows Red Hat's usage but is broader than the field's documented intent
+**Scanner** MUST recognize `framework` components with `scope: excluded` and a CPE as product attribution nodes, not runtime deliverables.
+
+**Scanner** MUST follow `provides` edges to determine which product CPE (and therefore which VEX stream) applies to each component.
+
+**Scanner** SHOULD handle components that appear in multiple products' `provides` lists by evaluating them against all applicable VEX streams.
+
+Every component in the SBOM belongs to the top-level product or application identified in `metadata.component`. Component-level attribution identifies which upstream product team is responsible for a patch. A component with no `provides` edge pointing to it is still part of the top-level application — the application owner has no upstream product stream to look to and must address vulnerabilities directly.
+
+#### Open questions
+
+- **Semantic fit of `provides`**: its canonical CycloneDX meaning is "implements a specification/standard" (CBOM origin); the product-membership reading follows Red Hat's usage but is broader than the field's documented intent.
+- **Consumer key for attribution**: confirm whether Trustify / SBOMer keys attribution off `component.cpe` / `evidence.identity` (correct) or relies on the RH CPE-as-`bom-ref` convention — this determines whether purl-as-`bom-ref` is safe to adopt.
 
 ## 6. Reference Implementations
 
@@ -528,10 +525,3 @@ This area requires further design work and community input, particularly around:
 | Scanner | Notes |
 |---------|-------|
 | [Clair](https://github.com/quay/clair) | Container vulnerability scanner with SBOM ingestion support |
-
-### Product Integrations
-
-These pull requests demonstrate how product teams configure SBOM generators:
-
-- **Apache Artemis** — [PR #6600](https://github.com/apache/artemis/pull/6600): configures maven-assembly-sbom to generate an SBOM for the Artemis distribution archive
-- **Keycloak** — [PR #51743](https://github.com/keycloak/keycloak/pull/51743): configures SBOM generation for the Keycloak distribution
