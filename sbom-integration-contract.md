@@ -65,17 +65,17 @@ An SBOM generated at build time has access to the full dependency resolution con
 
 This section defines where SBOMs are placed and how they are named, covering the obligations of generators (who produce and place them), product teams (who configure placement), and scanners (who discover them).
 
-SBOMs MAY be GZip-compressed to reduce size. When compressed, the `*.gz` suffix is appended to the standard filename (e.g., `bom.cdx.json.gz`). Scanners must be prepared to handle both compressed and uncompressed SBOMs in all placement locations described below.
+SBOMs MAY be GZip-compressed to reduce size. When compressed, the `*.gz` suffix is appended to the standard filename (e.g., `sbom.cdx.json.gz`). Scanners must be prepared to handle both compressed and uncompressed SBOMs in all placement locations described below.
 
 ### 3.1 Naming Convention
 
 **Generator** MUST use the `*.cdx.json` filename pattern for JSON-format CycloneDX SBOMs (or `*.cdx.xml` for XML format). If GZip-compressed, the file MUST use `*.cdx.json.gz` (or `*.cdx.xml.gz`).
 
-**Generator** SHOULD default to `bom.cdx.json` as the canonical filename.
+**Generator** SHOULD default to `sbom.cdx.json` as the canonical filename.
 
 **Scanner** MUST recognize files matching `*.cdx.json` and `*.cdx.xml` as CycloneDX SBOM files. **Scanner** MUST also recognize `*.cdx.json.gz` and `*.cdx.xml.gz` as GZip-compressed SBOMs and decompress them before parsing.
 
-**Scanner** SHOULD prefer `bom.cdx.json` (or `bom.cdx.json.gz`) when multiple SBOM files are found in the same location. If both a compressed and uncompressed version of the same SBOM exist (e.g., `bom.cdx.json` and `bom.cdx.json.gz`), the scanner SHOULD prefer the uncompressed version.
+**Scanner** SHOULD prefer `sbom.cdx.json` (or `sbom.cdx.json.gz`) when multiple SBOM files are found in the same location. If both a compressed and uncompressed version of the same SBOM exist (e.g., `sbom.cdx.json` and `sbom.cdx.json.gz`), the scanner SHOULD prefer the uncompressed version.
 
 ### 3.2 Filesystem Placement
 
@@ -95,7 +95,7 @@ For JARs with external SBOMs, the SBOM is placed next to the JAR:
 
 ```
 keycloak-26.0.0/
-  bom.cdx.json                          <-- distribution SBOM at root
+  sbom.cdx.json                         <-- distribution SBOM at root
   bin/
     kc.sh
   lib/
@@ -108,7 +108,7 @@ keycloak-26.0.0/
 
 ```
 artemis-2.40.0/
-  bom.cdx.json                          <-- distribution SBOM at root
+  sbom.cdx.json                         <-- distribution SBOM at root
   bin/
     artemis
     artemis.cmd
@@ -130,12 +130,12 @@ SBOMs can be embedded inside JARs or native executables, allowing them to travel
 
 **Generator** MAY GZip-compress embedded SBOMs. If compressed, the file MUST use the `*.cdx.json.gz` extension. Quarkus compresses embedded SBOMs by default.
 
-**Scanner** MUST open JARs as ZIP archives and check `META-INF/` for `*.cdx.json` files. **Scanner** SHOULD also check for `*.cdx.json.gz` and decompress as needed.
+**Scanner** MUST open JARs as ZIP archives and check `META-INF/` for CycloneDX SBOM files (both `*.cdx.json` and the compressed `*.cdx.json.gz` form, per [3.1](#31-naming-convention)).
 
 ```
 myapp-1.0-runner.jar
   META-INF/
-    bom.cdx.json.gz                     <-- GZip-compressed SBOM
+    sbom.cdx.json.gz                    <-- GZip-compressed SBOM
   com/
     example/
       ...
@@ -274,10 +274,10 @@ Both `externalReference` URLs and `evidence/occurrences` locations use the same 
 The `!` character separates each archive from the entry path within it. This nesting can repeat for archives within archives:
 
 ```
-web/console.war!/WEB-INF/lib/nested.jar!/META-INF/bom.cdx.json
+web/console.war!/WEB-INF/lib/nested.jar!/META-INF/sbom.cdx.json
 ```
 
-This means: open `web/console.war` as a ZIP, then open the `WEB-INF/lib/nested.jar` entry within it as a ZIP, then read `META-INF/bom.cdx.json` from that inner archive.
+This means: open `web/console.war` as a ZIP, then open the `WEB-INF/lib/nested.jar` entry within it as a ZIP, then read `META-INF/sbom.cdx.json` from that inner archive.
 
 **Generator** MAY add `externalReference` entries of type `bom` to components that carry their own SBOM (e.g., a WAR or JAR inside the distribution that has an embedded SBOM).
 
@@ -299,13 +299,13 @@ This means: open `web/console.war` as a ZIP, then open the `WEB-INF/lib/nested.j
   "externalReferences": [
     {
       "type": "bom",
-      "url": "web/admin-console.war!/META-INF/bom.cdx.json"
+      "url": "web/admin-console.war!/META-INF/sbom.cdx.json"
     }
   ]
 }
 ```
 
-In this example, the distribution's main SBOM lists `admin-console.war` as a component and points to its embedded SBOM. A scanner following the reference would open `web/admin-console.war` as a ZIP archive and read `META-INF/bom.cdx.json` from inside it to discover the WAR's own components.
+In this example, the distribution's main SBOM lists `admin-console.war` as a component and points to its embedded SBOM. A scanner following the reference would open `web/admin-console.war` as a ZIP archive and read `META-INF/sbom.cdx.json` from inside it to discover the WAR's own components.
 
 ### 4.4 SBOMs Without Product Information
 
@@ -321,51 +321,9 @@ Different runtime architectures require different approaches to product identifi
 
 ### 5.1 Single-Product Runtimes
 
-Products like Keycloak and Apache Artemis are single-product distributions: one SBOM describes one product, and all components belong to that product.
+Products like Keycloak and Apache Artemis are single-product distributions: one SBOM describes one product, and all components belong to it. This is [4.1](#41-product-identification) applied directly — the **Product Team** supplies the product's CPE, name, version, and supplier in `metadata.component`, and every entry in the `components` array belongs to that product (see [4.1](#41-product-identification) and [4.2](#42-component-inventory) for the field structures).
 
-**Product Team** configures the generator with the product's CPE, name, version, and supplier. **Generator** places this in `metadata.component`. All entries in the `components` array are components of this product.
-
-This is the straightforward case. Scanners can match the product CPE against VEX data and apply the results to all components in the SBOM.
-
-```json
-{
-  "bomFormat": "CycloneDX",
-  "specVersion": "1.6",
-  "metadata": {
-    "component": {
-      "type": "application",
-      "name": "artemis",
-      "version": "2.40.0",
-      "group": "org.apache.activemq",
-      "purl": "pkg:maven/org.apache.activemq/apache-artemis@2.40.0?type=zip&classifier=dist",
-      "cpe": "cpe:2.3:a:apache:activemq_artemis:2.40.0:*:*:*:*:*:*:*",
-      "supplier": {
-        "name": "The Apache Software Foundation",
-        "url": ["https://www.apache.org"]
-      },
-      "hashes": [
-        { "alg": "SHA-256", "content": "e4f90a1b..." }
-      ]
-    }
-  },
-  "components": [
-    {
-      "type": "library",
-      "group": "org.apache.activemq",
-      "name": "artemis-core-client",
-      "version": "2.40.0",
-      "purl": "pkg:maven/org.apache.activemq/artemis-core-client@2.40.0?type=jar"
-    },
-    {
-      "type": "library",
-      "group": "io.netty",
-      "name": "netty-buffer",
-      "version": "4.1.115.Final",
-      "purl": "pkg:maven/io.netty/netty-buffer@4.1.115.Final?type=jar"
-    }
-  ]
-}
-```
+This is the straightforward case: scanners match the single product CPE against VEX data and apply the results to all components in the SBOM.
 
 ### 5.2 Multi-Product Runtimes
 
@@ -508,7 +466,7 @@ Every component in the SBOM belongs to the top-level product or application iden
 #### Open questions
 
 - **Semantic fit of `provides`**: its canonical CycloneDX meaning is "implements a specification/standard" (CBOM origin); the product-membership reading follows Red Hat's usage but is broader than the field's documented intent.
-- **Consumer key for attribution**: confirm whether Trustify / SBOMer keys attribution off `component.cpe` / `evidence.identity` (correct) or relies on the RH CPE-as-`bom-ref` convention — this determines whether purl-as-`bom-ref` is safe to adopt.
+- **Consumer key for attribution**: confirm whether the consumer (Trustify) keys attribution off `component.cpe` / `evidence.identity` (correct) or relies on the RH CPE-as-`bom-ref` convention emitted by generators such as SBOMer — this determines whether purl-as-`bom-ref` is safe to adopt.
 
 ## 6. Reference Implementations
 
@@ -516,12 +474,13 @@ Every component in the SBOM belongs to the top-level product or application iden
 
 | Generator | Approach | Placement | Key Features |
 |-----------|----------|-----------|--------------|
-| [maven-assembly-sbom](https://github.com/cyberstamp/maven-assembly-sbom) | Content-based: hashes every file in the archive and matches against known Maven artifacts | Embedded in archive (`bom.cdx.json`), external next to archive (`*.cdx.json`), or both | Shaded JAR detection, unpacked WAR handling, multi-ecosystem SBOM merging (npm, pnpm), external SBOM linking, product metadata configuration |
-| [Quarkus CycloneDX](https://quarkus.io/guides/cyclonedx) | Dependency-resolution-based: records components during application build | Embedded in JAR (`META-INF/bom.cdx.json.gz`) or native executable (GraalVM SBOM) | GZip compression by default, travels with the artifact, covers both JVM and native builds |
-| [WildFly/EAP Galleon plugin](https://github.com/aloubyansky/galleon-plugins/tree/sbom-cdx) | Provisioning-based: records artifacts as they are installed into the server distribution | Filesystem at distribution root (`bom.cdx.json`) | Shaded JAR detection, npm package detection via JavaScript source map analysis, evidence/occurrences tracking |
+| [maven-assembly-sbom](https://github.com/cyberstamp/maven-assembly-sbom) | Content-based: hashes every file in the archive and matches against known Maven artifacts | Embedded in archive (`sbom.cdx.json`), external next to archive (`*.cdx.json`), or both | Shaded JAR detection, unpacked WAR handling, multi-ecosystem SBOM merging (npm, pnpm), external SBOM linking, product metadata configuration |
+| [Quarkus CycloneDX](https://quarkus.io/guides/cyclonedx) | Dependency-resolution-based: records components during application build | Embedded in JAR (`META-INF/sbom.cdx.json.gz`) or native executable (GraalVM SBOM) | GZip compression by default, travels with the artifact, covers both JVM and native builds |
+| [WildFly/EAP Galleon plugin](https://github.com/aloubyansky/galleon-plugins/tree/sbom-cdx) | Provisioning-based: records artifacts as they are installed into the server distribution | Filesystem at distribution root (`sbom.cdx.json`) | Shaded JAR detection, npm package detection via JavaScript source map analysis, evidence/occurrences tracking |
 
 ### Scanners
 
 | Scanner | Notes |
 |---------|-------|
+| [Red Hat Advanced Cluster Security (ACS)](https://www.redhat.com/en/technologies/cloud-computing/openshift/advanced-cluster-security-kubernetes) | Kubernetes-native security platform; its Scanner V4 is built on Clair and ingests SBOMs |
 | [Clair](https://github.com/quay/clair) | Container vulnerability scanner with SBOM ingestion support |

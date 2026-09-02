@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SBOM Integration Contract</title>
+<style>
+  :root {
+    --bg: #0a0e14;
+    --bg-2: #0f141c;
+    --panel: #131a24;
+    --panel-2: #182230;
+    --line: #26303f;
+    --text: #e6edf3;
+    --muted: #8b98a9;
+    --dim: #6a7686;
+    --accent: #35d0ba;      /* cyan */
+    --accent-2: #8b7bff;    /* violet */
+    --amber: #f5b850;
+    --gen: #35d0ba;         /* Generator */
+    --prod: #8b7bff;        /* Product Team */
+    --scan: #f77f7f;        /* Scanner */
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+
+  .deck {
+    scroll-snap-type: y mandatory;
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+  }
+
+  .slide {
+    scroll-snap-align: start;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5.5vh 8vw 7vh;
+    position: relative;
+    border-bottom: 1px solid var(--line);
+    background:
+      radial-gradient(1200px 700px at 85% -10%, rgba(139,123,255,0.10), transparent 60%),
+      radial-gradient(1000px 600px at 0% 110%, rgba(53,208,186,0.08), transparent 55%),
+      var(--bg);
+  }
+
+  .slide-inner { width: 100%; max-width: 1120px; margin: 0 auto; }
+
+  /* ---- Section eyebrow ---- */
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600; margin-bottom: 1.4rem;
+  }
+  .eyebrow .num {
+    font-family: var(--mono); color: var(--dim);
+    border: 1px solid var(--line); border-radius: 6px;
+    padding: 2px 8px; font-size: 0.72rem; letter-spacing: 0;
+  }
+
+  h1 {
+    font-size: clamp(2.6rem, 6vw, 5rem);
+    line-height: 1.02; font-weight: 800; letter-spacing: -0.03em;
+    background: linear-gradient(110deg, #fff 15%, var(--accent) 60%, var(--accent-2) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  h2 {
+    font-size: clamp(1.9rem, 3.8vw, 3rem);
+    line-height: 1.08; font-weight: 750; letter-spacing: -0.025em;
+    margin-bottom: 1.2rem;
+  }
+  h2 .hl {
+    background: linear-gradient(110deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  h3 { font-size: 1.15rem; font-weight: 700; letter-spacing: -0.01em; }
+
+  .lead { font-size: clamp(1.05rem, 1.7vw, 1.4rem); color: var(--muted); max-width: 62ch; }
+  p.body { color: var(--muted); font-size: 1.02rem; max-width: 68ch; margin-top: 0.6rem; }
+  .accent-text { color: var(--accent); font-weight: 600; }
+
+  /* ---- Cards / grids ---- */
+  .grid { display: grid; gap: 1.1rem; margin-top: 2rem; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 860px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: linear-gradient(160deg, var(--panel), var(--bg-2));
+    border: 1px solid var(--line);
+    border-radius: 14px; padding: 1.4rem 1.5rem;
+  }
+  .card h3 { margin-bottom: 0.55rem; }
+  .card p { color: var(--muted); font-size: 0.96rem; }
+  .card .icon { font-size: 1.5rem; margin-bottom: 0.7rem; display: block; }
+  .card.accent-edge { border-top: 2px solid var(--accent); }
+
+  /* ---- Role chips ---- */
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.74rem; font-weight: 700; letter-spacing: 0.02em;
+    padding: 3px 10px; border-radius: 999px; white-space: nowrap;
+    border: 1px solid transparent;
+  }
+  .chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .chip.gen  { color: var(--gen);  background: rgba(53,208,186,0.10);  border-color: rgba(53,208,186,0.35); }
+  .chip.prod { color: var(--prod); background: rgba(139,123,255,0.12); border-color: rgba(139,123,255,0.38); }
+  .chip.scan { color: var(--scan); background: rgba(247,127,127,0.12); border-color: rgba(247,127,127,0.38); }
+
+  /* ---- RFC 2119 keyword tags ---- */
+  .kw { font-family: var(--mono); font-size: 0.72rem; font-weight: 700; padding: 1px 6px; border-radius: 5px; letter-spacing: 0.03em; }
+  .kw.must   { color: #ff9d9d; background: rgba(247,127,127,0.15); }
+  .kw.should { color: var(--amber); background: rgba(245,184,80,0.14); }
+  .kw.may    { color: var(--accent); background: rgba(53,208,186,0.14); }
+
+  /* ---- Obligation table ---- */
+  .oblig { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 1.8rem; }
+  @media (min-width: 861px){ .oblig { grid-template-columns: repeat(3,1fr); } }
+  .role-col { background: linear-gradient(160deg, var(--panel), var(--bg-2)); border: 1px solid var(--line); border-radius: 14px; padding: 1.3rem 1.4rem; }
+  .role-col.gen  { border-top: 2px solid var(--gen); }
+  .role-col.prod { border-top: 2px solid var(--prod); }
+  .role-col.scan { border-top: 2px solid var(--scan); }
+  .role-col .who { color: var(--dim); font-size: 0.85rem; margin: 0.35rem 0 0.9rem; }
+  .role-col ul { list-style: none; }
+  .role-col li { color: var(--muted); font-size: 0.92rem; padding: 0.4rem 0; border-top: 1px solid var(--line); display: flex; gap: 8px; align-items: baseline; }
+  .role-col li:first-of-type { border-top: none; }
+
+  /* ---- Rule lines (placement etc.) ---- */
+  .rules { display: flex; flex-direction: column; gap: 0.55rem; margin-top: 1.4rem; }
+  .rule { display: flex; gap: 12px; align-items: baseline; font-size: 0.95rem; color: var(--muted); padding: 0.55rem 0.9rem; background: rgba(255,255,255,0.015); border: 1px solid var(--line); border-radius: 10px; }
+  .rule .tags { display: inline-flex; gap: 6px; flex-shrink: 0; }
+  .rule code { font-family: var(--mono); color: var(--accent); font-size: 0.88em; background: rgba(53,208,186,0.08); padding: 1px 5px; border-radius: 4px; }
+
+  /* ---- Code blocks ---- */
+  pre {
+    background: #070a0f; border: 1px solid var(--line); border-radius: 12px;
+    padding: 1.15rem 1.3rem; overflow-x: auto; font-family: var(--mono);
+    font-size: 0.82rem; line-height: 1.65; color: #c9d3df; margin-top: 1.2rem;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.4);
+  }
+  pre .cap { display: block; color: var(--dim); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.7rem; font-family: var(--sans); }
+  .k { color: var(--accent-2); }      /* json key */
+  .s { color: #7fd6a0; }              /* string */
+  .n { color: var(--amber); }         /* number/literal */
+  .cpe { color: #ff9d9d; }            /* cpe highlight */
+  .purl { color: var(--accent); }     /* purl highlight */
+  .cm { color: var(--dim); }          /* comment */
+  .arw { color: var(--accent-2); }
+
+  /* ---- Split layout ---- */
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 2.2rem; align-items: center; margin-top: 1.5rem; }
+  @media (max-width: 940px){ .split { grid-template-columns: 1fr; } }
+
+  /* ---- ASCII/graph diagram ---- */
+  .diagram {
+    font-family: var(--mono); font-size: 0.86rem; line-height: 1.9; color: var(--muted);
+    background: #070a0f; border: 1px solid var(--line); border-radius: 12px; padding: 1.4rem 1.5rem;
+    white-space: pre; overflow-x: auto; tab-size: 2;
+  }
+  .diagram .node { color: var(--text); font-weight: 600; }
+  .diagram .app  { color: #fff; }
+  .diagram .mem  { color: var(--prod); }
+  .diagram .art  { color: var(--accent); }
+  .diagram .edge { color: var(--dim); }
+  .diagram .excl { color: var(--scan); }
+
+  /* ---- Badges ---- */
+  .badges { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2rem; }
+  .badge { font-size: 0.82rem; color: var(--muted); border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 6px 14px; }
+  .badge b { color: var(--accent); font-weight: 700; }
+  .badge.warn b { color: var(--amber); }
+
+  /* ---- Callout ---- */
+  .callout { margin-top: 1.6rem; border-left: 3px solid var(--amber); background: rgba(245,184,80,0.06); padding: 0.9rem 1.2rem; border-radius: 0 10px 10px 0; color: var(--muted); font-size: 0.95rem; }
+  .callout.accent { border-left-color: var(--accent); background: rgba(53,208,186,0.06); }
+  .callout strong { color: var(--text); }
+
+  /* ---- Big statement list ---- */
+  .why-list { list-style: none; margin-top: 1.6rem; display: flex; flex-direction: column; gap: 1rem; }
+  .why-list li { display: flex; gap: 1rem; align-items: flex-start; }
+  .why-list .marker { font-family: var(--mono); color: var(--accent); font-size: 0.85rem; border: 1px solid var(--line); border-radius: 8px; padding: 4px 9px; flex-shrink: 0; margin-top: 2px; }
+  .why-list h3 { margin-bottom: 0.2rem; }
+  .why-list p { color: var(--muted); font-size: 0.95rem; }
+
+  /* ---- Ref table ---- */
+  table { width: 100%; border-collapse: collapse; margin-top: 1.6rem; font-size: 0.92rem; }
+  th, td { text-align: left; padding: 0.85rem 1rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--accent); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  td { color: var(--muted); }
+  td b { color: var(--text); font-weight: 650; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ---- Progress rail ---- */
+  .rail { position: fixed; right: 22px; top: 50%; transform: translateY(-50%); z-index: 50; display: flex; flex-direction: column; gap: 11px; }
+  .rail a { width: 9px; height: 9px; border-radius: 50%; background: var(--line); border: 1px solid transparent; transition: all 0.25s; display: block; }
+  .rail a:hover { background: var(--muted); transform: scale(1.25); }
+  .rail a.active { background: linear-gradient(var(--accent), var(--accent-2)); box-shadow: 0 0 10px rgba(53,208,186,0.6); transform: scale(1.3); }
+  @media (max-width: 760px){ .rail { display: none; } }
+
+  .hint { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 50; color: var(--dim); font-size: 0.78rem; display: flex; align-items: center; gap: 8px; opacity: 0.8; }
+  .hint .arrow { animation: bob 1.6s infinite; }
+  @keyframes bob { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(4px);} }
+
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 8px; margin-top: 2rem;
+    font-size: 0.85rem; color: var(--amber); border: 1px solid rgba(245,184,80,0.35);
+    background: rgba(245,184,80,0.08); border-radius: 999px; padding: 7px 16px;
+  }
+  .status-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+
+  .parties { display: flex; gap: 1.4rem; flex-wrap: wrap; margin-top: 2.6rem; }
+  .party { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; font-weight: 600; }
+  .party .d { width: 11px; height: 11px; border-radius: 50%; }
+
+  .footer-note { color: var(--dim); font-size: 0.85rem; margin-top: 1.5rem; }
+  .footer-note a, a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .slide-num { position: absolute; bottom: 26px; left: 8vw; font-family: var(--mono); font-size: 0.75rem; color: var(--dim); letter-spacing: 0.1em; }
+</style>
+</head>
+<body>
+
+<nav class="rail" id="rail"></nav>
+<div class="hint"><span>scroll to navigate</span><span class="arrow">↓</span></div>
+
+<div class="deck" id="deck">
+
+  <!-- 1. TITLE / OVERVIEW -->
+  <section class="slide" id="s1">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">Overview</span> A three-party integration contract</div>
+      <h1>SBOM<br>Integration Contract</h1>
+      <p class="lead" style="margin-top:1.6rem">How SBOMs should be <span class="accent-text">generated</span>, <span class="accent-text">bundled with products</span>, and <span class="accent-text">consumed by vulnerability scanners</span> — so software composition analysis actually works in the real world.</p>
+
+      <div class="parties">
+        <div class="party"><span class="d" style="background:var(--gen)"></span>Generators</div>
+        <div class="party"><span class="d" style="background:var(--prod)"></span>Product Teams</div>
+        <div class="party"><span class="d" style="background:var(--scan)"></span>Scanners</div>
+      </div>
+
+      <div class="status-badge"><span class="dot"></span> Proposal · CycloneDX 1.6 · grounded in working implementations (SPDX planned)</div>
+    </div>
+    <div class="slide-num">01 / 11</div>
+  </section>
+
+  <!-- 2. THE CHALLENGE -->
+  <section class="slide" id="s2">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">§2</span> The Challenge</div>
+      <h2>A scanner is only as good as <span class="hl">what it can identify</span></h2>
+      <p class="lead">Vulnerability scanning depends on one thing: correctly identifying <em>which product</em> and <em>which components</em> are installed, then matching them against VEX/CVE data.</p>
+      <p class="body">The traditional approach — inspecting the filesystem after the fact — cannot reliably answer either question. You can't match a CVE to a product you can't name, or to a library whose identity was erased at build time.</p>
+
+      <div class="grid grid-2">
+        <div class="card accent-edge">
+          <h3>What's the product?</h3>
+          <p>No universal convention exposes product name, version, or CPE on disk. Version files, manifests, directory names — or nothing at all. Every product does it differently.</p>
+        </div>
+        <div class="card accent-edge">
+          <h3>What are the components?</h3>
+          <p>Modern packaging deliberately dissolves component boundaries. The original coordinates a scanner needs are frequently gone by the time bytes hit the filesystem.</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">02 / 11</div>
+  </section>
+
+  <!-- 3. WHY FILESYSTEM SCANNING BREAKS -->
+  <section class="slide" id="s3">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">§2</span> Why filesystem scanning breaks</div>
+      <h2>Packaging <span class="hl">obscures</span> component identity</h2>
+      <p class="lead">Three techniques, ubiquitous in production builds, make components impossible to identify from files alone.</p>
+
+      <div class="grid grid-3">
+        <div class="card">
+          <span class="icon">📦</span>
+          <h3>Shaded / fat JARs</h3>
+          <p>Many Maven artifacts repackaged into one JAR, often with relocated package names. The original GAV coordinates, directory structure, and manifest entries are lost.</p>
+        </div>
+        <div class="card">
+          <span class="icon">✂️</span>
+          <h3>Tree-shaking &amp; minification</h3>
+          <p>JS/frontend tooling removes unused code and compresses the rest. Package names, version strings, and file boundaries disappear.</p>
+        </div>
+        <div class="card">
+          <span class="icon">⚙️</span>
+          <h3>GraalVM native images</h3>
+          <p>A single native binary compiled from Maven JARs, NPM packages, and more. No individual component files exist in the output at all.</p>
+        </div>
+      </div>
+
+      <div class="callout"><strong>The through-line:</strong> the information a scanner needs is available at <em>build time</em> and destroyed by <em>packaging time</em>. Reconstructing it afterward is guesswork.</div>
+    </div>
+    <div class="slide-num">03 / 11</div>
+  </section>
+
+  <!-- 3b. PACKAGE MANAGERS -->
+  <section class="slide" id="s3b">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">Baseline</span> The RPM layer</div>
+      <h2>For RPM-based systems, part of this is <span class="hl">already solved</span></h2>
+      <p class="lead">Scanners don't start blind. On RPM-based systems (RHEL, Fedora) they read the <strong>RPM database</strong> — an authoritative record of what the package manager installed, and where each package came from.</p>
+
+      <div class="split">
+        <div>
+          <h3 style="margin-bottom:.6rem">How product identity is derived</h3>
+          <div class="diagram">
+<span class="node">local RPM DB</span>  <span class="edge">(/var/lib/rpm)</span>
+ <span class="edge">|</span>
+ <span class="edge">+--</span> <span class="art">installed packages</span>      <span class="edge">(name · version · release · vendor)</span>
+ <span class="edge">|</span>
+ <span class="edge">`--</span> <span class="mem">originating repository</span>
+        <span class="edge">`--</span> repository-to-cpe.json <span class="edge">--></span> <span class="cpe">CPE</span> <span class="edge">--> VEX / CVE match</span>
+          </div>
+          <p class="body" style="margin-top:1rem">Clair, Trivy, and Grype enumerate installed RPMs/DEBs, resolve each package's repository to a <span class="cpe" style="font-weight:600">CPE</span> via a published mapping, then match against CPE-keyed security data. Reliable — and authoritative for whatever the package manager manages.</p>
+        </div>
+        <div>
+          <h3 style="margin-bottom:.6rem">What it can't see</h3>
+          <div class="grid" style="margin-top:0.2rem; gap:0.9rem">
+            <div class="card"><h3>Bundled language deps</h3><p>An RPM ships a fat JAR or WAR — the DB knows the <em>one</em> package, not the Maven/npm artifacts repackaged inside it.</p></div>
+            <div class="card"><h3>Non-packaged distributions</h3><p>WildFly, Keycloak, Artemis unpacked from a ZIP, or files added to a container via <code style="color:var(--accent)">COPY</code> — no DB entry ever exists.</p></div>
+            <div class="card"><h3>Multi-product attribution</h3><p>repo&rarr;CPE identifies the OS layer, not which application-level components belong to which upstream product.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout accent"><strong>The gap stays open.</strong> The package database is authoritative for OS-packaged content — but everything above it, the application and its language-ecosystem dependencies, is invisible to the package manager. That layer needs a different source of truth.</div>
+    </div>
+    <div class="slide-num">04 / 12</div>
+  </section>
+
+  <!-- 4. SBOMs AS THE ANSWER -->
+  <section class="slide" id="s4">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">§2</span> SBOMs as the answer</div>
+      <h2>Capture identity <span class="hl">at build time</span>, when it still exists</h2>
+
+      <div class="split">
+        <div>
+          <p class="lead">An SBOM generated during the build has the full dependency-resolution context — the dependency tree, resolved versions, licenses, and package identifiers.</p>
+          <p class="body">That's exactly the information a scanner <em>cannot</em> reconstruct after packaging. So when an SBOM is present, it is the <span class="accent-text">authoritative</span> source of product and component identity — and scanners should prefer it over their own heuristics.</p>
+        </div>
+        <ul class="why-list">
+          <li><span class="marker">01</span><div><h3>Explicit product identity</h3><p>Name, version, and CPE carried in a standard field — no guessing.</p></div></li>
+          <li><span class="marker">02</span><div><h3>Complete component inventory</h3><p>Every component with a Package URL, even after shading or native compilation.</p></div></li>
+          <li><span class="marker">03</span><div><h3>Authoritative, not heuristic</h3><p>Recorded from resolution truth, not inferred from bytes on disk.</p></div></li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-num">04 / 11</div>
+  </section>
+
+  <!-- 5. THE THREE-PARTY CONTRACT -->
+  <section class="slide" id="s5">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">§1</span> The Contract</div>
+      <h2>Three parties, <span class="hl">distinct obligations</span></h2>
+      <p class="lead">Obligations throughout the contract are tagged with the responsible role and an RFC 2119 keyword: <span class="kw must">MUST</span> <span class="kw should">SHOULD</span> <span class="kw may">MAY</span>.</p>
+
+      <div class="oblig">
+        <div class="role-col gen">
+          <h3><span class="chip gen">Generator</span></h3>
+          <div class="who">SBOM tool developers</div>
+          <ul>
+            <li><span class="kw must">MUST</span> Produce compliant SBOMs — structure, naming, placement.</li>
+            <li><span class="kw must">MUST</span> Identify components correctly.</li>
+            <li><span class="kw should">SHOULD</span> Support product-metadata configuration.</li>
+          </ul>
+        </div>
+        <div class="role-col prod">
+          <h3><span class="chip prod">Product Team</span></h3>
+          <div class="who">Engineers configuring the product build</div>
+          <ul>
+            <li><span class="kw must">MUST</span> Configure accurate identity (CPE, supplier, version).</li>
+            <li><span class="kw must">MUST</span> Ensure SBOMs ship in distribution artifacts.</li>
+            <li><span class="kw should">SHOULD</span> Choose the right output mode.</li>
+          </ul>
+        </div>
+        <div class="role-col scan">
+          <h3><span class="chip scan">Scanner</span></h3>
+          <div class="who">Scanner developers &amp; integrators</div>
+          <ul>
+            <li><span class="kw must">MUST</span> Discover SBOMs &amp; extract product/component info.</li>
+            <li><span class="kw must">MUST</span> Match against VEX/CVE sources.</li>
+            <li><span class="kw should">SHOULD</span> Follow external SBOM references.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-note">These role chips recur on every slide that follows — each rule is tagged with who owes it.</p>
+    </div>
+    <div class="slide-num">05 / 11</div>
+  </section>
+
+  <!-- 6. PLACEMENT & NAMING -->
+  <section class="slide" id="s6">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">§3</span> Placement &amp; Naming</div>
+      <h2>Where SBOMs live, <span class="hl">how they're found</span></h2>
+      <p class="lead">A discovery contract: predictable names and locations so scanners know exactly where to look. SBOMs <span class="kw may">MAY</span> be GZip-compressed (<code>.gz</code>) in any location.</p>
+
+      <div class="rules">
+        <div class="rule">
+          <span class="tags"><span class="chip gen">Generator</span></span>
+          <div><span class="kw must">MUST</span> use the <code>*.cdx.json</code> / <code>*.cdx.xml</code> pattern; <span class="kw should">SHOULD</span> default to <code>sbom.cdx.json</code>.</div>
+        </div>
+        <div class="rule">
+          <span class="tags"><span class="chip gen">Gen</span><span class="chip prod">Product</span></span>
+          <div><span class="kw must">MUST</span> place the SBOM at the <strong>distribution root</strong>; external SBOMs sit next to the JAR as <code>&lt;jar&gt;.cdx.json</code>.</div>
+        </div>
+        <div class="rule">
+          <span class="tags"><span class="chip gen">Generator</span></span>
+          <div><span class="kw must">MUST</span> embed SBOMs under <code>META-INF/</code> inside JARs (Quarkus GZips by default).</div>
+        </div>
+        <div class="rule">
+          <span class="tags"><span class="chip scan">Scanner</span></span>
+          <div><span class="kw should">SHOULD</span> read GraalVM native images via the exported <code>sbom</code> / <code>sbom_length</code> symbols (ELF · Mach-O · PE), then GZip-decompress.</div>
+        </div>
+        <div class="rule">
+          <span class="tags"><span class="chip prod">Product Team</span></span>
+          <div><span class="kw may">MAY</span> attach SBOMs as <strong>OCI attestations</strong> (cosign / in-toto) or serve them at the RFC 9472 runtime endpoint <code>/.well-known/sbom</code>.</div>
+        </div>
+      </div>
+
+      <pre><span class="cap">Distribution layout</span>keycloak-26.0.0/
+  <span class="purl">sbom.cdx.json</span>                         <span class="cm">&lt;-- distribution SBOM at root</span>
+  bin/  kc.sh
+  lib/  io.quarkus.quarkus-core-3.15.1.jar
+        org.keycloak.keycloak-server-spi-26.0.0.jar
+  providers/</pre>
+    </div>
+    <div class="slide-num">06 / 11</div>
+  </section>
+
+  <!-- 7. SBOM CONTENT = SINGLE-PRODUCT CASE -->
+  <section class="slide" id="s7">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">§4 · §5.1</span> SBOM Content — the single-product case</div>
+      <h2>Product identity <span class="hl">+</span> component inventory</h2>
+      <p class="lead">The straightforward model: <strong>one product, and every component belongs to it.</strong> Products like Keycloak and Artemis fit here directly.</p>
+
+      <div class="split">
+        <div>
+          <p class="body"><span class="chip prod" style="margin-right:6px">Product Team</span> <span class="kw must">MUST</span> supply CPE, name, version in <code style="color:var(--accent)">metadata.component</code>. The <span class="cpe" style="font-weight:600">CPE</span> is the key that matches VEX/CVE data.</p>
+          <p class="body" style="margin-top:1rem"><span class="chip gen" style="margin-right:6px">Generator</span> <span class="kw must">MUST</span> list every component with a <span class="purl" style="font-weight:600">purl</span>; <span class="kw should">SHOULD</span> add <code style="color:var(--accent)">evidence/occurrences</code> showing where each appears.</p>
+          <p class="body" style="margin-top:1rem"><span class="chip scan" style="margin-right:6px">Scanner</span> matches the product CPE against VEX and applies the result to <em>all</em> components in the SBOM.</p>
+          <div class="callout accent">This is the easy case. The next slides handle what happens when one CPE <em>isn't</em> enough.</div>
+        </div>
+        <pre><span class="cap">sbom.cdx.json (single product)</span>{
+  <span class="k">"metadata"</span>: {
+    <span class="k">"component"</span>: {
+      <span class="k">"type"</span>: <span class="s">"application"</span>,
+      <span class="k">"name"</span>: <span class="s">"keycloak"</span>,
+      <span class="k">"version"</span>: <span class="s">"26.0.0"</span>,
+      <span class="k">"purl"</span>: <span class="purl">"pkg:maven/org.keycloak/…@26.0.0"</span>,
+      <span class="k">"cpe"</span>:  <span class="cpe">"cpe:2.3:a:redhat:keycloak:26.0.0:*:…"</span>,
+      <span class="k">"supplier"</span>: { <span class="k">"name"</span>: <span class="s">"Red Hat"</span> }
+    }
+  },
+  <span class="k">"components"</span>: [
+    { <span class="k">"name"</span>: <span class="s">"netty-buffer"</span>,
+      <span class="k">"purl"</span>: <span class="purl">"pkg:maven/io.netty/netty-buffer@4.1.115.Final"</span>,
+      <span class="k">"evidence"</span>: { <span class="k">"occurrences"</span>: [
+        { <span class="k">"location"</span>: <span class="s">"lib/netty-buffer-4.1.115.Final.jar"</span> }
+      ] } }
+  ]
+}</pre>
+      </div>
+    </div>
+    <div class="slide-num">07 / 11</div>
+  </section>
+
+  <!-- 8. EXTERNAL REFERENCES & ARCHIVE URI -->
+  <section class="slide" id="s8">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">§4.3</span> External references</div>
+      <h2>Following SBOMs <span class="hl">into archives</span></h2>
+      <p class="lead">SBOMs are usually self-contained — treat that as the norm. But a component <span class="kw may">MAY</span> point to its own embedded SBOM via an <code>externalReference</code> of type <code>bom</code>. References are <strong>local only</strong> — remote URLs are out of scope.</p>
+
+      <div class="split">
+        <div>
+          <h3 style="margin-bottom:0.6rem">Archive URI syntax</h3>
+          <pre style="margin-top:0.4rem"><span class="cap">One syntax for occurrences &amp; references</span>&lt;path-from-dist-root&gt;<span class="arw">[!/</span>&lt;entry-in-archive&gt;<span class="arw">]*</span>
+
+web/console.war<span class="arw">!/</span>WEB-INF/lib/nested.jar<span class="arw">!/</span>META-INF/sbom.cdx.json</pre>
+          <p class="body" style="margin-top:1rem">The <code style="color:var(--accent-2)">!</code> separates each archive from the path inside it — and nests for archives within archives. Open the WAR as a ZIP, open the inner JAR, read the SBOM.</p>
+        </div>
+        <div>
+          <pre><span class="cap">Component referencing its own SBOM</span>{
+  <span class="k">"name"</span>: <span class="s">"admin-console"</span>,
+  <span class="k">"purl"</span>: <span class="purl">"pkg:maven/com.example/admin-console@2.0.0?type=war"</span>,
+  <span class="k">"externalReferences"</span>: [
+    {
+      <span class="k">"type"</span>: <span class="s">"bom"</span>,
+      <span class="k">"url"</span>:  <span class="s">"web/admin-console.war<span class="arw">!/</span>META-INF/sbom.cdx.json"</span>
+    }
+  ]
+}</pre>
+          <div class="rule" style="margin-top:1rem">
+            <span class="tags"><span class="chip scan">Scanner</span></span>
+            <div><span class="kw should">SHOULD</span> resolve local refs; components in the referenced SBOM belong to the parent component. Remote URLs <span class="kw may">MAY</span> be skipped.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">08 / 11</div>
+  </section>
+
+  <!-- 9. MULTI-PRODUCT TENSION -->
+  <section class="slide" id="s9">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">§5.2</span> When one CPE isn't enough</div>
+      <h2>Multi-product runtimes <span class="hl">break the simple model</span></h2>
+      <p class="lead">A Quarkus application bundles components from several products at once — each with its own CPE and VEX stream.</p>
+
+      <div class="split">
+        <div>
+          <pre><span class="cap">Which component belongs to whom?</span>metadata.component → <span class="s">"my-quarkus-app"</span>  <span class="cm">(the app)</span>
+
+components:
+  <span class="mem">quarkus-core</span>        <span class="cm">→ Quarkus product (own CPE)</span>
+  <span class="app">my-service</span>          <span class="cm">→ the customer's app code</span>
+  <span class="art">jackson-databind</span>    <span class="cm">→ 3rd-party, maybe many VEX streams</span></pre>
+        </div>
+        <div>
+          <p class="body">The top-level <code style="color:var(--accent)">metadata.component</code> names the deployed app — but the components below it belong to <em>different</em> products.</p>
+          <div class="callout"><strong>The problem:</strong> without knowing which component belongs to which product, a scanner can't route each one to the correct VEX/CVE source. A single product CPE no longer covers the SBOM.</div>
+          <p class="body" style="margin-top:1rem">What's needed is <span class="accent-text">component-to-product attribution</span> — the subject of the next slide.</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">09 / 11</div>
+  </section>
+
+  <!-- 10. COMPONENT-TO-PRODUCT ATTRIBUTION -->
+  <section class="slide" id="s10">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">§5.3</span> Component-to-Product Attribution · <span style="color:var(--amber)">active implementation</span></div>
+      <h2>Attribution via the <span class="hl">dependency graph</span></h2>
+      <p class="lead">Each upstream product is modeled as a <code>framework</code> component carrying its CPE; membership is expressed through <code>provides</code> edges. Native CycloneDX fields, no component duplication.</p>
+
+      <div class="split">
+        <div>
+          <div class="diagram">
+<span class="app">app</span>  <span class="edge">(root · metadata.component — the customer's product)</span>
+ <span class="edge">|</span>
+ <span class="edge">+-- dependsOn --></span> <span class="art">pkg:maven artifacts</span>   <span class="edge">(scope: required)</span>
+ <span class="edge">|</span>
+ <span class="edge">+-- dependsOn --></span> <span class="mem">member product</span>        <span class="excl">(CPE · framework · scope: excluded)</span>
+                   <span class="edge">|</span>
+                   <span class="edge">+-- provides --></span> <span class="art">attributed subset of artifacts</span>
+          </div>
+          <ul class="why-list" style="margin-top:1.3rem">
+            <li><span class="marker">1</span><div><h3>App is the root</h3><p>A product in its own right — no upstream CPE.</p></div></li>
+            <li><span class="marker">2</span><div><h3>Members carry CPEs</h3><p>Non-root <code>framework</code> nodes, <code>scope: excluded</code> — reachable but flagged as non-runtime.</p></div></li>
+            <li><span class="marker">3</span><div><h3>Shared artifacts, no dup</h3><p>Appear in multiple members' <code>provides</code> lists — one canonical bom-ref.</p></div></li>
+          </ul>
+        </div>
+        <div>
+          <pre><span class="cap">Member product + provides edge</span><span class="k">"components"</span>: [{
+  <span class="k">"type"</span>: <span class="s">"framework"</span>,
+  <span class="k">"bom-ref"</span>: <span class="purl">"pkg:maven/…/quarkus-camel-bom@3.15.1.redhat-00001?type=pom"</span>,
+  <span class="k">"purl"</span>:    <span class="purl">"pkg:maven/…/quarkus-camel-bom@3.15.1.redhat-00001?type=pom"</span>,
+  <span class="k">"cpe"</span>:   <span class="cpe">"cpe:2.3:a:redhat:camel_quarkus:3.15.1:*:…"</span>,
+  <span class="k">"scope"</span>: <span class="n">"excluded"</span>,
+  <span class="k">"evidence"</span>: { <span class="k">"identity"</span>: [
+    { <span class="k">"field"</span>: <span class="s">"cpe"</span>, <span class="k">"concludedValue"</span>: <span class="cpe">"cpe:2.3:a:redhat:camel_quarkus:…"</span> }
+  ] }
+}]
+<span class="k">"dependencies"</span>: [
+  { <span class="k">"ref"</span>: <span class="app">"…/my-quarkus-app@1.0.0"</span>,
+    <span class="k">"dependsOn"</span>: [ <span class="art">"…/camel-quarkus-atom@3.15.1"</span>,
+                  <span class="mem">"…/quarkus-camel-bom@…?type=pom"</span> ] },
+  { <span class="k">"ref"</span>: <span class="mem">"…/quarkus-camel-bom@…?type=pom"</span>,
+    <span class="k">"provides"</span>: [ <span class="art">"…/camel-quarkus-atom@3.15.1"</span> ] }
+]</pre>
+        </div>
+      </div>
+
+      <div class="grid grid-2" style="margin-top:1.4rem">
+        <div class="callout accent" style="margin-top:0"><strong>Role rules:</strong> <span class="chip gen">Generator</span> <span class="kw must">MUST</span> model members as excluded <code>framework</code>+CPE and add <code>provides</code> edges. <span class="chip scan">Scanner</span> <span class="kw must">MUST</span> follow <code>provides</code> to pick the right VEX stream; <span class="kw should">SHOULD</span> evaluate shared components against all streams.</div>
+        <div class="callout" style="margin-top:0"><strong>Open questions:</strong> the semantic fit of <code>provides</code> (canonical meaning is "implements a spec"); and whether the consumer (Trustify) keys attribution off <code>component.cpe</code> / <code>evidence.identity</code> vs. the RH CPE-as-<code>bom-ref</code> convention emitted by generators like SBOMer.</div>
+      </div>
+    </div>
+    <div class="slide-num">10 / 11</div>
+  </section>
+
+  <!-- 11. REFERENCE IMPLEMENTATIONS -->
+  <section class="slide" id="s11">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">§6</span> Reference Implementations &amp; Status</div>
+      <h2>Grounded in <span class="hl">working code</span></h2>
+      <p class="lead">This is a proposal — but not a paper one. Every part is backed by a shipping generator.</p>
+
+      <table>
+        <thead><tr><th>Generator</th><th>Approach</th><th>Placement</th></tr></thead>
+        <tbody>
+          <tr><td><b>maven-assembly-sbom</b></td><td>Content-based: hashes every file, matches known Maven artifacts</td><td>Embedded &amp; external, <code>sbom.cdx.json</code></td></tr>
+          <tr><td><b>Quarkus CycloneDX</b></td><td>Dependency-resolution-based, recorded during build</td><td>JAR <code>META-INF/…gz</code> or GraalVM native</td></tr>
+          <tr><td><b>WildFly / EAP Galleon plugin</b></td><td>Provisioning-based, records artifacts as installed</td><td>Distribution root <code>sbom.cdx.json</code></td></tr>
+        </tbody>
+      </table>
+
+      <div class="badges">
+        <span class="badge warn"><b>Status</b> Proposal — not yet a finalized standard</span>
+        <span class="badge"><b>Spec</b> CycloneDX 1.6 · SPDX planned (concepts are spec-agnostic)</span>
+        <span class="badge"><b>Scanner</b> ACS / Clair — SBOM ingestion</span>
+        <span class="badge"><b>Examples</b> Quarkus · WildFly/EAP · Artemis · Keycloak</span>
+      </div>
+
+      <p class="footer-note" style="margin-top:2.2rem">Concepts — placement, naming, product identification, component attribution — are spec-agnostic and will be covered for both CycloneDX and SPDX.</p>
+    </div>
+    <div class="slide-num">11 / 11</div>
+  </section>
+
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const rail = document.getElementById('rail');
+  const deck = document.getElementById('deck');
+
+  slides.forEach((s, i) => {
+    const a = document.createElement('a');
+    a.href = '#' + s.id;
+    a.title = 'Slide ' + (i + 1);
+    a.addEventListener('click', (e) => { e.preventDefault(); s.scrollIntoView({behavior:'smooth'}); });
+    rail.appendChild(a);
+    const num = s.querySelector('.slide-num');
+    if (num) num.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
+  });
+  const dots = Array.from(rail.children);
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        const i = slides.indexOf(en.target);
+        dots.forEach((d, j) => d.classList.toggle('active', j === i));
+        const hint = document.querySelector('.hint');
+        if (hint) hint.style.opacity = (i === 0) ? '0.8' : '0';
+      }
+    });
+  }, { root: deck, threshold: 0.5 });
+  slides.forEach(s => io.observe(s));
+
+  // keyboard navigation
+  let idx = 0;
+  document.addEventListener('keydown', (e) => {
+    const active = dots.findIndex(d => d.classList.contains('active'));
+    idx = active >= 0 ? active : idx;
+    if (['ArrowDown','ArrowRight','PageDown',' '].includes(e.key)) { e.preventDefault(); idx = Math.min(idx+1, slides.length-1); slides[idx].scrollIntoView({behavior:'smooth'}); }
+    if (['ArrowUp','ArrowLeft','PageUp'].includes(e.key)) { e.preventDefault(); idx = Math.max(idx-1, 0); slides[idx].scrollIntoView({behavior:'smooth'}); }
+    if (e.key === 'Home') { e.preventDefault(); slides[0].scrollIntoView({behavior:'smooth'}); }
+    if (e.key === 'End') { e.preventDefault(); slides[slides.length-1].scrollIntoView({behavior:'smooth'}); }
+  });
+</script>
+
+</body>
+</html>
