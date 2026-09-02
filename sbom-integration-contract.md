@@ -23,7 +23,7 @@ This document defines how CycloneDX SBOMs should be generated, bundled with prod
 |------|-----|------------|
 | **Generator** | SBOM tool developers | Produce compliant SBOMs with correct structure, naming, placement, and component identification. Support product metadata configuration. |
 | **Product Team** | Engineers configuring SBOM generation for a product build | Configure generators with accurate product identity (CPE, supplier, version). Choose output mode and ensure SBOMs are included in distribution artifacts. |
-| **Scanner** | Vulnerability scanner developers and integrators | Discover SBOMs, extract product and component information, match against VEX/CVE sources, and follow external SBOM references when present. |
+| **Scanner** | Vulnerability scanner developers and integrators | Discover SBOMs, extract product and component information, match against VEX/CVE sources, and follow local filesystem SBOM references when present. |
 
 Throughout this document, obligations are annotated with RFC 2119 keywords (**MUST**, **SHOULD**, **MAY**) and tagged with the responsible role.
 
@@ -126,16 +126,17 @@ SBOMs can be embedded inside JARs or native executables, allowing them to travel
 
 #### JARs
 
-**Generator** MUST place embedded SBOMs under the `META-INF/` directory using the `*.cdx.json` naming convention.
+**Generator** MUST place embedded SBOMs under the `META-INF/sbom/` directory using the `*.cdx.json` naming convention.
 
-**Generator** MAY GZip-compress embedded SBOMs. If compressed, the file MUST use the `*.cdx.json.gz` extension. Quarkus compresses embedded SBOMs by default.
+**Generator** MAY GZip-compress embedded SBOMs. If compressed, the file MUST use the `*.cdx.json.gz` extension.
 
-**Scanner** MUST open JARs as ZIP archives and check `META-INF/` for CycloneDX SBOM files (both `*.cdx.json` and the compressed `*.cdx.json.gz` form, per [3.1](#31-naming-convention)).
+**Scanner** MUST open JARs as ZIP archives and check `META-INF/sbom/` for CycloneDX SBOM files (both `*.cdx.json` and the compressed `*.cdx.json.gz` form, per [3.1](#31-naming-convention)).
 
 ```
 myapp-1.0-runner.jar
   META-INF/
-    sbom.cdx.json.gz                    <-- GZip-compressed SBOM
+    sbom/
+      sbom.cdx.json                     <-- embedded SBOM
   com/
     example/
       ...
